@@ -1,5 +1,7 @@
 # Collector Checkout for Magento 2
 
+Configuration manual here: [Collector Bank Magento 2 configuration manual](docs/manual.md)
+
 ## Requirements
 * Magento Open Source 2.2.0 or above
 * PHP 7.2 and above
