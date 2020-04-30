@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd"
+>
+    <default>
+        <payment>
+            <collectorbank_checkout>
+                <active>0</active>
+                <model>CollectorCheckoutFacade</model>
+                <order_status>pending</order_status>
+                <title>Collector Bank Checkout</title>
+                <allowspecific>0</allowspecific>
+                <can_edit>0</can_edit>
+                <can_authorize>1</can_authorize>
+                <can_void>1</can_void>
+                <can_cancel>1</can_cancel>
+                <can_capture>1</can_capture>
+                <can_capture_partial>0</can_capture_partial>
+                <can_refund>1</can_refund>
+                <can_refund_partial>0</can_refund_partial>
+                <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
+                <can_use_checkout>1</can_use_checkout>
+                <can_use_internal>0</can_use_internal>
+                <can_use_for_multishipping>0</can_use_for_multishipping>
+                <is_gateway>1</is_gateway>
+
+                <configuration>
+                    <country_code>SE</country_code>
+                    <test_mode>1</test_mode>
+                    <order_status>collectorbank_new</order_status>
+                    <order_accepted_status>collectorbank_acknowledged</order_accepted_status>
+                    <order_holded_status>collectorbank_onhold</order_holded_status>
+                    <order_denied_status>collectorbank_canceled</order_denied_status>
+                </configuration>
+            </collectorbank_checkout>
+        </payment>
+    </default>
+</config>

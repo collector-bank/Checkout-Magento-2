@@ -1,0 +1,10 @@
+<?php
+    $iframe = $block->getIframe();
+?>
+<?php if ($iframe): ?>
+    <?= $iframe ?>
+<?php else: ?>
+<div>
+    <?=__('The url is no longer valid')?>
+</div>
+<?php endif; ?>

@@ -1,0 +1,105 @@
+<li class="item product product-item" data-role="product-item">
+    <div class="product">
+
+        <div class="product-item-details">
+            <div class="column-left">
+                <div class="column-image">
+                    <a data-bind="attr: {href: product_url, title: product_name}" class="product-item-photo">
+                        <!-- ko foreach: $parent.getRegion('itemImage') -->
+                            <!-- ko template: {name: getTemplate(), data: item.product_image} --><!-- /ko -->
+                        <!-- /ko -->
+                    </a>
+                </div>
+
+                <div class="column-product-info">
+                    <strong class="product-item-name">
+                        <!-- ko if: is_visible_in_site_visibility -->
+                            <a data-bind="attr: {href: configure_url}, html: product_name"></a>
+                        <!-- /ko -->
+                        <!-- ko ifnot: is_visible_in_site_visibility-->
+                            <!-- ko if: product_has_url -->
+                            <a data-bind="attr: {href: product_url}, html: product_name"></a>
+                            <!-- /ko -->
+                            <!-- ko ifnot: product_has_url -->
+                                <!-- ko text: product_name --><!-- /ko -->
+                            <!-- /ko -->
+                        <!-- /ko -->
+                    </strong>
+
+                    <!-- ko if: options.length -->
+                    <div class="product options">
+                        <div data-role="content" class="content">
+                            <dl class="product options list">
+                                <!-- ko foreach: { data: options, as: 'option' } -->
+                                <dt class="label"><!-- ko text: option.label --><!-- /ko -->:</dt>
+                                <dd class="values">
+                                    <!-- ko if: Array.isArray(option.value) -->
+                                        <span data-bind="html: option.value.join(', ')"></span>
+                                    <!-- /ko -->
+                                    <!-- ko ifnot: Array.isArray(option.value) -->
+                                        <span data-bind="text: option.value"></span>
+                                    <!-- /ko -->
+                                </dd>
+                                <!-- /ko -->
+                            </dl>
+                        </div>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+
+            <div class="column-right">
+
+                <div class="column-qty qty">
+                    <button
+                            class="collector action qty-button"
+                            data-bind="
+                            click: $parent.minusQty(item_id),
+                            attr: {'data-cart-item': item_id, title: $t('Minus item quantity')}
+                        "
+                            aria-label="Minus item quantity"
+                    >
+                        -
+                    </button>
+
+                    <input data-bind="attr: {
+                            id: 'collector-cart-item-'+item_id+'-qty',
+                            'data-cart-item': item_id,
+                            'data-item-qty': qty,
+                            'data-cart-item-id': product_sku
+                            }, value: qty,
+                            event: {change: $parent.debounce($parent.updateItemQty(item_id), 500)}
+                            "
+                            type="number"
+                            size="4"
+                            class="item-qty cart-item-qty"
+                    >
+
+                    <button
+                            class="collector action qty-button"
+                            data-bind="
+                            click: $parent.plusQty(item_id),
+                            attr: {'data-cart-item': item_id, title: $t('Plus item quantity')}
+                        "
+                            aria-label="Plus item quantity"
+                    >
+                        +
+                    </button>
+                </div>
+                <div class="column-remove">
+                    <span class="cart-items-remove-item" data-bind="
+                            text: $t('Remove'),
+                            attr: {'data-cart-item': item_id, title: $t('Remove item')},
+                            click: $parent.removeItem(item_id)">
+                    </span>
+                </div>
+                <div class="column-price product-item-pricing">
+                    <div
+                        class=""
+                        data-bind="template: { name: 'Magento_Checkout/minicart/item/price', data: item.product_price_subtotal, as: 'price'}"
+                    ></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</li>

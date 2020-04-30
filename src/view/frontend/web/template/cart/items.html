@@ -1,0 +1,15 @@
+<div class="collector-items">
+    <h4 class="collector-checkout-header" data-bind="text: $t('Shopping Cart')"></h4>
+    <div class="items-header">
+        <div class="column-left">
+            <span data-bind="text: $t('Product')"></span>
+        </div>
+        <div class="column-right">
+            <span class="qty-header" data-bind="text: $t('Qty')"></span>
+            <span data-bind="text: $t('Price')"></span>
+        </div>
+    </div>
+    <ol id="collector-cart" class="items" data-bind="foreach: { data: getCartItems(), as: 'item' }">
+        <div data-bind="template: { name: 'Webbhuset_CollectorCheckout/cart/item/default' }"></div>
+    </ol>
+</div>

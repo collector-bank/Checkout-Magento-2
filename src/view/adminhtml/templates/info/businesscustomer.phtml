@@ -1,0 +1,34 @@
+<?php
+    $block->init();
+    $orgNumber = $block->getOrgNumber();
+    $reference = $block->getReference();
+?>
+<?php if ($block->isBusinessCustomer()): ?>
+<section class="admin__page-section order-view-billing-shipping">
+    <div class="admin__page-section-title">
+        <span class="title"><?=__('Business Customer')?></span>
+    </div>
+    <div class="admin__page-section-content">
+        <div class="admin__page-section-item order-payment-method">
+            <div class="admin__page-section-item-content">
+                <table class="admin__table-secondary order-information-table">
+                    <tbody>
+                    <?php if ($orgNumber): ?>
+                    <tr>
+                        <th><?=__('Organization number')?></th>
+                        <td><?=$orgNumber?></td>
+                    </tr>
+                    <?php endif; ?>
+                    <?php if ($reference): ?>
+                    <tr>
+                        <th><?=__('Reference')?></th>
+                        <td><?=$reference;?></td>
+                    </tr>
+                    <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+<?php endif; ?>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="default">
+        <job name="collector_remove_pending_orders"
+             instance="Webbhuset\CollectorCheckout\Cron\RemovePendingOrders"
+             method="run">
+            <schedule>* 1 * * *</schedule>
+        </job>
+    </group>
+</config>

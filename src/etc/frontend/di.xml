@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\UrlInterface">
+        <plugin name="checkout_url_replacer" type="Webbhuset\CollectorCheckout\Plugin\CheckoutUrlReplacer" sortOrder="1" disabled="false"/>
+    </type>
+    <type name="Magento\Checkout\Model\Cart">
+        <plugin name="collector_update_quote_item_change" type="Webbhuset\CollectorCheckout\Plugin\SetNeedsUpdateOnItemChange" sortOrder="1" disabled="false"/>
+    </type>
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="collector_checkout_provider" xsi:type="object">Webbhuset\CollectorCheckout\Gateway\Config</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Webbhuset\CollectorCheckout\Block\Info">
+        <arguments>
+            <argument name="data" xsi:type="array">
+                <item xsi:type="string" name="is_secure_mode">1</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Quote\Observer\SubmitObserver">
+        <plugin name="collector_send_no_email" type="Webbhuset\CollectorCheckout\Plugin\SubmitObserverBeforeExecute" />
+    </type>
+    <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="add_subtotal_to_item" type="Webbhuset\CollectorCheckout\Plugin\AddSubtotalToItem" sortOrder="1"/>
+    </type>
+</config>
