@@ -8,7 +8,7 @@ Configuration manual here: [Collector Bank Magento 2 configuration manual](docs/
 
 ## Install
 Run these commands from the Magento base folder:
-* composer require webbhuset/collector-checkout-magento2
+* composer require collector-bank/collector-checkout-magento2
 * bin/magento module:enable Webbhuset_CollectorCheckout
 * bin/magento setup:upgrade && bin/magento setup:di:compile && bin/magento cache:flush
 
