@@ -1,11 +1,11 @@
 {
-    "name": "webbhuset/collector-checkout-magento2",
+    "name": "collector-bank/collector-checkout-magento2",
     "license": "Apache-2.0",
     "type": "magento2-module",
     "description": "Magento 2 Collector Bank Checkout Module",
     "require": {
-		"webbhuset/collector-php-sdk-payments": "^1.0",
-		"webbhuset/collector-php-sdk-checkout": "^1.0"
+		"collector-bank/collector-php-sdk-payments": "^1.0",
+		"collector-bank/collector-php-sdk-checkout": "^1.0"
     },
     "authors": [
         {
