@@ -18,6 +18,7 @@ After that, head to administration -> Stores -> Configuration -> Payment methods
 ## Upgrade
 To upgrade run 
 * composer update collector-bank/collector-checkout-magento2 --with-dependencies
+
 Then run 
 * bin/magento setup:upgrade && bin/magento setup:di:compile && bin/magento cache:flush 
 from your base folder.
