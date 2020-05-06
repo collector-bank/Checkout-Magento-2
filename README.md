@@ -16,4 +16,8 @@ Run these commands from the Magento base folder:
 After that, head to administration -> Stores -> Configuration -> Payment methods -> Collector Bank Checkout and click configure to configure Collector Checkout.
 
 ## Upgrade
-To upgrade run composer update webbhuset/collector-checkout-magento2 --with-dependencies. Then run bin/magento setup:upgrade && bin/magento setup:di:compile && bin/magento cache:flush from your base folder.
+To upgrade run 
+* composer update collector-bank/collector-checkout-magento2 --with-dependencies
+Then run 
+* bin/magento setup:upgrade && bin/magento setup:di:compile && bin/magento cache:flush 
+from your base folder.
