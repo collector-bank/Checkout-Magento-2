@@ -91,7 +91,6 @@ class BusinessCustomer extends \Magento\Backend\Block\Template
         return $this->orderHandler->getOrgNumber($this->order);
     }
 
-    protected function loadOrder()
     /**
      * Returns the current order
      *
@@ -99,6 +98,7 @@ class BusinessCustomer extends \Magento\Backend\Block\Template
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
+    protected function loadOrder()
     {
         $orderId = $this->request->getParam('order_id');
 

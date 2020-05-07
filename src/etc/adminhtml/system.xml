@@ -500,6 +500,31 @@
                     </depends>
                 </field>
             </group>
+            <group
+                    id="deliverycheckout"
+                    translate="label"
+                    type="text"
+                    sortOrder="30"
+                    showInDefault="1"
+                    showInWebsite="1"
+                    showInStore="1"
+            >
+
+
+                <label>Collector Bank Delivery Checkout Configuration</label>
+                <field
+                        id="active"
+                        translate="label"
+                        type="select"
+                        sortOrder="1"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                >
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
             </group>
         </section>
     </system>

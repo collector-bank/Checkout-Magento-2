@@ -239,9 +239,15 @@ class Adapter
      */
     public function updateFees(\Magento\Quote\Model\Quote $quote) : \Webbhuset\CollectorCheckoutSDK\Session
     {
+        /** @var \Webbhuset\CollectorCheckout\Config\QuoteConfig $config */
         $config = $this->configFactory->create(['quote' => $quote]);
         $adapter = $this->getAdapter($config);
         $collectorSession = new \Webbhuset\CollectorCheckoutSDK\Session($adapter);
+
+        if($config->getIsDeliveryCheckoutActive()) {
+
+            return $collectorSession;
+        }
 
         $fees = $this->quoteConverter->getFees($quote);
         $privateId = $this->quoteDataHandler->getPrivateId($quote);

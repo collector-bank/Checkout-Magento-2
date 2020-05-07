@@ -4,7 +4,13 @@
         <referenceContainer name="left">
             <referenceContainer name="order_additional_info">
                 <block class="Webbhuset\CollectorCheckout\Block\Admin\BusinessCustomer" name="sales_order_view_business" template="Webbhuset_CollectorCheckout::info/businesscustomer.phtml" before="-"/>
+                <!--<block class="Webbhuset\CollectorCheckout\Block\Admin\Carrier" name="order_shipping_view_collector_info" template="Webbhuset_CollectorCheckout::info/shipping.phtml"/>-->
             </referenceContainer>
         </referenceContainer>
+        <referenceBlock name="order_shipping_view">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Webbhuset_CollectorCheckout::info/shipping.phtml</argument>
+            </action>
+        </referenceBlock>
     </body>
 </page>

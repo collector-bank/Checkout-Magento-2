@@ -460,6 +460,30 @@ class Config implements
     }
 
     /**
+     * Returns true if collector delivery checkout is active
+     *
+     * @return bool
+     */
+    public function getIsDeliveryCheckoutActive(): bool
+    {
+        return 1 == $this->getDeliveryCheckoutConfigValue('active');
+    }
+
+
+    protected function getDeliveryCheckoutConfigValue($name)
+    {
+        $storeId = $this->magentoStoreId;
+
+        $value = $this->scopeConfig->getValue(
+            'payment/collectorbank_checkout/deliverycheckout/' . $name,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
+        return $value;
+    }
+
+    /**
      * Get the current mode the collector bank payment method is running in
      *
      * @return string

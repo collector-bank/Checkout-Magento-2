@@ -91,4 +91,16 @@
             </argument>
         </arguments>
     </virtualType>
+    <preference
+            for="Webbhuset\CollectorCheckout\Api\Data\CarrierDataInterface"
+            type="Webbhuset\CollectorCheckout\Carrier\CarrierData"
+    />
+    <preference
+            for="Webbhuset\CollectorCheckout\Api\CarrierDataRepositoryInterface"
+            type="Webbhuset\CollectorCheckout\Carrier\CarrierDataRepository"
+    />
+    <preference
+            for="Magento\Sales\Block\Adminhtml\Order\AbstractOrder"
+            type="Webbhuset\CollectorCheckout\Block\Admin\Carrier"
+    />
 </config>

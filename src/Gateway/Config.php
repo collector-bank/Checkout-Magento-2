@@ -85,6 +85,7 @@ class Config implements ConfigProviderInterface
                     'newsletter_url' => $this->getNewsletterUrl(),
                     'reinit_url' => $this->getReinitUrl(),
                     'update_url' => $this->getUpdateUrl(),
+                    'delivery_checkout' => $this->config->getIsDeliveryCheckoutActive(),
                 ],
             ],
         ];

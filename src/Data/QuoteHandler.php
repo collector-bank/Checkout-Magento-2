@@ -182,6 +182,34 @@ class QuoteHandler
         return $this->getAdditionalData($quote, 'store_id');
     }
 
+
+    /**
+     * Set delivery checkout data on quote
+     *
+     * @param Quote $quote
+     * @param       $shippingInfo
+     * @return QuoteHandler
+     */
+    public function setDeliveryCheckoutData(Quote $quote, $shippingInfo)
+    {
+        return $this->setAdditionalData($quote, 'delivery_checkout_data', json_encode($shippingInfo));
+    }
+
+    /**
+     * Get delivery checkout data from quote
+     *
+     * @param Quote $quote
+     * @return array|null
+     */
+    public function getDeliveryCheckoutData(Quote $quote)
+    {
+        $shippingData = $this->getAdditionalData($quote, 'delivery_checkout_data');
+        $shippingData = json_decode($shippingData);
+
+        return ($shippingData) ? get_object_vars($shippingData) : [];
+    }
+
+
     /**
      * Set newsletter subscribe on quote (subscribes the customer on order place)
      *

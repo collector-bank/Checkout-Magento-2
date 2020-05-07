@@ -35,7 +35,7 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $logger;
 
     protected $config;
-
+    protected $quoteRepository;
     /**
      * Index constructor.
      *
@@ -53,7 +53,8 @@ class Index extends \Magento\Framework\App\Action\Action
         \Webbhuset\CollectorCheckout\Data\OrderHandlerFactory $orderDataHandler,
         \Magento\Framework\View\Result\PageFactory $pageFactory,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
-        \Webbhuset\CollectorCheckout\Config\Config $config
+        \Webbhuset\CollectorCheckout\Config\Config $config,
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
     ) {
         $this->pageFactory      = $pageFactory;
         $this->collectorAdapter = $collectorAdapter;
@@ -61,6 +62,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->orderDataHandler = $orderDataHandler;
         $this->logger           = $logger;
         $this->config           = $config;
+        $this->quoteRepository  = $quoteRepository;
 
         parent::__construct($context);
     }
@@ -76,6 +78,11 @@ class Index extends \Magento\Framework\App\Action\Action
         $page = $this->pageFactory->create();
         try {
             $order = $orderManager->getOrderByPublicToken($reference);
+            $quoteId = $order->getQuoteId();
+            $quote = $this->quoteRepository->get($quoteId);
+            $quote->setIsActive(0);
+            $this->quoteRepository->save($quote);
+
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             $page->getLayout()
                 ->getBlock('collectorbank_success_iframe');

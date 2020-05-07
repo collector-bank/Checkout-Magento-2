@@ -91,7 +91,29 @@ class QuoteUpdater
             $quote->setCustomer($customer);
         }
 
+        if ($this->config->create()->getIsDeliveryCheckoutActive()) {
+
+            $this->setDeliveryCheckoutData($quote, $checkoutData);
+        }
+
         return $quote;
+    }
+
+    public function setDeliveryCheckoutData(
+        Quote $quote,
+        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+    ) {
+        $fees = $checkoutData->getFees();
+        if(!$fees) {
+
+            return;
+        }
+
+        $fees = $fees->toArray();
+        if(isset($fees['shipping'])) {
+
+            $this->quoteHandler->setDeliveryCheckoutData($quote, $fees['shipping']);
+        }
     }
 
     public function setDefaultShippingIfEmpty(
@@ -133,6 +155,12 @@ class QuoteUpdater
 
     protected function getDefaultShippingMethod(Quote $quote)
     {
+        if ($this->config->create()->getIsDeliveryCheckoutActive()) {
+            $gatewayKey = \Webbhuset\CollectorCheckout\Carrier\Collector::GATEWAY_KEY;
+
+            return $gatewayKey . '_' . $gatewayKey;
+        }
+
         $shippingAddress = $quote->getShippingAddress();
         $rates = $this->shippingMethodManagement->getList($quote->getId());
 

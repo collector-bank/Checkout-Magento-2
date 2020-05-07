@@ -7,29 +7,24 @@ use Webbhuset\CollectorCheckout\Exception\QuoteNotInSyncException;
 
 class QuoteComparer
 {
-    protected $adapter;
     protected $quoteConverter;
     protected $config;
     protected $storeManager;
 
     public function __construct(
-        \Webbhuset\CollectorCheckout\AdapterFactory $adapter,
         \Webbhuset\CollectorCheckout\QuoteConverter $quoteConverter,
         \Webbhuset\CollectorCheckout\Config\Config $config,
         \Magento\Store\Model\StoreManagerInterface $storeManager
     ) {
-        $this->adapter        = $adapter;
         $this->quoteConverter = $quoteConverter;
         $this->config         = $config;
         $this->storeManager   = $storeManager;
     }
 
     public function isQuoteInSync(
-        \Magento\Quote\Api\Data\CartInterface $quote
+        \Magento\Quote\Api\Data\CartInterface $quote,
+        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ): bool {
-        $adapter = $this->adapter->create();
-        $checkoutData = $adapter->acquireCheckoutInformationFromQuote($quote);
-
         $grandTotalInSync = $this->isGrandTotalSync($quote, $checkoutData);
         if (!$grandTotalInSync) {
             throw new QuoteNotInSyncException(new Phrase('Grand total not in sync'));

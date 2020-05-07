@@ -71,9 +71,13 @@ define([
             document.addEventListener('collectorCheckoutReloadedByUser', self.listener.bind(self));
             document.addEventListener('collectorCheckoutExpired', self.listener.bind(self));
             document.addEventListener('collectorCheckoutResumed', self.listener.bind(self));
+            document.addEventListener('collectorCheckoutShippingUpdated', self.listener.bind(self));
 
             var event = {type: "update", detail: window.checkoutConfig.quoteData.collectorbank_public_id}
-            this.addressUpdated(event);
+
+            if(!window.checkoutConfig.payment.collector_checkout.delivery_checkout){
+                this.addressUpdated(event);
+            }
 
             this._super();
         },
@@ -88,6 +92,17 @@ define([
                     this.addressUpdated(event);
                     break;
 
+                case 'collectorCheckoutShippingUpdated':
+                    /*
+                        Occurs when the checkout client-side detects any change to customer information,
+                        such as a changed email, mobile phone number or delivery address.
+                        This event is also fired the first time the customer is identified.
+                    */
+                    console.log("shipping updated");
+                    this.addressUpdated(event);
+                    break;
+
+
                 case 'collectorCheckoutOrderValidationFailed':
                     /*
                         This event is only used if you use the optional validate order functionality.
@@ -98,28 +113,30 @@ define([
                     break;
 
                 case 'collectorCheckoutLocked':
+                    this.lockCartForInput(true);
                     /*
                         Occurs when no user input should be accepted, for instance during processing of a purchase.
                     */
                     break;
 
                 case 'collectorCheckoutUnlocked':
-                        /*
-                            Occurs after a locked event when it is safe to allow user input again.
-                            For instance after a purchase has been processed (regardless of whether the purchase was successful or not).
-                        */
-                        var url = this.getReinitUrl();
-                        var data = { publicId: event.detail };
-                        $.ajax({
-                            url: url,
-                            data: data,
-                            type: 'post',
-                            dataType: 'json',
-                            context: this,
-                        })
-                        .fail(function(response) {
-                            console.error(response);
-                        });
+                    this.lockCartForInput(false);
+                    /*
+                        Occurs after a locked event when it is safe to allow user input again.
+                        For instance after a purchase has been processed (regardless of whether the purchase was successful or not).
+                    */
+                    var url = this.getReinitUrl();
+                    var data = { publicId: event.detail };
+                    $.ajax({
+                        url: url,
+                        data: data,
+                        type: 'post',
+                        dataType: 'json',
+                        context: this,
+                    })
+                    .fail(function(response) {
+                        console.error(response);
+                    });
                     break;
 
                 case 'collectorCheckoutReloadedByUser':
@@ -145,6 +162,24 @@ define([
                         Occurs when the checkout has loaded new data and is back in its normal state after a suspend.
                     */
                     break;
+            }
+        },
+
+        lockCartForInput: function(lock) {
+            if (lock) {
+                $('.collectorcheckout-index-index .collector.action.qty-button').attr('disabled','disabled');
+                $('.collectorcheckout-index-index .item-qty.cart-item-qty').attr('disabled','disabled');
+                $('.collectorcheckout-index-index .co-shipping-method-form .radio').attr('disabled','disabled');
+                $('.collectorcheckout-index-index .form-discount .input-text').attr('disabled','disabled');
+                $('.collectorcheckout-index-index .form-discount .action').attr('disabled','disabled');
+                $('.collectorcheckout-index-index .cart-items-remove-item').hide();
+            } else{
+                $('.collectorcheckout-index-index .collector.action.qty-button').removeAttr('disabled');
+                $('.collectorcheckout-index-index .item-qty.cart-item-qty').removeAttr('disabled');
+                $('.collectorcheckout-index-index .co-shipping-method-form .radio').removeAttr('disabled');
+                $('.collectorcheckout-index-index .form-discount .input-text').removeAttr('disabled');
+                $('.collectorcheckout-index-index .form-discount .action').removeAttr('disabled');
+                $('.collectorcheckout-index-index .cart-items-remove-item').show();
             }
         },
 
@@ -202,9 +237,11 @@ define([
                 function (response) {
                     var address = quote.shippingAddress();
 
-                    address.postcode = response.postcode;
-                    address.region = response.region;
-                    address.countryId = response.country_id;
+                    if (address) {
+                        address.postcode = response.postcode;
+                        address.region = response.region;
+                        address.countryId = response.country_id;
+                    }
 
                     checkoutData.setSelectedShippingRate(response.shipping_method);
 

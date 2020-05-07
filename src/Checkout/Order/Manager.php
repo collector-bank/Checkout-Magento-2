@@ -72,6 +72,7 @@ class Manager
      * @var \Webbhuset\CollectorCheckout\Config\Config|\Webbhuset\CollectorCheckout\Config\ConfigFactory
      */
     protected $config;
+    protected $carrierManager;
 
     /**
      * Manager constructor.
@@ -106,7 +107,8 @@ class Manager
         \Webbhuset\CollectorCheckout\Invoice\AdministrationFactory $invoice,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
         \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
-        \Webbhuset\CollectorCheckout\Config\Config $config
+        \Webbhuset\CollectorCheckout\Config\Config $config,
+        \Webbhuset\CollectorCheckout\Carrier\Manager $carrierManager
     ) {
         $this->cartManagement        = $cartManagement;
         $this->collectorAdapter      = $collectorAdapter;
@@ -123,28 +125,31 @@ class Manager
         $this->logger                = $logger;
         $this->subscriberFactory     = $subscriberFactory;
         $this->config                = $config;
+        $this->carrierManager        = $carrierManager;
     }
 
     /**
-     * Create order from quote and return order id
+     * Create order from quote and return increment order id
      *
      * @param $quoteId
-     * @return string orderId
+     * @return int incrementOrderId
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function createOrder(\Magento\Quote\Model\Quote $quote): string
     {
-        $orderId = $this->quoteManagement->placeOrder($quote->getId());
+        $quoteId = $quote->getId();
+        $orderId = $this->quoteManagement->placeOrder($quoteId);
+
         $order = $this->orderRepository->get($orderId);
-        $incrementId = $order->getIncrementId();
+        $incrementOrderId = $order->getIncrementId();
 
         $this->logger->addInfo(
-            "Submitted order increment id: {$incrementId}. qouteId: {$quote->getId()} "
+            "Submitted order order id: {$incrementOrderId}. qouteId: {$quoteId} "
         );
 
-        return $incrementId;
+        return $incrementOrderId;
     }
 
     /**
@@ -232,22 +237,29 @@ class Manager
         switch ($paymentResult) {
             case PurchaseResult::PRELIMINARY:
                 $result = $this->acknowledgeOrder($order, $checkoutData);
+                $this->orderRepository->save($order);
+
+                if ($config->getIsDeliveryCheckoutActive()) {
+
+                    $order = $this->carrierManager->saveShipmentDataOnOrder($order->getId(), $checkoutData);
+                }
                 break;
 
             case PurchaseResult::ON_HOLD:
                 $result = $this->holdOrder($order, $checkoutData);
+                $this->orderRepository->save($order);
                 break;
 
             case PurchaseResult::REJECTED:
                 $result = $this->cancelOrder($order, $checkoutData);
+                $this->orderRepository->save($order);
                 break;
 
             case PurchaseResult::ACTIVATED:
                 $result = $this->activateOrder($order, $checkoutData);
+                $this->orderRepository->save($order);
                 break;
-
         }
-        $this->orderRepository->save($order);
 
         return $result;
     }
@@ -265,7 +277,8 @@ class Manager
         \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ):array {
         $orderStatusBefore = $this->orderManagement->getStatus($order->getId());
-        $orderStatusAfter  = $this->configFactory->create(['order' => $order])->getOrderStatusAcknowledged();
+        $config = $this->configFactory->create(['order' => $order]);
+        $orderStatusAfter  = $config->getOrderStatusAcknowledged();
 
         if ($orderStatusAfter == $orderStatusBefore) {
             return [

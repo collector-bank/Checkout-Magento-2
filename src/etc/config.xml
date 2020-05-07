@@ -35,5 +35,16 @@
                 </configuration>
             </collectorbank_checkout>
         </payment>
+        <carriers>
+            <collectorshipping>
+                <active>1</active>
+                <allowed_methods>delivery</allowed_methods>
+                <methods>delivery</methods>
+                <model>Webbhuset\CollectorCheckout\Carrier\Collector</model>
+                <name>Collector shipping</name>
+                <title>collector</title>
+                <handling_type>F</handling_type>
+            </collectorshipping>
+        </carriers>
     </default>
 </config>

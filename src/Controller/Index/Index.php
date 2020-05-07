@@ -124,6 +124,10 @@ class Index extends \Magento\Framework\App\Action\Action
         );
         $iframe = \Webbhuset\CollectorCheckoutSDK\Iframe::getScript($iframeConfig, $this->config->getMode());
 
+        if ($this->config->getIsDeliveryCheckoutActive()) {
+            $page->getConfig()->addBodyClass('delivery-checkout');
+        }
+
         $block = $page
             ->getLayout()
             ->getBlock('collectorbank_checkout_iframe')

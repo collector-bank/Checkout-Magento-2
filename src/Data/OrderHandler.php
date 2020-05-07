@@ -201,6 +201,60 @@ class OrderHandler
         return (1 == (int)$newsletterSubscribe) ? true : false;
     }
 
+
+    /**
+     * Set delivery checkout shipment data on quote
+     *
+     * @param Order $quote
+     * @param       $shippingInfo
+     * @return OrderHandler
+     */
+    public function setDeliveryCheckoutShipmentData(Order $order, $shippingInfo)
+    {
+        return $this->setAdditionalData($order, 'delivery_checkout_shipment_data', json_encode($shippingInfo));
+    }
+
+    /**
+     * Get delivery checkout shipment data from quote
+     *
+     * @param Order $quote
+     * @return array|null
+     */
+    public function getDeliveryCheckoutShipmentData(Order $order)
+    {
+        $shippingData = $this->getAdditionalData($order, 'delivery_checkout_shipment_data');
+        $shippingData = json_decode($shippingData);
+
+        return ($shippingData) ? get_object_vars($shippingData) : [];
+    }
+
+
+    /**
+     * Set delivery checkout data on quote
+     *
+     * @param Quote $quote
+     * @param       $shippingInfo
+     * @return OrderHandler
+     */
+    public function setDeliveryCheckoutData(Order $order, $shippingInfo)
+    {
+        return $this->setAdditionalData($order, 'delivery_checkout_data', json_encode($shippingInfo));
+    }
+
+    /**
+     * Get delivery checkout data from quote
+     *
+     * @param Quote $quote
+     * @return array|null
+     */
+    public function getDeliveryCheckoutData(Order $order)
+    {
+        $shippingData = $this->getAdditionalData($order, 'delivery_checkout_data');
+        $shippingData = json_decode($shippingData);
+
+        return ($shippingData) ? get_object_vars($shippingData) : [];
+    }
+    
     /**
      * @param Order  $order
      * @param string $name
