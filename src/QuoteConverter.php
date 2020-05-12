@@ -122,6 +122,7 @@ class QuoteConverter
         $vat                    = (float) $quoteItem->getTaxPercent();
         $requiresElectronicId   = (bool) $this->requiresElectronicId($quoteItem);
         $sku                    = (string) $quoteItem->getSku() . $optionText;
+        $weight                 = (float) $quoteItem->getWeight();
 
         $item = new Item(
             $id,
@@ -130,7 +131,8 @@ class QuoteConverter
             $quantity,
             $vat,
             $requiresElectronicId,
-            $sku
+            $sku,
+            $weight
         );
 
         return $item;
