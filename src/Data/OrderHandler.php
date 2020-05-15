@@ -268,4 +268,78 @@ class OrderHandler
 
         return $this->setData($order, $data);
     }
+
+
+    /**
+     * Set decimal rounding credited
+     *
+     * @param Order $order
+     * @param       $reference
+     * @return OrderHandler
+     */
+    public function setDecimalRoundingCredited(Order $order)
+    {
+        return $this->setAdditionalData($order, 'decimal_rounding_credited', true);
+    }
+
+
+    /**
+     * Get get decimal rounding credited
+     *
+     * @param Order $order
+     * @return mixed|null
+     */
+    public function getDecimalRoundingCredited(Order $order)
+    {
+        return (bool) $this->getAdditionalData($order, 'decimal_rounding_credited');
+    }
+
+    /**
+     * Set decimal rounding credited
+     *
+     * @param Order $order
+     * @param       $reference
+     * @return OrderHandler
+     */
+    public function setDecimalRoundingInvoiced(Order $order)
+    {
+        return $this->setAdditionalData($order, 'decimal_rounding_invoiced', true);
+    }
+
+
+    /**
+     * Get get decimal rounding credited
+     *
+     * @param Order $order
+     * @return mixed|null
+     */
+    public function getDecimalRoundingInvoiced(Order $order)
+    {
+        return (bool) $this->getAdditionalData($order, 'decimal_rounding_invoiced');
+    }
+
+
+    /**
+     * Set invoice number
+     *
+     * @param Order $order
+     * @param       $reference
+     * @return OrderHandler
+     */
+    public function setInvoiceNumber(Order $order, $invoiceNumber)
+    {
+        return $this->setAdditionalData($order, 'invoice_number', $invoiceNumber);
+    }
+
+
+    /**
+     * Get invoice number
+     *
+     * @param Order $order
+     * @return mixed|null
+     */
+    public function getInvoiceNumber(Order $order)
+    {
+        return $this->getAdditionalData($order, 'invoice_number');
+    }
 }

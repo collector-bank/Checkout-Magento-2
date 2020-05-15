@@ -34,7 +34,24 @@ class CollectorBankCommand implements CommandInterface
      * @var \Webbhuset\CollectorCheckout\Logger\Logger
      */
     protected $logger;
+    /**
+     * @var \Webbhuset\CollectorCheckout\Invoice\RowMatcher
+     */
+    protected $rowMatcher;
+    /**
+     * @var \Magento\Framework\Message\ManagerInterface
+     */
+    protected $messageManager;
+    /**
+     * @var \Webbhuset\CollectorCheckout\Data\OrderHandler
+     */
+    protected $orderHandler;
+    /**
+     * @var \Magento\Sales\Model\OrderRepository
+     */
+    protected $orderRepository;
 
+    protected $invoiceHandler;
     /**
      * CollectorBankCommand constructor.
      *
@@ -49,13 +66,23 @@ class CollectorBankCommand implements CommandInterface
         \Webbhuset\CollectorCheckout\Data\PaymentHandlerFactory $paymentHandler,
         \Webbhuset\CollectorCheckout\Invoice\Administration $invoice,
         \Webbhuset\CollectorCheckout\Invoice\Transaction\ManagerFactory $transaction,
-        \Webbhuset\CollectorCheckout\Logger\Logger $logger
+        \Webbhuset\CollectorCheckout\Logger\Logger $logger,
+        \Webbhuset\CollectorCheckout\Invoice\RowMatcher $rowMatcher,
+        \Magento\Framework\Message\ManagerInterface $messageManager,
+        \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+        \Webbhuset\CollectorCheckout\Invoice\RowMatcher\InvoiceHandler $invoiceHandler
     ) {
-        $this->method         = $client['method'];
-        $this->paymentHandler = $paymentHandler;
-        $this->invoice        = $invoice;
-        $this->transaction    = $transaction;
-        $this->logger         = $logger;
+        $this->method           = $client['method'];
+        $this->paymentHandler   = $paymentHandler;
+        $this->invoice          = $invoice;
+        $this->transaction      = $transaction;
+        $this->logger           = $logger;
+        $this->rowMatcher       = $rowMatcher;
+        $this->messageManager   = $messageManager;
+        $this->orderHandler     = $orderHandler;
+        $this->orderRepository  = $orderRepository;
+        $this->invoiceHandler   = $invoiceHandler;
     }
 
     /**
@@ -78,23 +105,47 @@ class CollectorBankCommand implements CommandInterface
      */
     public function capture($data)
     {
-        $payment = $this->extractPayment($data);
+        $payment    = SubjectReader::readPayment($data)->getPayment();
+        $order      = $payment->getOrder();
+        $invoice    = $order->getInvoiceCollection()->getLastItem();
 
-        $paymentHandler = $this->paymentHandler->create();
+        $articleList = $this->rowMatcher->invoiceToArticleList($invoice, $order);
 
         try {
-            $invoiceNo = $paymentHandler->getPurchaseIdentifier($payment);
-            $orderId = $payment->getOrder()->getId();
+            $invoiceNo  = $this->getPurchaseIdentifier($order);
+            $orderId = $order->getId();
 
-            $response = $this->invoice->activateInvoice(
+            if ($this->invoiceHandler->isDecimalRoundingInvoiced($order)) {
+                $articleList->removeDecimalRounding();
+            } else{
+                $this->invoiceHandler->setDecimalRoundingIsInvoiced($order);
+            }
+
+            $response = $this->invoice->partActivateInvoice(
                 $invoiceNo,
-                $orderId
+                $articleList,
+                $orderId,
+                $invoiceNo
             );
+
+            $this->saveNewInvoiceNumber($order, $response);
+            $this->addCaptureSuccessMessage($response);
+
+            $this->transaction->create()->addTransaction(
+                $payment->getOrder(),
+                TransactionInterface::TYPE_CAPTURE,
+                false,
+                $response
+            );
+
         } catch (ResponseError $e) {
             $incrementOrderId = (string)$payment->getOrder()->getIncrementId();
             $this->logger->addCritical(
                 "Response error on capture. increment orderId: {$incrementOrderId} invoiceNo {$invoiceNo}" .
                 $e->getMessage()
+            );
+            throw new \Webbhuset\CollectorCheckout\Exception\Exception(
+                __($e->getMessage())
             );
 
             return false;
@@ -106,6 +157,69 @@ class CollectorBankCommand implements CommandInterface
         );
 
         return true;
+    }
+
+
+    /**
+     * Save collector invoice number on the order
+     *
+     * @param $order
+     * @param $response
+     */
+    public function saveNewInvoiceNumber($order, $response)
+    {
+        if (isset($response['NewInvoiceNo'])) {
+            $newInvoiceNo = $response['NewInvoiceNo'];
+            $this->orderHandler->setInvoiceNumber($order, $newInvoiceNo);
+            $this->orderRepository->save($order);
+        }
+    }
+
+
+    /**
+     * Get collector invoice number on an order
+     *
+     * @param $order
+     * @return mixed|string|null
+     */
+    public function getPurchaseIdentifier($order)
+    {
+        $invoiceNumber = $this->orderHandler->getInvoiceNumber($order);
+        if($invoiceNumber) {
+
+            return $invoiceNumber;
+        }
+        $payment = $order->getPayment();
+
+        return $this->paymentHandler->create()->getPurchaseIdentifier($payment);
+    }
+
+
+    /**
+     * Add success messages to show in admin for capture invoice
+     *
+     * @param $response
+     */
+    public function addCaptureSuccessMessage($response)
+    {
+        $message = [];
+
+        if (isset($response['TotalAmount'])) {
+            $totalAmount = $response['TotalAmount'];
+            $message[] = __('The invoice was activated for %1', $totalAmount);
+        }
+        if (isset($response['NewInvoiceNo'])) {
+            $newInvoiceNo = $response['NewInvoiceNo'];
+            $message[] = __('The new invoice number is: %1', $newInvoiceNo);
+        }
+        if (isset($response['InvoiceUrl'])) {
+            $invoiceUrl = $response['InvoiceUrl'];
+            $message[] = __('You can access the invoice using this link: %1', $invoiceUrl);
+        }
+        if (!empty($message)) {
+            $messageText = implode(". ", $message);
+            $this->messageManager->addSuccessMessage($messageText);
+        }
     }
 
     /**
@@ -145,6 +259,35 @@ class CollectorBankCommand implements CommandInterface
                 $invoiceNo,
                 $orderId
             );
+        $payment    = SubjectReader::readPayment($payment)->getPayment();
+        $order      = $payment->getOrder();
+        $creditMemo = $payment->getCreditmemo();
+
+        $this->adjustInvoice($creditMemo, $payment);
+
+        $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $order);
+
+        if(count($articleList->getArticleList()) == 0){
+
+            return true;
+        }
+
+        try {
+            $invoiceNo = $creditMemo->getInvoice()->getTransactionId();
+            $orderId = (int)$payment->getOrder()->getId();
+
+            $response = $this->invoice->partCreditInvoice(
+                $invoiceNo,
+                $articleList,
+                $orderId
+            );
+
+            $this->transaction->create()->addTransaction(
+                $payment->getOrder(),
+                TransactionInterface::TYPE_REFUND,
+                $response
+            );
+
         } catch (ResponseError $e) {
             $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
             $this->logger->addCritical(
@@ -162,6 +305,80 @@ class CollectorBankCommand implements CommandInterface
 
         return true;
     }
+
+    /**
+     * Adjust a collector invoice with negative or positive adjustment fees
+     *
+     * @param \Magento\Sales\Model\Order\Creditmemo $creditMemo
+     * @param                                       $payment
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Webbhuset\CollectorCheckout\Exception\Exception
+     */
+    protected function adjustInvoice(
+        \Magento\Sales\Model\Order\Creditmemo $creditMemo,
+        $payment
+    ) {
+        $invoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
+
+        if (count($invoiceRows) == 0) {
+
+            return;
+        }
+
+        try {
+            $invoiceNo = $creditMemo->getInvoice()->getTransactionId();
+            $orderId = (int)$payment->getOrder()->getId();
+
+            $response = $this->invoice->adjustInvoice(
+                $invoiceNo,
+                $invoiceRows,
+                $orderId
+            );
+
+            $this->transaction->create()->addTransaction(
+                $payment->getOrder(),
+                TransactionInterface::TYPE_REFUND,
+                $response
+            );
+
+        } catch (ResponseError $e) {
+            $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
+            $this->logger->addCritical(
+                "Response error on adjustment of invoice: {$incrementOrderId} invoiceNo {$invoiceNo}" .
+                $e->getMessage()
+            );
+            throw new \Webbhuset\CollectorCheckout\Exception\Exception(
+                __($e->getMessage())
+            );
+        }
+    }
+
+
+    /**
+     * Get adjustments as collector invoice rows
+     *
+     * @param \Magento\Sales\Model\Order\Creditmemo $creditMemo
+     * @return array
+     */
+    public function getAdjustmentsInvoiceRows(
+        \Magento\Sales\Model\Order\Creditmemo $creditMemo
+    ) {
+        $invoiceRows = [];
+
+        if (0 < $creditMemo->getBaseAdjustmentNegative()) {
+            $adjustmentFee = $creditMemo->getBaseAdjustmentNegative();
+            $invoiceRows[] = $this->rowMatcher->adjustmentToInvoiceRows($adjustmentFee)->toArray();
+        }
+
+        if (0 < $creditMemo->getBaseAdjustmentPositive()) {
+            $adjustmentFee = (-1)*$creditMemo->getBaseAdjustmentPositive();
+            $invoiceRows[] = $this->rowMatcher->adjustmentToInvoiceRows($adjustmentFee)->toArray();
+        }
+
+        return $invoiceRows;
+    }
+
 
     /**
      * Void / cancel the order

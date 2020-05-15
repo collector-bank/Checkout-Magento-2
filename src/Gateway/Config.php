@@ -27,6 +27,10 @@ class Config implements ConfigProviderInterface
      * Remove order older than this number
      */
     const REMOVE_PENDING_ORDERS_HOURS = 5;
+    /**
+     * Swish payment name
+     */
+    const PAYMENT_METHOD_SWISH = "Swish";
 
     /**
      * @var \Webbhuset\CollectorCheckout\Config\Config
@@ -101,11 +105,21 @@ class Config implements ConfigProviderInterface
         return $this->urlBuilder->getUrl('collectorcheckout/newsletter');
     }
 
+    /**
+     * Get url for reinitalizing collector checkout
+     *
+     * @return string
+     */
     public function getReinitUrl()
     {
         return $this->urlBuilder->getUrl('collectorcheckout/reinit');
     }
 
+    /**
+     * Get url for updating information in the collector checkout
+     *
+     * @return string
+     */
     public function getUpdateUrl()
     {
         return $this->urlBuilder->getUrl('collectorcheckout/update');

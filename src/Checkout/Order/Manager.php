@@ -259,6 +259,10 @@ class Manager
                 $result = $this->activateOrder($order, $checkoutData);
                 $this->orderRepository->save($order);
                 break;
+
+	    case PurchaseResult::COMPLETED:
+                $result = $this->completeOrder($order, $checkoutData);
+                break;
         }
 
         return $result;
@@ -442,6 +446,22 @@ class Manager
             'order_status_before' => $orderStatusBefore,
             'order_status_after' => \Magento\Sales\Model\Order::STATE_PROCESSING
         ];
+    }
+
+    /**
+     * Called on swishorders that are already completed when they are placed.
+     * Invoices the order offline
+     *
+     * @param \Magento\Sales\Api\Data\OrderInterface  $order
+     * @param \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+     * @return array
+     */
+    public function completeOrder(
+        \Magento\Sales\Api\Data\OrderInterface $order,
+        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+    ):array {
+
+        return $this->activateOrder($order, $checkoutData);
     }
 
     /**
