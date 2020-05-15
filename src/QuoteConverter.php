@@ -45,10 +45,32 @@ class QuoteConverter
         if ($roundingError) {
             $items = array_merge($items, [$roundingError]);
         }
-
+        $items = $this->renameDuplicates($items);
         $cart = new Cart($items);
 
         return $cart;
+    }
+
+    protected function renameDuplicates($items)
+    {
+        $duplicates = [];
+
+        foreach($items as $item) {
+
+            $sku = $item->getId();
+
+            if (!isset($duplicates[$sku])) {
+                $duplicates[$sku] = 0;
+            } else{
+                $duplicates[$sku] = $duplicates[$sku]+1;
+                $num = $duplicates[$sku];
+
+                $newSku = $sku ."-" . $num;
+                $item->setId($newSku);
+            }
+        }
+
+        return $items;
     }
 
     protected function extractQuoteItem($quoteItem)
@@ -68,11 +90,20 @@ class QuoteConverter
 
         $childrenTotal = 0;
         foreach ($quoteItem->getChildren() as $child) {
-            $childrenItem = $this->getCartItem($child, "- ");
+            $childrenItem = $this->getCartItem(
+                $child, "- ",
+                false,
+                $quoteItem->getQty()
+            );
+
             $items[] = $childrenItem;
             $childrenTotal += $childrenItem->getUnitPrice();
             if ((float)$child->getDiscountAmount()) {
-                $items[] = $this->getDiscountItem($child,'- ' . __('Discount: '));
+                $items[] = $this->getDiscountItem(
+                    $child,
+                    '- ' . __('Discount: '),
+                    $quoteItem->getQty()
+                );
             }
         }
         $bundleParent = [];
@@ -111,18 +142,22 @@ class QuoteConverter
 
     }
 
-    public function getCartItem(\Magento\Quote\Model\Quote\Item $quoteItem, $prefix = "",  $priceIsZero = false) : Item
-    {
+    public function getCartItem(
+        \Magento\Quote\Model\Quote\Item $quoteItem,
+        $prefix = "",
+        $priceIsZero = false,
+        $parentQty = 1)
+    : Item {
         $optionText = $this->getSelectedOptionText($quoteItem);
 
         $id                     = (string) $prefix . $quoteItem->getSku();
         $description            = (string) $quoteItem->getName() . $optionText;
         $unitPrice              = ($priceIsZero) ? 0.00: (float) $quoteItem->getPriceInclTax();
-        $quantity               = (int) $quoteItem->getQty();
+        $weight                 = (float) $quoteItem->getWeight();
+        $quantity               = (int) $quoteItem->getQty() * $parentQty;
         $vat                    = (float) $quoteItem->getTaxPercent();
         $requiresElectronicId   = (bool) $this->requiresElectronicId($quoteItem);
-        $sku                    = (string) $quoteItem->getSku() . $optionText;
-        $weight                 = (float) $quoteItem->getWeight();
+        $sku                    = (string) $quoteItem->getItemId();
 
         $item = new Item(
             $id,
@@ -138,8 +173,11 @@ class QuoteConverter
         return $item;
     }
 
-    public function getDiscountItem(\Magento\Quote\Model\Quote\Item $quoteItem, $prefix = "")
-    {
+    public function getDiscountItem(
+        \Magento\Quote\Model\Quote\Item $quoteItem,
+        $prefix = "",
+        $parentQty = 1
+    ) {
         $discountAmount = $quoteItem->getDiscountAmount();
         $taxPercent = $quoteItem->getTaxPercent();
         $priceIncludesTax = $this->scopeConfig->getValue(
@@ -153,17 +191,19 @@ class QuoteConverter
         }
 
         $id                     = (string) $prefix . $quoteItem->getSku();
-        $description            = (string) __('collector_discount');
+        $description            = (string) __('Discount');
         $unitPrice              = (float) ($discountAmount + $discountTax) * -1;
-        $quantity               = (int) 1;
+        $quantity               = (int) $quoteItem->getQty() * $parentQty;
         $vat                    = (float) 0;
 
         $item = new Item(
             $id,
             $description,
-            round($unitPrice, 2),
+            round($unitPrice/$quantity, 2),
             $quantity,
-            $vat
+            $vat,
+            null,
+            $quoteItem->getItemId(). ":discount"
         );
 
         return $item;
@@ -199,7 +239,8 @@ class QuoteConverter
             $id,
             $description,
             $unitPrice,
-            $vatPercent
+            $vatPercent,
+            'shipping'
         );
 
         return $fee;

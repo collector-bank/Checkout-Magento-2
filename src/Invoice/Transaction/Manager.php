@@ -36,19 +36,36 @@ class Manager
      */
     public function addTransaction(
         \Magento\Sales\Api\Data\OrderInterface $order,
-        $type,
-        $status = false
+	$type,
+	$status = false,
+        $response = []
     ) {
         $payment = $order->getPayment();
 
-        $id            = $order->getIncrementId();
-        $txnId         = "{$id}-{$type}";
-        $parentTransId = $payment->getLastTransId();
+        $id             = $order->getIncrementId();
+        $txnId          = "{$id}-{$type}";
+        $parentTransId  = $payment->getLastTransId();
+        $paymentData    = $payment->getAdditionalInformation();
+
+        if (!empty($response)) {
+            if(isset($response['InvoiceUrl'])) {
+                $paymentData['invoice_url'] = $response['InvoiceUrl'];
+            }
+            if(isset($response['CorrelationId'])) {
+                $purchaseIdentifier = $response['CorrelationId'];
+                $paymentData['purchase_identifier'] = $purchaseIdentifier;
+                $txnId = $purchaseIdentifier;
+            }
+            if(isset($response['TotalAmount'])) {
+                $paymentData['amount_to_pay'] = $response['TotalAmount'];
+            }
+        }
+
         $payment->setTransactionId($txnId)
             ->setIsTransactionClosed($status)
             ->setTransactionAdditionalInfo(
                 \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
-                $payment->getAdditionalInformation()
+                $paymentData
             );
 
         $transaction = $payment->addTransaction($type, null, true);

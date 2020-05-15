@@ -120,6 +120,61 @@ class Administration
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
+    public function partCreditInvoice(
+        string $invoiceNo,
+        \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList $articleList,
+        string $orderId
+    ):array {
+        $config = $this->getConfig($orderId);
+
+        $adapter = new SoapAdapter($config);
+        $invoiceAdmin = new InvoiceAdministration($adapter);
+
+        $this->logger->addInfo(
+            "Invoice credited online orderId: {$orderId} invoiceNo: {$invoiceNo} "
+        );
+
+        return $invoiceAdmin->partCreditInvoice($invoiceNo, $articleList, $orderId);
+    }
+
+
+    /**
+     * Credit an invoice in collector bank portal
+     *
+     * @param string $invoiceNo
+     * @param string $orderId
+     * @return array
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function partActivateInvoice(
+        string $invoiceNo,
+        \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList $articleList,
+        string $orderId,
+        string $correlationId
+    ):array {
+        $config = $this->getConfig($orderId);
+
+        $adapter = new SoapAdapter($config);
+        $invoiceAdmin = new InvoiceAdministration($adapter);
+
+        $this->logger->addInfo(
+            "Invoice activated online orderId: {$orderId} invoiceNo: {$invoiceNo} "
+        );
+
+        return $invoiceAdmin->partActivateInvoice($invoiceNo, $articleList, $correlationId);
+    }
+
+
+    /**
+     * Credit an invoice in collector bank portal
+     *
+     * @param string $invoiceNo
+     * @param string $orderId
+     * @return array
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function creditInvoice(string $invoiceNo, string $orderId):array
     {
         $config = $this->getConfig($orderId);
@@ -133,6 +188,35 @@ class Administration
 
         return $invoiceAdmin->creditInvoice($invoiceNo, $orderId);
     }
+
+
+    /**
+     * Adjust invoice in collector bank portal
+     *
+     * @param string $invoiceNo
+     * @param \Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRows $invoiceRows
+     * @param string $orderId
+     * @return array
+     * @throws \Magento\Framework\Exception\InputException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function adjustInvoice(
+        string $invoiceNo,
+        $invoiceRows,
+        string $orderId
+    ):array {
+        $config = $this->getConfig($orderId);
+
+        $adapter = new SoapAdapter($config);
+        $invoiceAdmin = new InvoiceAdministration($adapter);
+
+        $this->logger->addInfo(
+            "Invoice adjusted online orderId: {$orderId} invoiceNo: {$invoiceNo} "
+        );
+
+        return $invoiceAdmin->adjustInvoice($invoiceNo, $invoiceRows, $orderId);
+    }
+
 
     /**
      * Get invoice information from collector bank portal

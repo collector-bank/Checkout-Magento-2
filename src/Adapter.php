@@ -14,13 +14,21 @@ class Adapter
      */
     protected $quoteConverter;
     /**
-     * @var Config\ConfigFactory
+     * @var Config\OrderConfigFactory
+     */
+    protected $orderConfigFactory;
+    /**
+     * @var Data\QuoteHandler
      */
     protected $configFactory;
     /**
      * @var Data\QuoteHandler
      */
     protected $quoteDataHandler;
+    /**
+     * @var Data\OrderHandler
+     */
+    protected $orderDataHandler;
     /**
      * @var QuoteUpdater
      */
@@ -49,16 +57,20 @@ class Adapter
         \Webbhuset\CollectorCheckout\QuoteConverter $quoteConverter,
         \Webbhuset\CollectorCheckout\QuoteUpdater $quoteUpdater,
         \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteDataHandler,
+        \Webbhuset\CollectorCheckout\Data\OrderHandler $orderDataHandler,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Webbhuset\CollectorCheckout\Config\QuoteConfigFactory $configFactory,
+        \Webbhuset\CollectorCheckout\Config\OrderConfigFactory $orderConfigFactory,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger
     ) {
-        $this->quoteConverter   = $quoteConverter;
-        $this->configFactory    = $configFactory;
-        $this->quoteDataHandler = $quoteDataHandler;
-        $this->quoteUpdater     = $quoteUpdater;
-        $this->quoteRepository  = $quoteRepository;
-        $this->logger           = $logger;
+        $this->quoteConverter       = $quoteConverter;
+        $this->orderConfigFactory   = $orderConfigFactory;
+        $this->configFactory        = $configFactory;
+        $this->quoteDataHandler     = $quoteDataHandler;
+        $this->quoteUpdater         = $quoteUpdater;
+        $this->quoteRepository      = $quoteRepository;
+        $this->logger               = $logger;
+        $this->orderDataHandler     = $orderDataHandler;
     }
 
     /**
@@ -207,6 +219,22 @@ class Adapter
     {
         $config = $this->configFactory->create(['quote' => $quote]);
         $privateId = $this->quoteDataHandler->getPrivateId($quote);
+        $data = $this->acquireCheckoutInformation($config, $privateId);
+
+        return $data;
+    }
+
+    /**
+     * Acquires information from collector bank from an order
+     *
+     * @param \Magento\Quote\Model\Quote $quote
+     * @return \Webbhuset\CollectorCheckoutSDK\CheckoutData
+     */
+    public function acquireCheckoutInformationFromOrder(\Magento\Sales\Api\Data\OrderInterface $order): \Webbhuset\CollectorCheckoutSDK\CheckoutData
+    {
+        $config = $this->orderConfigFactory->create(['order' => $order]);
+        $privateId = $this->orderDataHandler->getPrivateId($order);
+
         $data = $this->acquireCheckoutInformation($config, $privateId);
 
         return $data;
