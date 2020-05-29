@@ -156,7 +156,7 @@ class QuoteComparer
 
     protected function removeExtraColumns(&$item, $key)
     {
-        unset($item['requiresElectronicId'], $item['sku'], $item['description']);
+        unset($item['requiresElectronicId'], $item['sku'], $item['description'], $item['unitWeight']);
     }
 
     protected function toArrayOnElements(&$item, $key)
