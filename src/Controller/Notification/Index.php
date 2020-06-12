@@ -52,11 +52,11 @@ class Index extends \Magento\Framework\App\Action\Action
             $jsonResult->setHttpResponseCode(200);
             $jsonResult->setData($result);
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
-            $jsonResult->setHttpResponseCode(400);
+            $jsonResult->setHttpResponseCode(200);
             $jsonResult->setData(['message' => __('Entity not found')]);
 
         } catch (\Throwable $e) {
-            $jsonResult->setHttpResponseCode(400);
+            $jsonResult->setHttpResponseCode(200);
             $jsonResult->setData(['message' => __($e->getMessage())]);
 
         }
