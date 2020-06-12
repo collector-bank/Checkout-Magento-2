@@ -153,7 +153,6 @@ class Adapter
     {
         $config = $this->configFactory->create(['quote' => $quote]);
         $quote = $this->quoteUpdater->setDefaultShippingIfEmpty($quote);
-        $this->quoteRepository->save($quote);
 
         $cart = $this->quoteConverter->getCart($quote);
         $fees = $this->quoteConverter->getFees($quote);
