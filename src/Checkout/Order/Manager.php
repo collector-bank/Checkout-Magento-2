@@ -260,7 +260,12 @@ class Manager
                 $this->orderRepository->save($order);
                 break;
 
-	    case PurchaseResult::COMPLETED:
+            case PurchaseResult::COMPLETED:
+                if ($config->getIsDeliveryCheckoutActive()
+                    && $checkoutData->getPaymentName() == \Webbhuset\CollectorCheckout\Gateway\Config::PAYMENT_METHOD_SWISH
+                ) {
+                    $order = $this->carrierManager->saveShipmentDataOnOrder($order->getId(), $checkoutData);
+                }
                 $result = $this->completeOrder($order, $checkoutData);
                 break;
         }
