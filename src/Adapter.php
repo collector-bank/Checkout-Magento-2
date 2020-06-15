@@ -2,6 +2,10 @@
 
 namespace Webbhuset\CollectorCheckout;
 
+use Magento\Framework\Phrase;
+use Webbhuset\CollectorCheckout\Exception\CanNotInitiateIframeException;
+use Webbhuset\CollectorCheckout\Exception\ResponseErrorOnCartUpdate;
+
 /**
  * Class Adapter
  *
@@ -93,8 +97,14 @@ class Adapter
                     $collectorSession = $this->initialize($quote);
                     $publicToken = $collectorSession->getPublicToken();
                 } else {
-                    $this->logger->addCritical("Response error when initiating iframe " . $responseError->getMessage());
-                    die;
+                    $errorMsg = $e->getErrorLogMessageFromResponse();
+                    $this->logger->addCritical("Response error when updating fees. " . $errorMsg);
+
+                    throw new ResponseErrorOnCartUpdate(
+                        new Phrase(
+                            'Response error when updating fees. Check var/log/collectorbank.log for error details.'
+                        )
+                    );
                 }
             }
         } else {
@@ -182,8 +192,14 @@ class Adapter
 
             $this->quoteRepository->save($quote);
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
-            $this->logger->addCritical("Response error when initiating iframe " . $e->getMessage());
-            die;
+            $errorMsg = $e->getErrorLogMessageFromResponse();
+            $this->logger->addCritical("Response error when initiating iframe " . $errorMsg);
+
+            throw new CanNotInitiateIframeException(
+                new Phrase(
+                    'Can not initiate payment window. Check var/log/collectorbank.log for error details.'
+                )
+            );
         }
 
         return $collectorSession;
@@ -267,8 +283,14 @@ class Adapter
                     ->updateFees($fees);
             }
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
-            $this->logger->addCritical("Response error when updating fees. " . $e->getMessage());
-            die;
+            $errorMsg = $e->getErrorLogMessageFromResponse();
+            $this->logger->addCritical("Response error when updating fees. " . $errorMsg);
+
+            throw new ResponseErrorOnCartUpdate(
+                new Phrase(
+                    'Response error when updating fees. Check var/log/collectorbank.log for error details.'
+                )
+            );
         }
 
         return $collectorSession;
@@ -296,8 +318,14 @@ class Adapter
                     ->updateCart($cart);
             }
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
-            $this->logger->addCritical("Response error when updating cart. " . $e->getMessage());
-            die;
+            $errorMsg = $e->getErrorLogMessageFromResponse();
+            $this->logger->addCritical("Response error when updating cart. " . $errorMsg);
+
+            throw new ResponseErrorOnCartUpdate(
+                new Phrase(
+                    'Response error when updating cart. Examine error log at var/log/collectorbank.log for more details.'
+                )
+            );
         }
 
         return $collectorSession;
