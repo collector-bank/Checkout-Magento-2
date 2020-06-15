@@ -47,6 +47,11 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $quoteComparer;
 
     /**
+     * @var \Webbhuset\CollectorCheckout\QuoteUpdater
+     */
+    protected $quoteUpdater;
+
+    /**
      * Index constructor.
      *
      * @param \Magento\Framework\App\Action\Context                 $context
@@ -66,6 +71,7 @@ class Index extends \Magento\Framework\App\Action\Action
         \Webbhuset\CollectorCheckout\Adapter $collectorAdapter,
         \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteDataHandler,
         \Webbhuset\CollectorCheckout\QuoteConverter $quoteConverter,
+        \Webbhuset\CollectorCheckout\QuoteUpdater $quoteUpdater,
         \Magento\Framework\View\Result\PageFactory $pageFactory,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Webbhuset\CollectorCheckout\Config\Config $config,
@@ -81,6 +87,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->config           = $config;
         $this->quoteValidator   = $quoteValidator;
         $this->quoteComparer    = $quoteComparer;
+        $this->quoteUpdater     = $quoteUpdater;
 
         return parent::__construct($context);
     }
@@ -108,11 +115,11 @@ class Index extends \Magento\Framework\App\Action\Action
         $customerType = $this->getRequest()->getParam('customerType');
         $customerType = $customerType ? (int) $customerType : null;
 
-        if ($this->needsForceReinit($quote, $customerType)) {
-            $publicToken = $this->collectorAdapter->initWithCustomerType($quote, $customerType);
-        } else {
-            $publicToken = $this->collectorAdapter->initOrSync($quote);
+        if ($this->customerTypeChanged($quote, $customerType)) {
+            $this->quoteUpdater->setCustomerTypeData($quote, (int) $customerType);
         }
+
+        $publicToken = $this->collectorAdapter->initOrSync($quote);
 
         $iframeConfig = new \Webbhuset\CollectorCheckoutSDK\Config\IframeConfig(
             $publicToken,
@@ -137,13 +144,13 @@ class Index extends \Magento\Framework\App\Action\Action
     }
 
     /**
-     * Check if we need to reinit iframe
+     * Check if customer typ is changed
      *
      * @param \Magento\Quote\Model\Quote $quote
      * @param integer $customerType
      * @return bool
      */
-    public function needsForceReinit(\Magento\Quote\Model\Quote $quote, int $customerType = null)
+    public function customerTypeChanged(\Magento\Quote\Model\Quote $quote, int $customerType = null)
     {
         $canChangeCustomerType = \Webbhuset\CollectorCheckout\Config\Source\Customer\Type::BOTH_CUSTOMERS == $this->config->getCustomerTypeAllowed();
 

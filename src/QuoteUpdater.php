@@ -226,6 +226,24 @@ class QuoteUpdater
         return $address;
     }
 
+    public function setCustomerTypeData(
+        Quote $quote,
+        int $customerType
+    ) {
+        /** @var \Webbhuset\CollectorCheckout\Config\QuoteConfig $config */
+        $config = $this->config->create(['quote' => $quote]);
+
+        $this->quoteHandler->setCustomerType($quote, $customerType);
+        if (\Webbhuset\CollectorCheckout\Config\Source\Customer\DefaultType::PRIVATE_CUSTOMERS == $customerType) {
+            $storeId = $config->getB2CStoreId();
+        } else {
+            $storeId =  $config->getB2BStoreId();
+        }
+        $this->quoteHandler->setStoreId($quote, $storeId);
+
+        return $quote;
+    }
+
     public function setBusinessAddressData(
         Quote\Address $address,
         SDK\BusinessCustomer $customer,
