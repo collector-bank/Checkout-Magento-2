@@ -42,6 +42,7 @@ class Index extends \Magento\Framework\App\Action\Action
      */
     protected $quoteComparer;
     protected $adapter;
+    protected $quoteUpdater;
     /**
      * Index constructor.
      *
@@ -63,7 +64,8 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
         \Webbhuset\CollectorCheckout\QuoteComparerFactory $quoteComparer,
-        \Webbhuset\CollectorCheckout\AdapterFactory $adapter
+        \Webbhuset\CollectorCheckout\AdapterFactory $adapter,
+        \Webbhuset\CollectorCheckout\QuoteUpdater $quoteUpdater
     ) {
         $this->orderManager    = $orderManager;
         $this->jsonResult      = $jsonResult;
@@ -73,6 +75,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->logger          = $logger;
         $this->quoteComparer   = $quoteComparer;
         $this->adapter         = $adapter;
+        $this->quoteUpdater    = $quoteUpdater;
 
         parent::__construct($context);
     }
@@ -89,6 +92,7 @@ class Index extends \Magento\Framework\App\Action\Action
             $quote = $quoteManager->getQuoteByPublicToken($reference);
 
             $checkoutData = $this->adapter->create()->acquireCheckoutInformationFromQuote($quote);
+            $quote = $this->quoteUpdater->setQuoteData($quote, $checkoutData);
 
             $this->quoteComparer->create()->isQuoteInSync($quote, $checkoutData);
 
