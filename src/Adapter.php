@@ -143,6 +143,8 @@ class Adapter
         }
 
         $quote->collectTotals();
+
+        $quote->setNeedsCollectorUpdate(null);
         $this->quoteRepository->save($quote);
 
         $this->updateFees($quote);
@@ -189,6 +191,8 @@ class Adapter
                 ->setPublicToken($quote, $collectorSession->getPublicToken())
                 ->setCustomerType($quote, $customerType)
                 ->setStoreId($quote, $storeId);
+
+            $quote->collectTotals();
 
             $this->quoteRepository->save($quote);
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
