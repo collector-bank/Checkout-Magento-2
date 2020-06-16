@@ -124,7 +124,7 @@ class Adapter
      * @return \Magento\Quote\Api\Data\CartInterface
      * @throws \Exception
      */
-    public function synchronize(\Magento\Quote\Model\Quote $quote)
+    public function synchronize(\Magento\Quote\Model\Quote $quote, $eventName = null)
     {
         $shippingAddress = $quote->getShippingAddress();
 
@@ -146,6 +146,14 @@ class Adapter
 
         $quote->setNeedsCollectorUpdate(null);
         $this->quoteRepository->save($quote);
+
+        $config = $this->configFactory->create(['quote' => $quote]);
+        if('collectorCheckoutShippingUpdated' === $eventName
+            && $config->getIsDeliveryCheckoutActive()
+        ) {
+
+            return $quote;
+        }
 
         $this->updateFees($quote);
         $this->updateCart($quote);
