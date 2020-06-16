@@ -2,6 +2,8 @@
 
 Configuration manual here: [Collector Bank Magento 2 configuration manual](docs/manual.md)
 
+Technical information how to fetch delivery checkout data from the order. [Delivery checkout technical integration](docs/deliveryCheckoutIntegration.md)
+
 ## Requirements
 * Magento Open Source 2.2.0 or above
 * PHP 7.2 and above
