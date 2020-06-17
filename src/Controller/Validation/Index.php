@@ -92,6 +92,7 @@ class Index extends \Magento\Framework\App\Action\Action
             $quote = $quoteManager->getQuoteByPublicToken($reference);
 
             $checkoutData = $this->adapter->create()->acquireCheckoutInformationFromQuote($quote);
+            $quote->setNeedsCollectorUpdate(null);
             $quote = $this->quoteUpdater->setQuoteData($quote, $checkoutData);
 
             $this->quoteComparer->create()->isQuoteInSync($quote, $checkoutData);
