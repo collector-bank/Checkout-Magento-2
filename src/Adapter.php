@@ -102,7 +102,7 @@ class Adapter
 
                     throw new ResponseErrorOnCartUpdate(
                         new Phrase(
-                            'Response error when updating fees. Check var/log/collectorbank.log for error details.'
+                            'Please refresh the page and try again.'
                         )
                     );
                 }
@@ -300,7 +300,7 @@ class Adapter
 
             throw new ResponseErrorOnCartUpdate(
                 new Phrase(
-                    'Response error when updating fees. Check var/log/collectorbank.log for error details.'
+                    'Please refresh the page and try again.'
                 )
             );
         }
@@ -335,7 +335,7 @@ class Adapter
 
             throw new ResponseErrorOnCartUpdate(
                 new Phrase(
-                    'Response error when updating cart. Examine error log at var/log/collectorbank.log for more details.'
+                    'Please refresh the page and try again.'
                 )
             );
         }
