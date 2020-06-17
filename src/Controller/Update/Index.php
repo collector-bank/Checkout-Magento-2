@@ -85,8 +85,6 @@ class Index extends \Magento\Framework\App\Action\Action
             return $result->setData(['message' => __('Quote not found')]);
         }
 
-        \dahbug::dump($eventName);
-
         $quote = $this->collectorAdapter->synchronize($quote, $eventName);
         $shippingAddress = $quote->getShippingAddress();
 

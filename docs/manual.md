@@ -69,6 +69,28 @@ The latest installation instructions can be found in the README.md file in the o
  |Style iframe data-action-color|(optional) Set this to a hexadecimal color code to change the background color of call to action buttons, formatted as the following example #582f87. Button text color will automatically be set to dark gray instead of white if not enough contrast according to WCAG 2.0 level AA for large text.|
  |Style iframe data-action-text-color|(optional) Set this to override the automatic text color of call to action buttons. Valid values are black, white, #000000 and #ffffff. Other hexadecimal color values are also valid, but will be interpreted as either black or white (and instead of black, the actual text color will be dark gray).|
 
+
+#### Setting up the delivery checkout
+
+The delivery checkout will allow you to integrate your checkout experience with a third party shipping provider like unifaun. 
+
+When this is set up, the available shipping methods will not be fetched from Magento, instead you will add your shipping methods from an external source e.g. unifaun delivery checkout. The shipping methods will be fetched dynamically depending on information about the current customer quote e.g. like weight, shipping address or cart subtotal.
+
+The choice of shipping methods will be integrated into the payment iframe after the shipping address.  
+
+![alt text](images/deliveryCheckout.png "Delivery checkout")
+
+Steps to set up the delivery checkout:
+* Contact our merchant services and provide them with your shipping / unifaun API details.
+* You will be provided with a profileName which you will have to enter in the Magento admin configuration under Profile Name B2C or Profile Name B2B (see above).
+* Enable delivery checkout in the admin:
+
+![alt text](images/enable-delivery-checkout.png "Enble delivery checkout")
+
+**Note**: In Unifaun delivery checkout it is possible to set up rules for shipment methods. Cart total and order weight are automatically sent to Unifaun, additional variables might need custom configuration.
+
+Technical information how to retreive shipping data from orders, for e.g. integrating to business systems or printing address labels automatically. [Delivery checkout technical integration](deliveryCheckoutIntegration.md)
+
 #### Test mode
 
 After you have installed the module on your Magento 2 installation you can test it by running it in test mode. Test credentials for different scenarios can be found here [https://checkout-documentation.collector.se/#test-credentials](https://checkout-documentation.collector.se/#test-credentials).
@@ -185,6 +207,8 @@ Below is a complete flow chart of the order states and statuses:
 
 For debugging purposes a dedicated error log is stored for errors related to the checkout in:
 /magento-root/var/log/collectorbank.log
+
+
 
 ## Miscellaneous
 
