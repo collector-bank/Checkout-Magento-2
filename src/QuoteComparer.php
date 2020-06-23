@@ -42,10 +42,10 @@ class QuoteComparer
         \Magento\Quote\Model\Quote $quote,
         \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ) {
-        $grandTotalCeil = ceil($quote->getGrandTotal());
+        $grandTotalCeil = ceil($quote->getBaseGrandTotal());
         $collectorTotalCeil = ceil($this->calculateCollectorTotal($checkoutData));
 
-        $grandTotalRound = round($quote->getGrandTotal());
+        $grandTotalRound = round($quote->getBaseGrandTotal());
         $collectorTotalRound = round($this->calculateCollectorTotal($checkoutData));
 
         return ($grandTotalCeil == $collectorTotalCeil)

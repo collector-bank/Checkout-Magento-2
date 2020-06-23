@@ -43,6 +43,8 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $quoteComparer;
     protected $adapter;
     protected $quoteUpdater;
+    protected $cartTotalManagement;
+    protected $configFactory;
     /**
      * Index constructor.
      *
@@ -65,7 +67,10 @@ class Index extends \Magento\Framework\App\Action\Action
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
         \Webbhuset\CollectorCheckout\QuoteComparerFactory $quoteComparer,
         \Webbhuset\CollectorCheckout\AdapterFactory $adapter,
-        \Webbhuset\CollectorCheckout\QuoteUpdater $quoteUpdater
+        \Webbhuset\CollectorCheckout\QuoteUpdater $quoteUpdater,
+        \Webbhuset\CollectorCheckout\Config\QuoteConfigFactory $configFactory,
+        \Magento\Quote\Api\CartTotalManagementInterface $cartTotalManagement,
+        \Magento\Quote\Api\ShippingMethodManagementInterface $shippingMethodManagement
     ) {
         $this->orderManager    = $orderManager;
         $this->jsonResult      = $jsonResult;
@@ -76,6 +81,9 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->quoteComparer   = $quoteComparer;
         $this->adapter         = $adapter;
         $this->quoteUpdater    = $quoteUpdater;
+        $this->cartTotalManagement = $cartTotalManagement;
+        $this->shippingMethodManagement = $shippingMethodManagement;
+        $this->configFactory = $configFactory;
 
         parent::__construct($context);
     }
@@ -92,8 +100,22 @@ class Index extends \Magento\Framework\App\Action\Action
             $quote = $quoteManager->getQuoteByPublicToken($reference);
 
             $checkoutData = $this->adapter->create()->acquireCheckoutInformationFromQuote($quote);
-            $quote->setNeedsCollectorUpdate(null);
             $quote = $this->quoteUpdater->setQuoteData($quote, $checkoutData);
+            $quote->setNeedsCollectorUpdate(null);
+            $this->quoteRepository->save($quote);
+
+            $quote = $quoteManager->getQuoteByPublicToken($reference);
+            /** @var \Webbhuset\CollectorCheckout\Config\QuoteConfig $config */
+            $config = $this->configFactory->create(['quote' => $quote]);
+            if($config->getIsDeliveryCheckoutActive()) {
+                $totals = $this->cartTotalManagement->collectTotals(
+                    $quote->getId(),
+                    $quote->getPayment(),
+                    \Webbhuset\CollectorCheckout\Carrier\Collector::GATEWAY_KEY,
+                    \Webbhuset\CollectorCheckout\Carrier\Collector::GATEWAY_KEY
+                );
+                $quote = $quoteManager->getQuoteByPublicToken($reference);
+            }
 
             $this->quoteComparer->create()->isQuoteInSync($quote, $checkoutData);
 
