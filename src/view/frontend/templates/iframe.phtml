@@ -1,10 +1,18 @@
 <?php
-    $iframe = $block->getIframe();
+/** @var \Webbhuset\CollectorCheckout\Block\Checkout $block */
+$iframe = $block->getIframe();
 ?>
-<?php if ($iframe): ?>
-    <?= $iframe ?>
-<?php else: ?>
-<div>
-    <?=__('The url is no longer valid')?>
-</div>
-<?php endif; ?>
+
+<div id="collectorIframe"></div>
+<script>
+    <?php if ($iframe): ?>
+    function loadCollectorIframe() {
+        var collectorIframe = document.createElement("script");
+        collectorIframe.src = "<?=$block->escapeUrl($block->getIframeSrc())?>";
+        collectorIframe.setAttribute('data-token',"<?=$block->escapeHtml($block->getDataToken())?>");
+        document.getElementById("collectorIframe").appendChild(collectorIframe);
+    }
+    <?php else: ?>
+    document.getElementById("collectorIframe").innerHTML = '<?=__('The url is no longer valid')?>';
+    <?php endif; ?>
+</script>

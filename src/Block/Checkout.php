@@ -22,6 +22,9 @@ class Checkout extends \Magento\Framework\View\Element\Template
      */
     protected $configProvider;
 
+    protected $dataToken;
+    protected $iframeSrc;
+
     /**
      * Checkout constructor.
      *
@@ -72,6 +75,30 @@ class Checkout extends \Magento\Framework\View\Element\Template
         $this->iframe = $iframe;
 
         return $this;
+    }
+
+    public function setDataToken($dataToken)
+    {
+        $this->dataToken = $dataToken;
+
+        return $this;
+    }
+
+    public function setIframeSrc($iframeSrc)
+    {
+        $this->iframeSrc = $iframeSrc;
+
+        return $this;
+    }
+
+    public function getDataToken()
+    {
+        return $this->dataToken;
+    }
+
+    public function getIframeSrc()
+    {
+        return $this->iframeSrc;
     }
 
     /**

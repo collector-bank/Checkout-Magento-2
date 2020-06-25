@@ -73,6 +73,8 @@ define([
             document.addEventListener('collectorCheckoutResumed', self.listener.bind(self));
             document.addEventListener('collectorCheckoutShippingUpdated', self.listener.bind(self));
 
+            loadCollectorIframe();
+
             var event = {type: "update", detail: window.checkoutConfig.quoteData.collectorbank_public_id}
 
             if(!window.checkoutConfig.payment.collector_checkout.delivery_checkout){
