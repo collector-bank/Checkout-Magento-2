@@ -448,7 +448,7 @@ class Config implements
 
     protected function getConfigValue($name)
     {
-        $storeId = $this->magentoStoreId;
+        $storeId = $this->storeManager->getStore()->getId();
 
         $value = $this->scopeConfig->getValue(
             'payment/collectorbank_checkout/configuration/' . $name,
@@ -472,7 +472,7 @@ class Config implements
 
     protected function getDeliveryCheckoutConfigValue($name)
     {
-        $storeId = $this->magentoStoreId;
+        $storeId = $this->storeManager->getStore()->getId();
 
         $value = $this->scopeConfig->getValue(
             'payment/collectorbank_checkout/deliverycheckout/' . $name,
