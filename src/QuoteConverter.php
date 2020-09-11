@@ -14,17 +14,20 @@ class QuoteConverter
     protected $taxCalculator;
     protected $scopeConfig;
     protected $configurationHelper;
+    protected $config;
 
     public function __construct(
         \Magento\Tax\Model\Config $taxConfig,
         \Magento\Tax\Model\Calculation $taxCalculator,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Catalog\Helper\Product\Configuration $configurationHelper
+        \Magento\Catalog\Helper\Product\Configuration $configurationHelper,
+        \Webbhuset\CollectorCheckout\Config\QuoteConfigFactory $config
     ) {
         $this->taxConfig            = $taxConfig;
         $this->taxCalculator        = $taxCalculator;
         $this->scopeConfig          = $scopeConfig;
         $this->configurationHelper  = $configurationHelper;
+        $this->config               = $config;
     }
 
     public function getCart(\Magento\Quote\Model\Quote $quote) : Cart
@@ -220,6 +223,46 @@ class QuoteConverter
         );
 
         return $fees;
+    }
+
+    public function getFallbackFees(\Magento\Quote\Model\Quote $quote) : Fees
+    {
+        $shippingFee        = $this->getShippingFallbackFee($quote);
+        $directInvoiceFee   = $this->getDirectInvoiceFee($quote);
+
+        $fees = new Fees(
+            $shippingFee,
+            $directInvoiceFee
+        );
+
+        return $fees;
+    }
+
+    public function getShippingFallbackFee(\Magento\Quote\Model\Quote $quote)
+    {
+        $shippingAddress = $quote->getShippingAddress();
+        $method = $shippingAddress->getShippingMethod();
+        if (!$method) {
+            return null;
+        }
+
+        /** @var \Webbhuset\CollectorCheckout\Config\QuoteConfig $config */
+        $config         = $this->config->create();
+
+        $id          = (string) $config->getDeliveryCheckoutFallbackTitle();
+        $description = (string) $config->getDeliveryCheckoutFallbackDescription();
+        $unitPrice   = (float) $config->getDeliveryCheckoutFallbackPrice();
+        $vatPercent  = (float) $this->getShippingTaxPercent($quote);
+
+        $fee = new Fee(
+            $id,
+            $description,
+            $unitPrice,
+            $vatPercent,
+            'shipping'
+        );
+
+        return $fee;
     }
 
     public function getShippingFee(\Magento\Quote\Model\Quote $quote)

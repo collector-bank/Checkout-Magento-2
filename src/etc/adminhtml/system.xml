@@ -23,508 +23,561 @@
                 </label>
                 <fieldset_css>complex collectorbank-payment-section</fieldset_css>
                 <frontend_model>Magento\Paypal\Block\Adminhtml\System\Config\Fieldset\Payment</frontend_model>
-            <group
-                    id="configuration"
-                    translate="label"
-                    type="text"
-                    sortOrder="30"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1"
-            >
-
-
-                <label>Collector Bank Checkout Configuration</label>
-                <field
-                        id="active"
-                        translate="label"
-                        type="select"
-                        sortOrder="1"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-
-                <field
-                        id='username'
-                        translate='label'
-                        type='text'
-                        sortOrder='2'
-                        showInDefault='1'
-                        showInWebsite='1'
-                        showInStore='1'
-                >
-                    <validate>required-entry</validate>
-                    <label>Username</label>
-                    <comment><![CDATA[]]></comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id='password'
-                        translate='label'
-                        type="obscure"
-                        sortOrder='3'
-                        showInDefault='1'
-                        showInWebsite='1'
-                        showInStore='1'
-                >
-                    <validate>required-entry</validate>
-                    <label>Password</label>
-                    <comment><![CDATA[]]></comment>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id='b2c'
-                        translate='label'
-                        type='text'
-                        sortOrder='4'
-                        showInDefault='1'
-                        showInWebsite='1'
-                        showInStore='1'
-                >
-                    <label>B2C StoreId</label>
-                    <comment><![CDATA[]]></comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id='b2b'
-                        translate='label'
-                        type='text'
-                        sortOrder='5'
-                        showInDefault='1'
-                        showInWebsite='1'
-                        showInStore='1'
-                >
-                    <label>B2B StoreId</label>
-                    <comment><![CDATA[]]></comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="country_code"
-                        translate="label"
-                        type="select"
-                        sortOrder="6"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Country</label>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                    <validate>required-entry</validate>
-                    <source_model>Webbhuset\CollectorCheckout\Config\Source\Country\Country</source_model>
-                </field>
-
-
-                <field
-                        id="test_mode"
-                        translate="label"
-                        type="select"
-                        sortOrder="7"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Test mode</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id='test_mode_username'
-                        translate='label'
-                        type='text'
-                        sortOrder='8'
-                        showInDefault='1'
-                        showInWebsite='1'
-                        showInStore='1'
-                >
-                    <label>Test mode - Username</label>
-                    <validate>required-entry</validate>
-                    <comment><![CDATA[]]></comment>
-                    <depends>
-                        <field id='active'>1</field>
-                        <field id='test_mode'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id='test_mode_password'
-                        translate='label'
-                        type="obscure"
-                        sortOrder='9'
-                        showInDefault='1'
-                        showInWebsite='1'
-                        showInStore='1'
-                >
-                    <label>Test mode - Password</label>
-                    <validate>required-entry</validate>
-                    <comment><![CDATA[]]></comment>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                    <depends>
-                        <field id='active'>1</field>
-                        <field id='test_mode'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id='test_mode_b2c'
-                        translate='label'
-                        type='text'
-                        sortOrder='10'
-                        showInDefault='1'
-                        showInWebsite='1'
-                        showInStore='1'
-                >
-                    <label>Test mode - B2C StoreId</label>
-                    <comment><![CDATA[]]></comment>
-                    <depends>
-                        <field id='active'>1</field>
-                        <field id='test_mode'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id='test_mode_b2b'
-                        translate='label'
-                        type='text'
-                        sortOrder='11'
-                        showInDefault='1'
-                        showInWebsite='1'
-                        showInStore='1'
-                >
-                    <label>Test mode - B2B StoreId</label>
-                    <comment><![CDATA[]]></comment>
-                    <depends>
-                        <field id='active'>1</field>
-                        <field id='test_mode'>1</field>
-                    </depends>
-                </field>
-
-
-                <field
-                        id="customer_type"
-                        translate="label"
-                        type="select"
-                        sortOrder="35"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Allowed Customers</label>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                    <source_model>Webbhuset\CollectorCheckout\Config\Source\Customer\Type</source_model>
-                </field>
-
-                <field
-                        id="default_customer_type"
-                        translate="label"
-                        type="select"
-                        sortOrder="36"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Default Customer Type</label>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                    <source_model>Webbhuset\CollectorCheckout\Config\Source\Customer\DefaultType</source_model>
-                </field>
-
-                <field
-                        id="order_status"
-                        translate="label"
-                        type="select"
-                        sortOrder="37"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Order status - New order</label>
-                    <validate>required-entry</validate>
-                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="order_accepted_status"
-                        translate="label"
-                        type="select"
-                        sortOrder="38"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Order status - Acknowledged order</label>
-                    <validate>required-entry</validate>
-                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="order_holded_status"
-                        translate="label"
-                        type="select"
-                        sortOrder="38"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Order status - On Hold</label>
-                    <validate>required-entry</validate>
-                    <source_model>Webbhuset\CollectorCheckout\Config\Source\Order\Holded</source_model>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="order_denied_status"
-                        translate="label"
-                        type="select"
-                        sortOrder="38"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Order status - Denied order</label>
-                    <validate>required-entry</validate>
-                    <source_model>Webbhuset\CollectorCheckout\Config\Source\Order\Cancelled</source_model>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="terms_url"
+                <group
+                        id="configuration"
                         translate="label"
                         type="text"
-                        sortOrder="95"
+                        sortOrder="30"
                         showInDefault="1"
                         showInWebsite="1"
                         showInStore="1"
                 >
-                    <label>Terms and Conditions URL</label>
-                    <validate>required-entry</validate>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
 
-                <field
-                        id="custom_base_url"
+
+                    <label>Collector Bank Checkout Configuration</label>
+                    <field
+                            id="active"
+                            translate="label"
+                            type="select"
+                            sortOrder="1"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field
+                            id='username'
+                            translate='label'
+                            type='text'
+                            sortOrder='2'
+                            showInDefault='1'
+                            showInWebsite='1'
+                            showInStore='1'
+                    >
+                        <validate>required-entry</validate>
+                        <label>Username</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id='password'
+                            translate='label'
+                            type="obscure"
+                            sortOrder='3'
+                            showInDefault='1'
+                            showInWebsite='1'
+                            showInStore='1'
+                    >
+                        <validate>required-entry</validate>
+                        <label>Password</label>
+                        <comment><![CDATA[]]></comment>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id='b2c'
+                            translate='label'
+                            type='text'
+                            sortOrder='4'
+                            showInDefault='1'
+                            showInWebsite='1'
+                            showInStore='1'
+                    >
+                        <label>B2C StoreId</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id='b2b'
+                            translate='label'
+                            type='text'
+                            sortOrder='5'
+                            showInDefault='1'
+                            showInWebsite='1'
+                            showInStore='1'
+                    >
+                        <label>B2B StoreId</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="country_code"
+                            translate="label"
+                            type="select"
+                            sortOrder="6"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Country</label>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <validate>required-entry</validate>
+                        <source_model>Webbhuset\CollectorCheckout\Config\Source\Country\Country</source_model>
+                    </field>
+
+
+                    <field
+                            id="test_mode"
+                            translate="label"
+                            type="select"
+                            sortOrder="7"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Test mode</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id='test_mode_username'
+                            translate='label'
+                            type='text'
+                            sortOrder='8'
+                            showInDefault='1'
+                            showInWebsite='1'
+                            showInStore='1'
+                    >
+                        <label>Test mode - Username</label>
+                        <validate>required-entry</validate>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='test_mode'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id='test_mode_password'
+                            translate='label'
+                            type="obscure"
+                            sortOrder='9'
+                            showInDefault='1'
+                            showInWebsite='1'
+                            showInStore='1'
+                    >
+                        <label>Test mode - Password</label>
+                        <validate>required-entry</validate>
+                        <comment><![CDATA[]]></comment>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='test_mode'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id='test_mode_b2c'
+                            translate='label'
+                            type='text'
+                            sortOrder='10'
+                            showInDefault='1'
+                            showInWebsite='1'
+                            showInStore='1'
+                    >
+                        <label>Test mode - B2C StoreId</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='test_mode'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id='test_mode_b2b'
+                            translate='label'
+                            type='text'
+                            sortOrder='11'
+                            showInDefault='1'
+                            showInWebsite='1'
+                            showInStore='1'
+                    >
+                        <label>Test mode - B2B StoreId</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='test_mode'>1</field>
+                        </depends>
+                    </field>
+
+
+                    <field
+                            id="customer_type"
+                            translate="label"
+                            type="select"
+                            sortOrder="35"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Allowed Customers</label>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <source_model>Webbhuset\CollectorCheckout\Config\Source\Customer\Type</source_model>
+                    </field>
+
+                    <field
+                            id="default_customer_type"
+                            translate="label"
+                            type="select"
+                            sortOrder="36"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Default Customer Type</label>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <source_model>Webbhuset\CollectorCheckout\Config\Source\Customer\DefaultType</source_model>
+                    </field>
+
+                    <field
+                            id="order_status"
+                            translate="label"
+                            type="select"
+                            sortOrder="37"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Order status - New order</label>
+                        <validate>required-entry</validate>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="order_accepted_status"
+                            translate="label"
+                            type="select"
+                            sortOrder="38"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Order status - Acknowledged order</label>
+                        <validate>required-entry</validate>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="order_holded_status"
+                            translate="label"
+                            type="select"
+                            sortOrder="38"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Order status - On Hold</label>
+                        <validate>required-entry</validate>
+                        <source_model>Webbhuset\CollectorCheckout\Config\Source\Order\Holded</source_model>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="order_denied_status"
+                            translate="label"
+                            type="select"
+                            sortOrder="38"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Order status - Denied order</label>
+                        <validate>required-entry</validate>
+                        <source_model>Webbhuset\CollectorCheckout\Config\Source\Order\Cancelled</source_model>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="terms_url"
+                            translate="label"
+                            type="text"
+                            sortOrder="95"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Terms and Conditions URL</label>
+                        <validate>required-entry</validate>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="custom_base_url"
+                            translate="label"
+                            type="text"
+                            sortOrder="100"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Custom base URL - Used during development</label>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+
+                    <field
+                            id="create_customer_account"
+                            translate="label"
+                            type="select"
+                            sortOrder="96"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Create Customer Accounts</label>
+                        <comment>
+                            Yes = Customer accounts are created automatically for new email addresses. Orders are placed on the customer account. New customers get new customer email sent.
+
+                            No = Customers are checked out as guests no customer accounts are created.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field
+                            id="profile_name"
+                            translate="label"
+                            type="text"
+                            sortOrder="106"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Profile Name B2C</label>
+                        <comment>
+                           If you have been provided with a profile name from Collector Bank, enter it here, otherwise leave this field empty.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="profile_name_b2b"
+                            translate="label"
+                            type="text"
+                            sortOrder="107"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Profile Name B2B</label>
+                        <comment>
+                            If you have been provided with a profile name from Collector Bank, enter it here, otherwise leave this field empty.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="style_data_lang"
+                            translate="label"
+                            type="text"
+                            sortOrder="155"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Style iframe data-lang</label>
+                        <comment>
+                            (optional) The display language. Currently supported combinations are: sv-SE, en-SE, nb-NO, fi-FI, da-DK and en-DE. Both sv-SE and en-SE are available for use with swedish partners. In the other cases, the country part must match the country code used when initializing the checkout session or it will be ignored. Setting this attribute is optional and will only be of interest when there is more than one language for any single country.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="style_data_padding"
+                            translate="label"
+                            type="text"
+                            sortOrder="160"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Style iframe data-padding</label>
+                        <comment>
+                            (optional) Set this to none in order to cancel out the left and right padding inside the iframe (by adjusting its margins and width).
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="style_data_container_id"
+                            translate="label"
+                            type="text"
+                            sortOrder="170"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Style iframe data-container-id</label>
+                        <comment>
+                            (optional) Set this to the id of an element on the page and the iframe will render inside this element instead of immediately above the script element of the loader script. Put the container element somewhere above the script element. This is to make sure the container element is loaded before trying to populate it with the iframe.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="style_data_action_color"
+                            translate="label"
+                            type="text"
+                            sortOrder="180"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Style iframe data-action-color</label>
+                        <comment>
+                            (optional) Set this to a hexadecimal color code to change the background color of call to action buttons, formatted as the following example #582f87. Button text color will automatically be set to dark gray instead of white if not enough contrast according to WCAG 2.0 level AA for large text.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                            id="style_data_action_text_color"
+                            translate="label"
+                            type="text"
+                            sortOrder="190"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Style iframe data-action-text-color</label>
+                        <comment>
+                            (optional) Set this to override the automatic text color of call to action buttons. Valid values are black, white, #000000 and #ffffff. Other hexadecimal color values are also valid, but will be interpreted as either black or white (and instead of black, the actual text color will be dark gray).
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+                </group>
+
+                <group
+                        id="deliverycheckout"
                         translate="label"
                         type="text"
-                        sortOrder="100"
+                        sortOrder="30"
                         showInDefault="1"
                         showInWebsite="1"
                         showInStore="1"
                 >
-                    <label>Custom base URL - Used during development</label>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
+                    <label>Collector Bank Delivery Checkout Configuration</label>
+                    <field
+                            id="active"
+                            translate="label"
+                            type="select"
+                            sortOrder="1"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Enabled</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
 
+                    <field
+                            id="fallback_title"
+                            translate="label"
+                            type="text"
+                            sortOrder="106"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Fallback Title</label>
+                        <comment>
+                            If the delivery checkout fails to fetch delivery methods from e.g. unifaun delivery checkout, this title will be used for the fallback shipping method.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
 
-                <field
-                        id="create_customer_account"
-                        translate="label"
-                        type="select"
-                        sortOrder="96"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Create Customer Accounts</label>
-                    <comment>
-                        Yes = Customer accounts are created automatically for new email addresses. Orders are placed on the customer account. New customers get new customer email sent.
+                    <field
+                            id="fallback_description"
+                            translate="label"
+                            type="text"
+                            sortOrder="106"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Fallback Description</label>
+                        <comment>
+                            If the delivery checkout fails to fetch delivery methods from e.g. unifaun delivery checkout, this description will be used for the fallback shipping method.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
 
-                        No = Customers are checked out as guests no customer accounts are created.
-                    </comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-
-                <field
-                        id="profile_name"
-                        translate="label"
-                        type="text"
-                        sortOrder="106"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Profile Name B2C</label>
-                    <comment>
-                       If you have been provided with a profile name from Collector Bank, enter it here, otherwise leave this field empty.
-                    </comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="profile_name_b2b"
-                        translate="label"
-                        type="text"
-                        sortOrder="107"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Profile Name B2B</label>
-                    <comment>
-                        If you have been provided with a profile name from Collector Bank, enter it here, otherwise leave this field empty.
-                    </comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="style_data_lang"
-                        translate="label"
-                        type="text"
-                        sortOrder="155"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Style iframe data-lang</label>
-                    <comment>
-                        (optional) The display language. Currently supported combinations are: sv-SE, en-SE, nb-NO, fi-FI, da-DK and en-DE. Both sv-SE and en-SE are available for use with swedish partners. In the other cases, the country part must match the country code used when initializing the checkout session or it will be ignored. Setting this attribute is optional and will only be of interest when there is more than one language for any single country.
-                    </comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="style_data_padding"
-                        translate="label"
-                        type="text"
-                        sortOrder="160"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Style iframe data-padding</label>
-                    <comment>
-                        (optional) Set this to none in order to cancel out the left and right padding inside the iframe (by adjusting its margins and width).
-                    </comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="style_data_container_id"
-                        translate="label"
-                        type="text"
-                        sortOrder="170"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Style iframe data-container-id</label>
-                    <comment>
-                        (optional) Set this to the id of an element on the page and the iframe will render inside this element instead of immediately above the script element of the loader script. Put the container element somewhere above the script element. This is to make sure the container element is loaded before trying to populate it with the iframe.
-                    </comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="style_data_action_color"
-                        translate="label"
-                        type="text"
-                        sortOrder="180"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Style iframe data-action-color</label>
-                    <comment>
-                        (optional) Set this to a hexadecimal color code to change the background color of call to action buttons, formatted as the following example #582f87. Button text color will automatically be set to dark gray instead of white if not enough contrast according to WCAG 2.0 level AA for large text.
-                    </comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-
-                <field
-                        id="style_data_action_text_color"
-                        translate="label"
-                        type="text"
-                        sortOrder="190"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Style iframe data-action-text-color</label>
-                    <comment>
-                        (optional) Set this to override the automatic text color of call to action buttons. Valid values are black, white, #000000 and #ffffff. Other hexadecimal color values are also valid, but will be interpreted as either black or white (and instead of black, the actual text color will be dark gray).
-                    </comment>
-                    <depends>
-                        <field id='active'>1</field>
-                    </depends>
-                </field>
-            </group>
-            <group
-                    id="deliverycheckout"
-                    translate="label"
-                    type="text"
-                    sortOrder="30"
-                    showInDefault="1"
-                    showInWebsite="1"
-                    showInStore="1"
-            >
-
-
-                <label>Collector Bank Delivery Checkout Configuration</label>
-                <field
-                        id="active"
-                        translate="label"
-                        type="select"
-                        sortOrder="1"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                >
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-            </group>
+                    <field
+                            id="fallback_price"
+                            translate="label"
+                            type="text"
+                            sortOrder="106"
+                            showInDefault="1"
+                            showInWebsite="1"
+                            showInStore="1"
+                    >
+                        <label>Fallback Price</label>
+                        <comment>
+                            If the delivery checkout fails to fetch delivery methods from e.g. unifaun delivery checkout, this price will be used for the fallback shipping method. Enter shipping price in the format 29.00.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+                </group>
             </group>
         </section>
     </system>

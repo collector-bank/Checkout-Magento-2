@@ -470,6 +470,40 @@ class Config implements
     }
 
 
+
+    /**
+     * Get fallback title
+     *
+     * @return string
+     */
+    public function getDeliveryCheckoutFallbackTitle()
+    {
+        return $this->getDeliveryCheckoutConfigValue('fallback_title');
+    }
+
+
+    /**
+     * Get fallback description
+     *
+     * @return string
+     */
+    public function getDeliveryCheckoutFallbackDescription()
+    {
+        return $this->getDeliveryCheckoutConfigValue('fallback_description');
+    }
+
+
+    /**
+     * Get fallback price
+     *
+     * @return float
+     */
+    public function getDeliveryCheckoutFallbackPrice()
+    {
+        return (float)$this->getDeliveryCheckoutConfigValue('fallback_price');
+    }
+
+
     protected function getDeliveryCheckoutConfigValue($name)
     {
         $storeId = $this->storeManager->getStore()->getId();

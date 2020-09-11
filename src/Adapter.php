@@ -162,6 +162,18 @@ class Adapter
     }
 
     /**
+     * @return bool
+     */
+    private function isFallbackDeliveryMethodConfigured()
+    {
+        /** @var \Webbhuset\CollectorCheckout\Config\QuoteConfig $config */
+        $config = $this->configFactory->create();
+        return $config->getIsDeliveryCheckoutActive()
+            && $config->getDeliveryCheckoutFallbackDescription()
+            && $config->getDeliveryCheckoutFallbackTitle();
+    }
+
+    /**
      * Initializes a new iframe
      *
      * @param \Magento\Quote\Model\Quote $quote
@@ -175,7 +187,13 @@ class Adapter
         $quote = $this->quoteUpdater->setDefaultShippingIfEmpty($quote);
 
         $cart = $this->quoteConverter->getCart($quote);
-        $fees = $this->quoteConverter->getFees($quote);
+
+        if (!$this->isFallbackDeliveryMethodConfigured()) {
+            $fees = $this->quoteConverter->getFees($quote);
+        } else {
+            $fees = $this->quoteConverter->getFallbackFees($quote);
+        }
+
         $initCustomer = $this->quoteConverter->getInitializeCustomer($quote);
 
         $countryCode = $config->getCountryCode();
