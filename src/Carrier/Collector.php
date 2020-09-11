@@ -37,6 +37,10 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
     protected $quoteRepository;
 
     /**
+     * @var \Webbhuset\CollectorCheckout\QuoteConverter
+     */
+    protected $quoteConverter;
+    /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory
      * @param \Psr\Log\LoggerInterface $logger
@@ -72,14 +76,16 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         \Magento\Directory\Helper\Data $directoryData,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
-        array $data = [],
         \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteDataHandler,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
+        \Webbhuset\CollectorCheckout\QuoteConverter $quoteConverter,
+        array $data = []
     ) {
         $this->rateResultFactory        = $rateResultFactory;
         $this->rateResultMethodFactory  = $rateResultMethodFactory;
         $this->quoteDataHandler         = $quoteDataHandler;
         $this->quoteRepository          = $quoteRepository;
+        $this->quoteConverter           = $quoteConverter;
 
         parent::__construct(
             $scopeConfig,
@@ -143,7 +149,9 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
             return [];
         }
 
-        $price = $shippingData['unitPrice'];
+        $priceIncludingTax = $shippingData['unitPrice'];
+        $priceExlcudingTax = $this->shippingPriceToExludingTax($priceIncludingTax, $quote);
+
         $title = $shippingData['id'];
         $description = $shippingData['description'];
 
@@ -155,11 +163,17 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
         $method->setMethodDescription($description);
         $method->setMethod($this->_code);
         $method->setMethodTitle($description);
-        $method->setPrice($price );
+        $method->setPrice($priceExlcudingTax);
 
         return $method;
     }
 
+    private function shippingPriceToExludingTax($priceIncludingTax, $quote)
+    {
+        $taxPercentage = $this->quoteConverter->getShippingTaxPercent($quote)/100;
+
+        return $priceExludingTax = $priceIncludingTax / (1 + $taxPercentage);
+    }
 
     /**
      * @inheritDoc
