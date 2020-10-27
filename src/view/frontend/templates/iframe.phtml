@@ -2,17 +2,28 @@
 /** @var \Webbhuset\CollectorCheckout\Block\Checkout $block */
 $iframe = $block->getIframe();
 ?>
-
-<div id="collectorIframe"></div>
-<script>
-    <?php if ($iframe): ?>
-    function loadCollectorIframe() {
-        var collectorIframe = document.createElement("script");
-        collectorIframe.src = "<?=$block->escapeUrl($block->getIframeSrc())?>";
-        collectorIframe.setAttribute('data-token',"<?=$block->escapeHtml($block->getDataToken())?>");
-        document.getElementById("collectorIframe").appendChild(collectorIframe);
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "collectorIframe": {
+                        "component": "collectorIframe",
+                        "config":{
+                            "src": "<?=$block->escapeUrl($block->getIframeSrc())?>",
+                            "dataToken": "<?=$block->escapeHtml($block->getDataToken())?>"
+                        }
+                    }
+                }
+            }
+        }
     }
-    <?php else: ?>
-    document.getElementById("collectorIframe").innerHTML = '<?=__('The url is no longer valid')?>';
-    <?php endif; ?>
 </script>
+<?php if ($iframe): ?>
+    <div data-bind="scope: 'collectorIframe'" id="collectorIframe">
+    </div>
+<?php else: ?>
+    <div id="collectorIframe">
+        <?=__('The url is no longer valid')?>;
+    </div>
+<?php endif; ?>

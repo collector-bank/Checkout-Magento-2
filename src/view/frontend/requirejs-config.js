@@ -3,6 +3,7 @@ var config = {
         '*': {
             collectorCheckout: 'Webbhuset_CollectorCheckout/js/checkout',
             collectorNewsletter: 'Webbhuset_CollectorCheckout/js/newsletter',
+            collectorIframe: "Webbhuset_CollectorCheckout/js/iframeLoader"
         }
     },
     config: {
@@ -13,6 +14,11 @@ var config = {
             'Magento_Checkout/js/action/set-shipping-information' : {
                 'Webbhuset_CollectorCheckout/js/action/suspend-wrapper': true
             }
+        }
+    },
+    shim: {
+        'Webbhuset_CollectorCheckout/js/iframeLoader': {
+            deps: ['Webbhuset_CollectorCheckout/js/checkout']
         }
     }
 };
