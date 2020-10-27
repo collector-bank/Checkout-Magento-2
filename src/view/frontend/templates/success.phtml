@@ -1,6 +1,20 @@
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "collectorSuccess": {
+                        "component": "collectorSuccess"
+                    }
+                }
+            }
+        }
+    }
+</script>
 <?php
     $iframe = $block->getIframe();
 ?>
+
 <?php if ($iframe): ?>
     <script>
         window.dataLayer = window.dataLayer || [];

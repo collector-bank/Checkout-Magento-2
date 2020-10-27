@@ -3,7 +3,8 @@ var config = {
         '*': {
             collectorCheckout: 'Webbhuset_CollectorCheckout/js/checkout',
             collectorNewsletter: 'Webbhuset_CollectorCheckout/js/newsletter',
-            collectorIframe: "Webbhuset_CollectorCheckout/js/iframeLoader"
+            collectorIframe: "Webbhuset_CollectorCheckout/js/iframeLoader",
+            collectorSuccess: "Webbhuset_CollectorCheckout/js/success"
         }
     },
     config: {
