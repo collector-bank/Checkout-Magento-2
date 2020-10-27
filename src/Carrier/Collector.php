@@ -149,9 +149,7 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
             return [];
         }
 
-        $priceIncludingTax = $shippingData['unitPrice'];
-        $priceExlcudingTax = $this->shippingPriceToExludingTax($priceIncludingTax, $quote);
-
+        $price = $shippingData['unitPrice'];
         $title = $shippingData['id'];
         $description = $shippingData['description'];
 
@@ -163,16 +161,9 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
         $method->setMethodDescription($description);
         $method->setMethod($this->_code);
         $method->setMethodTitle($description);
-        $method->setPrice($priceExlcudingTax);
+        $method->setPrice($price);
 
         return $method;
-    }
-
-    private function shippingPriceToExludingTax($priceIncludingTax, $quote)
-    {
-        $taxPercentage = $this->quoteConverter->getShippingTaxPercent($quote)/100;
-
-        return $priceExludingTax = $priceIncludingTax / (1 + $taxPercentage);
     }
 
     /**
