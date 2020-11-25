@@ -106,6 +106,9 @@ class Adapter
                         )
                     );
                 }
+            } catch (\Webbhuset\CollectorCheckout\Exception\ResponseErrorOnCartUpdate $responseError) {
+                $collectorSession = $this->initialize($quote);
+                $publicToken = $collectorSession->getPublicToken();
             }
         } else {
             $collectorSession = $this->initialize($quote);
