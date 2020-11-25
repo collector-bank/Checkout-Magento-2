@@ -160,24 +160,19 @@ class QuoteUpdater
 
             return $gatewayKey . '_' . $gatewayKey;
         }
-
         $shippingAddress = $quote->getShippingAddress();
         $rates = $this->shippingMethodManagement->getList($quote->getId());
 
         if (empty($rates)) {
             return false;
         }
+        $rate = reset($rates);
+        if (!$rate) {
 
-        $shippingMethod = reset($rates);
-        foreach ($rates as $rate) {
-            $method = $rate->getCarrierCode() . '_' . $rate->getMethodCode();
-            if ($method === $shippingAddress->getShippingMethod()) {
-                $shippingMethod = $rate;
-                break;
-            }
+            return '';
         }
 
-        return $shippingMethod->getCarrierCode() . '_' . $shippingMethod->getMethodCode();
+        return $rate->getCarrierCode() . '_' . $rate->getMethodCode();
     }
 
     public function setCustomerData(
