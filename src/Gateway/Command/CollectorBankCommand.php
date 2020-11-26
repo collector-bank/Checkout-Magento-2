@@ -2,10 +2,10 @@
 
 namespace Webbhuset\CollectorCheckout\Gateway\Command;
 
-use Webbhuset\CollectorPaymentSDK\Errors\ResponseError as ResponseError;
 use Magento\Payment\Gateway\CommandInterface as CommandInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Sales\Api\Data\TransactionInterface;
+use Webbhuset\CollectorPaymentSDK\Errors\ResponseError as ResponseError;
 
 /**
  * Class CollectorBankCommand
@@ -117,7 +117,7 @@ class CollectorBankCommand implements CommandInterface
 
             if ($this->invoiceHandler->isDecimalRoundingInvoiced($order)) {
                 $articleList->removeDecimalRounding();
-            } else{
+            } else {
                 $this->invoiceHandler->setDecimalRoundingIsInvoiced($order);
             }
 
@@ -137,7 +137,6 @@ class CollectorBankCommand implements CommandInterface
                 false,
                 $response
             );
-
         } catch (ResponseError $e) {
             $incrementOrderId = (string)$payment->getOrder()->getIncrementId();
             $this->logger->addCritical(
@@ -147,13 +146,10 @@ class CollectorBankCommand implements CommandInterface
             throw new \Webbhuset\CollectorCheckout\Exception\Exception(
                 __($e->getMessage())
             );
-
-            return false;
         }
 
         return true;
     }
-
 
     /**
      * Save collector invoice number on the order
@@ -170,7 +166,6 @@ class CollectorBankCommand implements CommandInterface
         }
     }
 
-
     /**
      * Get collector invoice number on an order
      *
@@ -180,15 +175,13 @@ class CollectorBankCommand implements CommandInterface
     public function getPurchaseIdentifier($order)
     {
         $invoiceNumber = $this->orderHandler->getInvoiceNumber($order);
-        if($invoiceNumber) {
-
+        if ($invoiceNumber) {
             return $invoiceNumber;
         }
         $payment = $order->getPayment();
 
         return $this->paymentHandler->create()->getPurchaseIdentifier($payment);
     }
-
 
     /**
      * Add success messages to show in admin for capture invoice
@@ -251,8 +244,7 @@ class CollectorBankCommand implements CommandInterface
 
         $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $order);
 
-        if(count($articleList->getArticleList()) == 0){
-
+        if (count($articleList->getArticleList()) == 0) {
             return true;
         }
 
@@ -271,7 +263,6 @@ class CollectorBankCommand implements CommandInterface
                 TransactionInterface::TYPE_REFUND,
                 $response
             );
-
         } catch (ResponseError $e) {
             $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
             $this->logger->addCritical(
@@ -301,7 +292,6 @@ class CollectorBankCommand implements CommandInterface
         $invoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
 
         if (count($invoiceRows) == 0) {
-
             return;
         }
 
@@ -320,7 +310,6 @@ class CollectorBankCommand implements CommandInterface
                 TransactionInterface::TYPE_REFUND,
                 $response
             );
-
         } catch (ResponseError $e) {
             $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
             $this->logger->addCritical(
@@ -332,7 +321,6 @@ class CollectorBankCommand implements CommandInterface
             );
         }
     }
-
 
     /**
      * Get adjustments as collector invoice rows
@@ -357,7 +345,6 @@ class CollectorBankCommand implements CommandInterface
 
         return $invoiceRows;
     }
-
 
     /**
      * Void / cancel the order

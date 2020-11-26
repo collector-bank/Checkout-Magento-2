@@ -89,7 +89,7 @@ class InvoiceHandler
     ): ArticleList {
         $invoiceShippingAmount = $invoice->getShippingAmount();
 
-        if ($invoiceShippingAmount > 0
+        if ($invoiceShippingAmount >= 0
             && !$order->getPayment()->getShippingCaptured()
         ) {
             $shippingArticle = $articleList->getShippingArticle();
