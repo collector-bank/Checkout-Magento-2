@@ -54,7 +54,7 @@ The latest installation instructions can be found in the README.md file in the o
  |Test mode - B2B StoreId|Test Mode Merchant ID for B2B purchases for the selected country - Provided by Collector.|
  |Allowed Customers|Collector checkout supports private and business customers. Here you can select which of these you want to allow in the checkout or both. If both are selected and switch will appear on the checkout page where the customer can switch between them. If you are using different websites in Magento for different customer types you should only allow one customer type per website and not select both here. Selecting both here is only when you have both private and business customers in the same scope.|
  |Default Customer Type|The customer type selected here will be preselected when the checkout is loaded.|
- |Order status - New order|A temporary order status for new orders before they are acknowledged by collector as being paid. New order has not been paid and should never be shipped or touched from the backend. Sometimes new orders are never acknowledged for different reasons e.g. the customer is not credit accepted, then the new order will automatically be deleted within 5 hours using a Magento cron job. It is highly recommended to use the default value.|
+ |Order status - Payment review order|A temporary order status for payment review orders before they are acknowledged by collector as being paid. Payment review order has not been paid and should never be shipped or touched from the backend. Sometimes new orders are never acknowledged for different reasons e.g. the customer is not credit accepted, then the new order will automatically be deleted within 5 hours using a Magento cron job. It is highly recommended to use the default value.|
  |Order status - Acknowledged order|The order status for orders that have a valid payment and is acknowledged by collector when orders are acknowledged they can be invoiced in Magento.  |
  |Order status - On Hold|The order status for orders on hold|
  |Order status - Denied order|The order status for orders that have been denied. This can e.g. be because of a suspected fraud.|
@@ -141,7 +141,7 @@ The diagram below shows the simple happy case. It illustrates the communication 
 
 Before orders are acknowledged and a payment is accepted the orders have status:
 
-![alt text](images/new.png "Order new")
+![alt text](images/new.png "Order payment review")
 
 It can happen that orders are created in Magento and never get acknowledged. As a merchant you will see these orders in the Magento Order view, it is important not to touch them and let them be either until they get Acknowledged by Collector or until they are automatically deleted by a cron job after 5 hours.
 
@@ -201,7 +201,7 @@ The cancel option will not be available for orders that are in a state that do n
 
 Below is a complete flow chart of the order states and statuses:
 
-![alt text](images/checkout-flow-chart.png "Order new")
+![alt text](images/checkout-flow-chart.png "Order payment review")
 
 #### Debugging the checkout
 
@@ -218,15 +218,15 @@ The Collector checkout adds standard GTM Data Layer for Google Analytics and Goo
  
 Example of Google Analytics Data Layer on Checkout page:
 
-![alt text](images/ga-data.png "Order new")
+![alt text](images/ga-data.png "GA")
  
 Example of Google Analytics Enhanced Ecommerce Data Layer on Checkout page:
  
-![alt text](images/ecommerce-data.png "Order new")
+![alt text](images/ecommerce-data.png "GA")
 
 #### Order confirmation emails
 
-Standard functionality for sending out order confirmation email has been overridden. Normally in Magento emails are sent when an order is created / placed and has status new / pending. In the case of Collector checkout the order confirmation email is sent when the order has a confirmed payment and get status Acknowledged.
+Standard functionality for sending out order confirmation email has been overridden. Normally in Magento emails are sent when an order is created / placed and has status payment review / pending. In the case of Collector checkout the order confirmation email is sent when the order has a confirmed payment and get status Acknowledged.
 
 #### Orders placed by existing customers
 

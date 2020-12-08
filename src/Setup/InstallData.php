@@ -51,7 +51,7 @@ class InstallData implements \Magento\Framework\Setup\InstallDataInterface
         $orderStatuses = [];
         $orderStatuses[\Magento\Sales\Model\Order::STATE_NEW] = [
             'status' => 'collectorbank_new',
-            'label' => 'Collector Bank - New'
+            'label' => 'Collector Bank - Payment Review'
         ];
         $orderStatuses[\Magento\Sales\Model\Order::STATE_PROCESSING] = [
             'status' => 'collectorbank_acknowledged',
