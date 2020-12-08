@@ -99,6 +99,9 @@ class Index extends \Magento\Framework\App\Action\Action
             $quoteManager = $this->quoteManager->create();
             $quote = $quoteManager->getQuoteByPublicToken($reference);
 
+            if ($quote->getPayment()->getMethod() != \Webbhuset\CollectorCheckout\Gateway\Config::CHECKOUT_CODE) {
+                throw new \Magento\Framework\Exception\CouldNotSaveException(__('Please refresh the page and try again.'));
+            }
             $checkoutData = $this->adapter->create()->acquireCheckoutInformationFromQuote($quote);
             $quote = $this->quoteUpdater->setQuoteData($quote, $checkoutData);
             $quote->setNeedsCollectorUpdate(null);
