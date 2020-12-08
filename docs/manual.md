@@ -91,6 +91,10 @@ Steps to set up the delivery checkout:
 
 Technical information how to retreive shipping data from orders, for e.g. integrating to business systems or printing address labels automatically. [Delivery checkout technical integration](deliveryCheckoutIntegration.md)
 
+#### Swish orders
+
+Orders placed using swish do not follow the normal order flow. They are automatically invoiced offline in Magento and placed in the status Processing after they are Acknowledged.
+
 #### Test mode
 
 After you have installed the module on your Magento 2 installation you can test it by running it in test mode. Test credentials for different scenarios can be found here [https://checkout-documentation.collector.se/#test-credentials](https://checkout-documentation.collector.se/#test-credentials).
