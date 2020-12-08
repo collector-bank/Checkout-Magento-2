@@ -92,12 +92,11 @@ class Adapter
                 $this->synchronize($quote);
             } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $responseError) {
                 if (900 == $responseError->getCode()
-                    || 404 == $responseError->getCode() ){
-
+                    || 404 == $responseError->getCode()) {
                     $collectorSession = $this->initialize($quote);
                     $publicToken = $collectorSession->getPublicToken();
                 } else {
-                    $errorMsg = $e->getErrorLogMessageFromResponse();
+                    $errorMsg = $responseError->getErrorLogMessageFromResponse();
                     $this->logger->addCritical("Response error when updating fees. " . $errorMsg);
 
                     throw new ResponseErrorOnCartUpdate(
@@ -139,7 +138,6 @@ class Adapter
         $oldCart = $checkoutData->getCart();
         $quote = $this->quoteUpdater->setQuoteData($quote, $checkoutData);
 
-
         $rate = $shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod());
         if (!$rate || !$shippingAddress->getShippingMethod()) {
             $this->quoteUpdater->setDefaultShippingMethod($quote);
@@ -151,10 +149,9 @@ class Adapter
         $this->quoteRepository->save($quote);
 
         $config = $this->configFactory->create(['quote' => $quote]);
-        if('collectorCheckoutShippingUpdated' === $eventName
+        if ('collectorCheckoutShippingUpdated' === $eventName
             && $config->getIsDeliveryCheckoutActive()
         ) {
-
             return $quote;
         }
 
@@ -238,7 +235,6 @@ class Adapter
         return $collectorSession;
     }
 
-
     /**
      * Acquires information from collector bank about the current session
      *
@@ -302,8 +298,7 @@ class Adapter
         $adapter = $this->getAdapter($config);
         $collectorSession = new \Webbhuset\CollectorCheckoutSDK\Session($adapter);
 
-        if($config->getIsDeliveryCheckoutActive()) {
-
+        if ($config->getIsDeliveryCheckoutActive()) {
             return $collectorSession;
         }
 
