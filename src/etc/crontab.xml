@@ -4,7 +4,7 @@
     <group id="default">
         <job name="collector_remove_pending_orders"
              instance="Webbhuset\CollectorCheckout\Cron\RemovePendingOrders"
-             method="run">
+             method="execute">
             <schedule>* 1 * * *</schedule>
         </job>
     </group>
