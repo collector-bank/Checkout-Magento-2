@@ -43,6 +43,7 @@ define([
             localStorage.remove('checkout-data');
             localStorage.remove('cart');
 
+            self.setCheckoutData();
             this.cartData = customerData.get('cart');
 
             // Reload page if we cannot use collector checkout
@@ -76,6 +77,7 @@ define([
             var event = {type: "update", detail: window.checkoutConfig.quoteData.collectorbank_public_id}
 
             this._super();
+
         },
         listener: function(event) {
             switch(event.type) {
@@ -217,6 +219,37 @@ define([
                 rateProcessors['default'].getRates(quote.shippingAddress());
 
             totalsDefaultProvider.estimateTotals(quote.shippingAddress());
+        },
+        setCheckoutData: function () {
+            var self = this;
+            var payload = {}
+
+            return storage.post(
+                self.getUpdateUrl(event.type, event.detail), JSON.stringify(payload), true
+            ).fail(
+                function (response) {
+                    console.error(response);
+                }
+            ).success(
+                function (response) {
+                    var address = quote.shippingAddress();
+
+                    if (address) {
+                        address.postcode = response.postcode;
+                        address.region = response.region;
+                        address.countryId = response.country_id;
+                    }
+
+                    checkoutData.setSelectedShippingRate(response.shipping_method);
+
+                    cartCache.clear('address');
+                    cartCache.clear('totals');
+
+                    self.fetchShippingRates();
+
+                    totalsDefaultProvider.estimateTotals(quote.shippingAddress());
+                }
+            );
         },
         addressUpdated: function(event) {
             var self = this;
