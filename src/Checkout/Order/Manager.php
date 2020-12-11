@@ -387,7 +387,7 @@ class Manager
         \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ):array {
         $orderStatusBefore = $this->orderManagement->getStatus($order->getId());
-        $orderStatusAfter  = $this->configFactory->create(['order' => $order])->getOrderStatusHolded();
+        $orderStatusAfter  = $this->configFactory->create(['order' => $order])->getOrderStatusDenied();
 
         if ($orderStatusBefore == $orderStatusAfter) {
             return [
