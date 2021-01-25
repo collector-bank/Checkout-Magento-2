@@ -2,14 +2,12 @@
 
 namespace Webbhuset\CollectorCheckout\Checkout;
 
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Payment\Gateway\Command\CommandManagerInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
-use Magento\Payment\Model\InfoInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -42,7 +40,8 @@ class Adapter extends \Magento\Payment\Model\Method\Adapter
             $eventManager,
             $valueHandlerPool,
             $paymentDataObjectFactory,
-            $code, $formBlockType,
+            $code,
+            $formBlockType,
             $infoBlockType,
             $commandPool,
             $validatorPool,
@@ -55,9 +54,7 @@ class Adapter extends \Magento\Payment\Model\Method\Adapter
     {
         $additionalInformation = $this->getInfoInstance()->getAdditionalInformation();
 
-        if (isset($additionalInformation['payment_name'])
-            && \Webbhuset\CollectorCheckout\Gateway\Config::PAYMENT_METHOD_SWISH == $additionalInformation['payment_name']) {
-
+        if (isset($additionalInformation['payment_name'])) {
             return false;
         }
 
