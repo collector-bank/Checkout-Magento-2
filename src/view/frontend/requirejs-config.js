@@ -14,6 +14,9 @@ var config = {
             },
             'Magento_Checkout/js/action/set-shipping-information' : {
                 'Webbhuset_CollectorCheckout/js/action/suspend-wrapper': true
+            },
+            'Magento_Checkout/js/model/cart/totals-processor/default' : {
+                'Webbhuset_CollectorCheckout/js/action/suspend-wrapper-estimate-totals': true
             }
         }
     },
