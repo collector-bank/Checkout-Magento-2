@@ -93,7 +93,7 @@ Technical information how to retreive shipping data from orders, for e.g. integr
 
 #### Swish orders
 
-Orders placed using swish do not follow the normal order flow. They are automatically invoiced offline in Magento and placed in the status Processing after they are Acknowledged.
+Swish orders follow the normal order flow however they are not registered as transactions in Collectors settlements. Check out [https://payments.collectorbank.se/docs/checkout/optional/swishformerchants/#settlements-and-accounting](https://payments.collectorbank.se/docs/checkout/optional/swishformerchants/#settlements-and-accounting) for more information.
 
 #### Test mode
 
