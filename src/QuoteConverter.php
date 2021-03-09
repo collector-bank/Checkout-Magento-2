@@ -197,7 +197,7 @@ class QuoteConverter
         $description            = (string) __('Discount');
         $unitPrice              = (float) ($discountAmount + $discountTax) * -1;
         $quantity               = (int) $quoteItem->getQty() * $parentQty;
-        $vat                    = (float) 0;
+        $vat                    = (float) $quoteItem->getTaxPercent();
 
         $item = new Item(
             $id,
