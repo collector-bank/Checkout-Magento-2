@@ -39,4 +39,17 @@ class OrderConfig extends \Webbhuset\CollectorCheckout\Config\Config
 
         return parent::getStoreId();
     }
+
+    protected function getConfigValue($name)
+    {
+        $storeId = $this->getOrder()->getStoreId();
+
+        $value = $this->scopeConfig->getValue(
+            'payment/collectorbank_checkout/configuration/' . $name,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
+        return $value;
+    }
 }
