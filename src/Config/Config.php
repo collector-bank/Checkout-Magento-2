@@ -2,8 +2,6 @@
 
 namespace Webbhuset\CollectorCheckout\Config;
 
-use Webbhuset\CollectorCheckout\Config\Source\Customer\Type as AllowedCustomerType;
-
 /**
  * Class Config
  *
@@ -278,7 +276,7 @@ class Config implements
      */
     public function getOrderStatusNew(): string
     {
-        return $this->getConfigValue('order_status');
+        return $this->getWithoutConfigurationConfigValue('order_status');
     }
 
     /**
@@ -310,7 +308,6 @@ class Config implements
     {
         return $this->getConfigValue('order_denied_status');
     }
-
 
     /**
      * Gets B2C store id
@@ -351,7 +348,6 @@ class Config implements
 
         return $this->getB2BStoreId();
     }
-
 
     /**
      * Get production mode username
@@ -446,6 +442,19 @@ class Config implements
         return $this->getConfigValue('test_mode_b2b') ? $this->getConfigValue('test_mode_b2b') : "";
     }
 
+    protected function getWithoutConfigurationConfigValue($name)
+    {
+        $storeId = $this->storeManager->getStore()->getId();
+
+        $value = $this->scopeConfig->getValue(
+            'payment/collectorbank_checkout/' . $name,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+
+        return $value;
+    }
+
     protected function getConfigValue($name)
     {
         $storeId = $this->storeManager->getStore()->getId();
@@ -469,8 +478,6 @@ class Config implements
         return 1 == $this->getDeliveryCheckoutConfigValue('active');
     }
 
-
-
     /**
      * Get fallback title
      *
@@ -480,7 +487,6 @@ class Config implements
     {
         return $this->getDeliveryCheckoutConfigValue('fallback_title');
     }
-
 
     /**
      * Get fallback description
@@ -492,7 +498,6 @@ class Config implements
         return $this->getDeliveryCheckoutConfigValue('fallback_description');
     }
 
-
     /**
      * Get fallback price
      *
@@ -502,7 +507,6 @@ class Config implements
     {
         return (float)$this->getDeliveryCheckoutConfigValue('fallback_price');
     }
-
 
     protected function getDeliveryCheckoutConfigValue($name)
     {

@@ -264,6 +264,7 @@
                     >
                         <label>Order status - New order</label>
                         <validate>required-entry</validate>
+                        <config_path>payment/collectorbank_checkout/order_status</config_path>
                         <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
                         <depends>
                             <field id='active'>1</field>
