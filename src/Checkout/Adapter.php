@@ -50,17 +50,6 @@ class Adapter extends \Magento\Payment\Model\Method\Adapter
         );
     }
 
-    public function canVoid()
-    {
-        $additionalInformation = $this->getInfoInstance()->getAdditionalInformation();
-
-        if (isset($additionalInformation['payment_name'])) {
-            return false;
-        }
-
-        return parent::canVoid();
-    }
-
     public function isActive($storeId = 0)
     {
         return $this->config->getIsActive();
