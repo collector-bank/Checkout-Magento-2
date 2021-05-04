@@ -159,13 +159,16 @@ class Manager
      */
     public function deleteOrder($order)
     {
-        $this->registry->register('isSecureArea', 'true');
+        if (!$this->registry->registry('isSecureArea')) {
+            $this->registry->register('isSecureArea', 'true');
+        }
 
         $this->orderRepository->delete($order);
         $this->logger->addInfo(
             "Delete order {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
         );
-        $this->registry->unregister('isSecureArea', 'true');
+
+        $this->registry->unregister('isSecureArea');
     }
 
     /**
