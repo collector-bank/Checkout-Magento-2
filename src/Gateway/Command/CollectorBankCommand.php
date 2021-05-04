@@ -355,11 +355,10 @@ class CollectorBankCommand implements CommandInterface
     public function void($payment)
     {
         $payment = $this->extractPayment($payment);
-        $paymentHandler = $this->paymentHandler->create();
 
         $response = [];
         try {
-            $invoiceNo = $paymentHandler->getPurchaseIdentifier($payment);
+            $invoiceNo = $this->getPurchaseIdentifier($payment->getOrder());
             $orderId = (int)$payment->getOrder()->getId();
 
             $response = $this->invoice->cancelInvoice(
