@@ -31,7 +31,10 @@ class Config implements ConfigProviderInterface
      * Swish payment name
      */
     const PAYMENT_METHOD_SWISH = "Swish";
-
+    /**
+     * Swish payment name
+     */
+    const CURRENCY_ROUNDING_SKU = "ROUNDING";
     /**
      * @var \Webbhuset\CollectorCheckout\Config\Config
      */

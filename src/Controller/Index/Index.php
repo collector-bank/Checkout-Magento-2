@@ -108,7 +108,6 @@ class Index extends \Magento\Framework\App\Action\Action
 
         $quoteCheckoutErrors = $this->quoteValidator->getErrors($quote);
         if (!empty($quoteCheckoutErrors)) {
-
             return $this->resultRedirectFactory->create()->setPath('checkout/index');
         }
 
@@ -143,8 +142,7 @@ class Index extends \Magento\Framework\App\Action\Action
             ->getBlock('collectorbank_checkout_iframe')
             ->setIframe($iframe)
             ->setDataToken($iframeToken)
-            ->setIframeSrc($iframeSrc)
-        ;
+            ->setIframeSrc($iframeSrc);
 
         return $page;
     }
@@ -161,7 +159,6 @@ class Index extends \Magento\Framework\App\Action\Action
         $canChangeCustomerType = \Webbhuset\CollectorCheckout\Config\Source\Customer\Type::BOTH_CUSTOMERS == $this->config->getCustomerTypeAllowed();
 
         if (!$canChangeCustomerType) {
-
             return false;
         }
 
@@ -171,14 +168,12 @@ class Index extends \Magento\Framework\App\Action\Action
         ];
 
         if (!$customerType || !in_array($customerType, $availableCustomerTypes)) {
-
             return false;
         }
 
         $currentCustomerType = (int) $this->quoteDataHandler->getCustomerType($quote);
 
         if ($currentCustomerType === $customerType) {
-
             return false;
         }
 

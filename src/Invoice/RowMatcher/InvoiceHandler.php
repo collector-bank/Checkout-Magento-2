@@ -43,7 +43,7 @@ class InvoiceHandler
      * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return ArticleList
      */
-    public function addItemsAndDiscounts (
+    public function addItemsAndDiscounts(
         ArticleList $matchingArticles,
         ArticleList $articleList,
         \Magento\Sales\Model\Order\Invoice $invoice,
@@ -54,7 +54,7 @@ class InvoiceHandler
                 $quoteId = $this->getItemQuoteIdBy($invoiceItem->getOrderItemId());
 
                 $article = $articleList->getArticleBySku($quoteId);
-                if($article) {
+                if ($article) {
                     $article->setQuantity($invoiceItem->getQty());
                     $matchingArticles->addArticle($article);
 
@@ -69,7 +69,6 @@ class InvoiceHandler
         return $matchingArticles;
     }
 
-
     /**
      *
      * Add shipping as matchingArticles
@@ -81,7 +80,7 @@ class InvoiceHandler
      * @return ArticleList
      * @throws \Webbhuset\CollectorCheckout\Exception\Exception
      */
-    public function addShipping (
+    public function addShipping(
         ArticleList $matchingArticles,
         ArticleList $articleList,
         \Magento\Sales\Model\Order\Invoice $invoice,
@@ -93,14 +92,13 @@ class InvoiceHandler
             && !$order->getPayment()->getShippingCaptured()
         ) {
             $shippingArticle = $articleList->getShippingArticle();
-            if($shippingArticle){
+            if ($shippingArticle) {
                 $matchingArticles->addArticle($shippingArticle);
             }
         }
 
         return $matchingArticles;
     }
-
 
     /**
      *
@@ -112,12 +110,13 @@ class InvoiceHandler
      * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return ArticleList
      */
-    public function addDecimalRounding (
+    public function addDecimalRounding(
         ArticleList $matchingArticles,
         ArticleList $articleList
     ): ArticleList {
-        $decimalRounding = $articleList->getDecimalRounding();
-        if($decimalRounding) {
+        $decimalRounding = $articleList->getArticleBySku(\Webbhuset\CollectorCheckout\Gateway\Config::CURRENCY_ROUNDING_SKU);
+
+        if ($decimalRounding) {
             $matchingArticles->addArticle($decimalRounding);
         }
 
@@ -130,7 +129,7 @@ class InvoiceHandler
      * @param \Magento\Sales\Api\Data\OrderInterface $order
      * @return bool
      */
-    public function isDecimalRoundingInvoiced (
+    public function isDecimalRoundingInvoiced(
         \Magento\Sales\Api\Data\OrderInterface $order
     ) {
         return $this->orderHandler->getDecimalRoundingInvoiced($order);
@@ -141,13 +140,12 @@ class InvoiceHandler
      *
      * @param \Magento\Sales\Api\Data\OrderInterface $order
      */
-    public function setDecimalRoundingIsInvoiced (
+    public function setDecimalRoundingIsInvoiced(
         \Magento\Sales\Api\Data\OrderInterface $order
     ):void {
         $this->orderHandler->setDecimalRoundingInvoiced($order);
         $this->orderRepository->save($order);
     }
-
 
     /**
      * Get item from order from quote item id
@@ -155,7 +153,7 @@ class InvoiceHandler
      * @param int $orderItemId
      * @return int|null
      */
-    public function getItemQuoteIdBy (int $orderItemId)
+    public function getItemQuoteIdBy(int $orderItemId)
     {
         $orderItem = $this->orderItemRepository->get($orderItemId);
 

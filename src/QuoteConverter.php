@@ -36,7 +36,6 @@ class QuoteConverter
         $items = [];
 
         foreach ($quoteItems as $quoteItem) {
-
             if (\Magento\Bundle\Model\Product\Type::TYPE_CODE === $quoteItem->getProductType()) {
                 $items = array_merge($items, $this->extractBundleQuoteItem($quoteItem));
             } else {
@@ -58,17 +57,16 @@ class QuoteConverter
     {
         $duplicates = [];
 
-        foreach($items as $item) {
-
+        foreach ($items as $item) {
             $sku = $item->getId();
 
             if (!isset($duplicates[$sku])) {
                 $duplicates[$sku] = 0;
-            } else{
+            } else {
                 $duplicates[$sku] = $duplicates[$sku]+1;
                 $num = $duplicates[$sku];
 
-                $newSku = $sku ."-" . $num;
+                $newSku = $sku . "-" . $num;
                 $item->setId($newSku);
             }
         }
@@ -94,7 +92,8 @@ class QuoteConverter
         $childrenTotal = 0;
         foreach ($quoteItem->getChildren() as $child) {
             $childrenItem = $this->getCartItem(
-                $child, "- ",
+                $child,
+                "- ",
                 false,
                 $quoteItem->getQty()
             );
@@ -111,7 +110,7 @@ class QuoteConverter
         }
         $bundleParent = [];
         $bundleParent[] = ($childrenTotal > 0) ?
-            $this->getCartItem($quoteItem, "",true):
+            $this->getCartItem($quoteItem, "", true) :
             $this->getCartItem($quoteItem);
 
         $items = array_merge($bundleParent, $items);
@@ -127,35 +126,35 @@ class QuoteConverter
         $collectorCheckoutSum = $this->sumItems($items) + $this->sumFees($this->getFees($quote));
         $quoteSum = $quote->getGrandTotal();
 
-        $roundingError = round($quoteSum - $collectorCheckoutSum,2);
+        $roundingError = round($quoteSum - $collectorCheckoutSum, 2);
         if (!($roundingError != 0 && abs($roundingError) < 0.1)) {
-
             return false;
         }
 
         return new Item(
-            __("Currency rounding"),
+            \Webbhuset\CollectorCheckout\Gateway\Config::CURRENCY_ROUNDING_SKU,
             __("Currency rounding"),
             $roundingError,
             1,
             0,
             false,
-            __("Currency rounding")
+            \Webbhuset\CollectorCheckout\Gateway\Config::CURRENCY_ROUNDING_SKU
         );
-
     }
 
     public function getCartItem(
         \Magento\Quote\Model\Quote\Item $quoteItem,
         $prefix = "",
         $priceIsZero = false,
-        $parentQty = 1)
-    : Item {
+        $parentQty = 1
+    )
+    : Item
+    {
         $optionText = $this->getSelectedOptionText($quoteItem);
 
         $id                     = (string) $prefix . $quoteItem->getSku();
         $description            = (string) $quoteItem->getName() . $optionText;
-        $unitPrice              = ($priceIsZero) ? 0.00: (float) $quoteItem->getPriceInclTax();
+        $unitPrice              = ($priceIsZero) ? 0.00 : (float) $quoteItem->getPriceInclTax();
         $weight                 = (float) $quoteItem->getWeight();
         $quantity               = (int) $quoteItem->getQty() * $parentQty;
         $vat                    = (float) $quoteItem->getTaxPercent();
@@ -206,7 +205,7 @@ class QuoteConverter
             $quantity,
             $vat,
             null,
-            $quoteItem->getItemId(). ":discount"
+            $quoteItem->getItemId() . ":discount"
         );
 
         return $item;
@@ -407,11 +406,10 @@ class QuoteConverter
         }
 
         if (empty($result)) {
-
             return "";
         }
 
-        return ":" . implode("-",$result);
+        return ":" . implode("-", $result);
     }
 
     private function getSelectedOptionsOfQuoteItem(\Magento\Catalog\Model\Product\Configuration\Item\ItemInterface $item)
