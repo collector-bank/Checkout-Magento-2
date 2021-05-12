@@ -2,8 +2,11 @@
 
 namespace Webbhuset\CollectorCheckout;
 
-use Webbhuset\CollectorCheckoutSDK\Checkout\Customer as SDK;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\State\InputMismatchException;
 use Magento\Quote\Model\Quote as Quote;
+use Webbhuset\CollectorCheckoutSDK\Checkout\Customer as SDK;
 
 class QuoteUpdater
 {
@@ -78,7 +81,7 @@ class QuoteUpdater
         if (!$customerLoggedIn) {
             $quote->setCustomerIsGuest(true);
 
-            if($customer->getEmail()) {
+            if ($customer->getEmail()) {
                 $email = $customer->getEmail();
                 $quote->setEmail($email);
             }
@@ -86,13 +89,10 @@ class QuoteUpdater
             $customerId = $this->session->getCustomer()->getId();
             $customer = $this->customerRepositoryInterface->getById($customerId);
 
-            $this->customerRepositoryInterface->save($customer);
-
             $quote->setCustomer($customer);
         }
 
         if ($this->config->create()->getIsDeliveryCheckoutActive()) {
-
             $this->setDeliveryCheckoutData($quote, $checkoutData);
         }
 
@@ -104,14 +104,12 @@ class QuoteUpdater
         \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ) {
         $fees = $checkoutData->getFees();
-        if(!$fees) {
-
+        if (!$fees) {
             return;
         }
 
         $fees = $fees->toArray();
-        if(isset($fees['shipping'])) {
-
+        if (isset($fees['shipping'])) {
             $this->quoteHandler->setDeliveryCheckoutData($quote, $fees['shipping']);
         }
     }
@@ -168,7 +166,6 @@ class QuoteUpdater
         }
         $rate = reset($rates);
         if (!$rate) {
-
             return '';
         }
 
