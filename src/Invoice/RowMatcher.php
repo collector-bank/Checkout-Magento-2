@@ -2,8 +2,8 @@
 
 namespace Webbhuset\CollectorCheckout\Invoice;
 
-use \Webbhuset\CollectorPaymentSDK\Invoice\Article\Article as Article;
-use \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList as ArticleList;
+use Webbhuset\CollectorPaymentSDK\Invoice\Article\Article as Article;
+use Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList as ArticleList;
 use Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRow;
 use Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRows;
 
@@ -47,7 +47,6 @@ class RowMatcher
         $this->invoiceHandler       = $invoiceHandler;
     }
 
-
     /**
      * Converts an invoice to a collector article list
      *
@@ -58,8 +57,7 @@ class RowMatcher
     public function invoiceToArticleList(
         \Magento\Sales\Model\Order\Invoice $invoice,
         \Magento\Sales\Api\Data\OrderInterface $order
-    ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList
-    {
+    ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList {
         $checkoutDataArticleList = $this->checkoutDataToArticleList($order);
 
         $matchingArticles = new ArticleList();
@@ -86,7 +84,6 @@ class RowMatcher
         return $matchingArticles;
     }
 
-
     /**
      * Converts a credit memo to a collector article list that can be used to credit items using collectors payment api
      *
@@ -97,25 +94,24 @@ class RowMatcher
     public function creditMemoToArticleList(
         \Magento\Sales\Model\Order\Creditmemo $creditMemo,
         \Magento\Sales\Api\Data\OrderInterface $order
-    ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList
-    {
+    ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList {
         $checkoutDataArticleList = $this->checkoutDataToArticleList($order);
 
         $matchingArticles = new ArticleList();
 
-        $matchingArticles = $this->creditMemoHandler->addItemsAndDiscounts (
+        $matchingArticles = $this->creditMemoHandler->addItemsAndDiscounts(
             $matchingArticles,
             $checkoutDataArticleList,
             $creditMemo,
             $order
         );
-        $matchingArticles = $this->creditMemoHandler->addShipping (
+        $matchingArticles = $this->creditMemoHandler->addShipping(
             $matchingArticles,
             $checkoutDataArticleList,
             $creditMemo,
             $order
         );
-        $matchingArticles = $this->creditMemoHandler->addDecimalRounding (
+        $matchingArticles = $this->creditMemoHandler->addDecimalRounding(
             $matchingArticles,
             $checkoutDataArticleList,
             $creditMemo,
@@ -124,7 +120,6 @@ class RowMatcher
 
         return $matchingArticles;
     }
-
 
     /**
      * Convert adjustment fee to invoice rows
@@ -135,20 +130,18 @@ class RowMatcher
     public function adjustmentToInvoiceRows(
         $adjustmentFee
     ): \Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRow {
-
         if ($adjustmentFee > 0) {
             $articleId             = __('Adjustment Fee');
             $description     = __('Adjustment Fee');
-        } else{
+        } else {
             $articleId             = __('Adjustment Refund');
             $description     = __('Adjustment Refund');
         }
         $vat = 0;
         $qty = 1;
 
-        return new InvoiceRow($articleId, $description, $qty,$adjustmentFee, $vat);
+        return new InvoiceRow($articleId, $description, $qty, $adjustmentFee, $vat);
     }
-
 
     /**
      * Get the checkout data for an order from collector and return an article list
@@ -158,19 +151,21 @@ class RowMatcher
      */
     public function checkoutDataToArticleList(
         \Magento\Sales\Api\Data\OrderInterface $order
-    ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList
-    {
+    ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList {
         $checkoutData = $this->adapter->acquireCheckoutInformationFromOrder($order);
         $articles = new ArticleList();
 
         $items = $checkoutData->getOrder()->getItems();
         foreach ($items as $item) {
+            /** @var $item \Webbhuset\CollectorCheckoutSDK\Checkout\Order\Item */
             $articleId      = $item->getId();
             $description    = $item->getDescription();
             $qty            = $item->getQuantity();
             $sku            = $item->getSku();
+            $vat            = (float) $item->getVat();
+            $unitPrice      = (float) $item->getUnitPrice();
 
-            $article = new Article($articleId, $description, $qty, $sku);
+            $article = new Article($articleId, $description, $qty, $sku, $unitPrice, $vat);
 
             $articles->addArticle($article);
         }
@@ -178,6 +173,9 @@ class RowMatcher
         return $articles;
     }
 
-
-
+    public function convertArticleListToInvoiceRows(
+        ArticleList $articleList
+    ): InvoiceRows {
+        return new InvoiceRows();
+    }
 }

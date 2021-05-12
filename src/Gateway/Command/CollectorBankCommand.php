@@ -240,7 +240,11 @@ class CollectorBankCommand implements CommandInterface
         $order      = $payment->getOrder();
         $creditMemo = $payment->getCreditmemo();
 
-        $this->adjustInvoice($creditMemo, $payment);
+        $isInvoiceAdjusted = $this->adjustInvoice($creditMemo, $payment);
+
+        if ($isInvoiceAdjusted) {
+            return true;
+        }
 
         $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $order);
 
@@ -280,19 +284,25 @@ class CollectorBankCommand implements CommandInterface
      * Adjust a collector invoice with negative or positive adjustment fees
      *
      * @param \Magento\Sales\Model\Order\Creditmemo $creditMemo
-     * @param                                       $payment
+     * @param \Magento\Payment\Model\InfoInterface $payment
      * @throws \Magento\Framework\Exception\InputException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Webbhuset\CollectorCheckout\Exception\Exception
      */
-    protected function adjustInvoice(
+    public function adjustInvoice(
         \Magento\Sales\Model\Order\Creditmemo $creditMemo,
         $payment
     ) {
-        $invoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
+        $adjustmentsInvoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
 
-        if (count($invoiceRows) == 0) {
-            return;
+        if (count($adjustmentsInvoiceRows) == 0) {
+            return false;
+        }
+        $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $payment->getOrder());
+        $invoiceRows = $articleList->getInvoiceRows()->toArray();
+
+        if (count($invoiceRows) > 0) {
+            $adjustmentsInvoiceRows = array_merge($adjustmentsInvoiceRows, $invoiceRows);
         }
 
         try {
@@ -301,7 +311,7 @@ class CollectorBankCommand implements CommandInterface
 
             $response = $this->invoice->adjustInvoice(
                 $invoiceNo,
-                $invoiceRows,
+                $adjustmentsInvoiceRows,
                 $orderId
             );
 
@@ -310,6 +320,8 @@ class CollectorBankCommand implements CommandInterface
                 TransactionInterface::TYPE_REFUND,
                 $response
             );
+
+            return true;
         } catch (ResponseError $e) {
             $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
             $this->logger->addCritical(

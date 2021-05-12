@@ -194,7 +194,7 @@ class Administration
      * Adjust invoice in collector bank portal
      *
      * @param string $invoiceNo
-     * @param \Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRows $invoiceRows
+     * @param \Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRows[] $invoiceRows
      * @param string $orderId
      * @return array
      * @throws \Magento\Framework\Exception\InputException
