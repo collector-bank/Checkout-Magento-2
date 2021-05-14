@@ -570,6 +570,6 @@ class Manager
         ];
         $payment->setAdditionalInformation($info);
 
-        $payment->authorize(true, $purchaseData->getAmountToPay());
+        $payment->authorize(true, $payment->getBaseAmountOrdered());
     }
 }
