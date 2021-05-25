@@ -82,6 +82,16 @@ class Config implements
     }
 
     /**
+     * Returns true if delete pending orders
+     *
+     * @return bool
+     */
+    public function getDeletePendingOrders(): bool
+    {
+        return 1 == $this->getConfigValue('delete_pending_orders');
+    }
+
+    /**
      * Returns true if customers accounts should be created for new orders
      *
      * @return bool

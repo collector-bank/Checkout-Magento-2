@@ -500,6 +500,28 @@
                             <field id='active'>1</field>
                         </depends>
                     </field>
+
+                    <field
+                        id="delete_pending_orders"
+                        translate="label"
+                        type="select"
+                        sortOrder="200"
+                        showInDefault="1"
+                        showInWebsite="0"
+                        showInStore="0"
+                    >
+                        <label>Delete pending orders</label>
+                        <comment>
+                            Yes = Pending orders will be cancelled and deleted within 5 hours by cron.
+
+                            No = Pending orders will be cancelled but not deleted within 5 hours by cron.
+                        </comment>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
                 </group>
 
                 <group

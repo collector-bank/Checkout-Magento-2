@@ -13,6 +13,7 @@ class RemovePendingOrders
      * @var \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory
      */
     protected $orderManager;
+    private \Webbhuset\CollectorCheckout\Config\Config $config;
 
     /**
      * RemovePendingOrders constructor.
@@ -20,9 +21,11 @@ class RemovePendingOrders
      * @param \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory $orderManager
      */
     public function __construct(
-        \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory $orderManager
+        \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory $orderManager,
+        \Webbhuset\CollectorCheckout\Config\Config $config
     ) {
         $this->orderManager = $orderManager;
+        $this->config = $config;
     }
 
     /**
@@ -31,11 +34,14 @@ class RemovePendingOrders
     public function execute()
     {
         $orderManager = $this->orderManager->create();
-
         $orders = $orderManager->getPendingCollectorBankOrders();
 
         foreach ($orders as $order) {
-            $orderManager->removeOrderIfExists($order);
+            if ($this->config->getDeletePendingOrders()) {
+                $orderManager->removeAndCancelOrder($order);
+            } else {
+                $orderManager->cancelOrderAndLog($order);
+            }
         }
     }
 }

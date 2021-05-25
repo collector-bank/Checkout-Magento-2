@@ -181,7 +181,7 @@ class Manager
         try {
             $order = $this->orderManager->create()->getOrderByPublicToken($reference);
             if (\Magento\Sales\Model\Order::STATE_NEW == $order->getState()) {
-                $this->removeOrderIfExists($order);
+                $this->removeAndCancelOrder($order);
             }
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
         }
@@ -192,14 +192,46 @@ class Manager
      *
      * @param \Magento\Sales\Api\Data\OrderInterface $order
      */
-    public function removeOrderIfExists(\Magento\Sales\Api\Data\OrderInterface $order)
+    public function removeAndCancelOrder(\Magento\Sales\Api\Data\OrderInterface $order)
     {
         try {
-            $this->orderManagement->cancel($order->getId());
+            if (!$this->cancelOrderAndLog($order)) {
+                return false;
+            }
 
             $this->deleteOrder($order);
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            return false;
         }
+
+        return true;
+    }
+
+    /**
+     * Cancel and log in collector log
+     *
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @return bool
+     */
+    public function cancelOrderAndLog(\Magento\Sales\Api\Data\OrderInterface $order): bool
+    {
+        try {
+            $cancelSuccess = $this->orderManagement->cancel((int) $order->getId());
+
+            if (!$cancelSuccess) {
+                $this->logger->addCritical(
+                    "Failed to cancel the order: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
+                );
+                return false;
+            }
+            $this->logger->addInfo(
+                "Order is cancelled: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
+            );
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -243,7 +275,6 @@ class Manager
                 $this->orderRepository->save($order);
 
                 if ($config->getIsDeliveryCheckoutActive()) {
-
                     $order = $this->carrierManager->saveShipmentDataOnOrder($order->getId(), $checkoutData);
                 }
                 break;
@@ -466,7 +497,6 @@ class Manager
         \Magento\Sales\Api\Data\OrderInterface $order,
         \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ):array {
-
         return $this->activateOrder($order, $checkoutData);
     }
 
@@ -485,7 +515,7 @@ class Manager
     /**
      * Gets the pending orders that were create 48 hours ago or less
      *
-     * @return array
+     * @return \Magento\Sales\Api\Data\OrderInterface[]
      */
     public function getPendingCollectorBankOrders(): array
     {
@@ -507,6 +537,14 @@ class Manager
 
         foreach ($pendingOrders as $order) {
             if ($order->getPayment()->getMethod() == \Webbhuset\CollectorCheckout\Gateway\Config::CHECKOUT_CODE) {
+                $additional = $order->getPayment()->getAdditionalInformation();
+                if ($additional
+                    && is_array($additional)
+                    && isset($additional['purchase_identifier'])
+                ) {
+                    continue;
+                }
+
                 $pendingCollectorOrders[] = $order;
             }
         }

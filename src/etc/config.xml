@@ -32,6 +32,7 @@
                     <order_accepted_status>collectorbank_acknowledged</order_accepted_status>
                     <order_holded_status>collectorbank_onhold</order_holded_status>
                     <order_denied_status>collectorbank_canceled</order_denied_status>
+                    <delete_pending_orders>1</delete_pending_orders>
                 </configuration>
             </collectorbank_checkout>
         </payment>
