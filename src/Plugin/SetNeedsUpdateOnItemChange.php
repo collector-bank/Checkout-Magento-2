@@ -63,4 +63,13 @@ class SetNeedsUpdateOnItemChange
 
         return $result;
     }
+
+    public function afterSave(
+        \Magento\Checkout\Model\Cart $subject,
+        $result
+    ) {
+        $subject->getQuote()->setNeedsCollectorUpdate(true);
+
+        return $result;
+    }
 }
