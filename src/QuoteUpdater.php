@@ -208,11 +208,13 @@ class QuoteUpdater
             ->setTelephone($customer->getMobilePhoneNumber())
             ->setFirstname($collectorAddress->getFirstName())
             ->setLastname($collectorAddress->getLastName())
-            ->setStreet([
-                $collectorAddress->getCoAddress(),
-                $collectorAddress->getAddress(),
-                $collectorAddress->getAddress2()
-            ])->setPostCode($collectorAddress->getPostalCode())
+            ->setStreet(
+                implode("\n", [
+                    $collectorAddress->getCoAddress(),
+                    $collectorAddress->getAddress(),
+                    $collectorAddress->getAddress2()
+                ])
+            )->setPostCode($collectorAddress->getPostalCode())
             ->setCity($collectorAddress->getCity());
 
         return $address;
@@ -246,11 +248,12 @@ class QuoteUpdater
             ->setFirstname($customer->getFirstName())
             ->setLastname($customer->getLastName())
             ->setCompany($collectorAddress->getCompanyName())
-            ->setStreet([
+            ->setStreet(
+                implode("\n", [
                 $collectorAddress->getCoAddress(),
                 $collectorAddress->getAddress(),
                 $collectorAddress->getAddress2()
-            ])->setPostCode($collectorAddress->getPostalCode())
+            ]))->setPostCode($collectorAddress->getPostalCode())
             ->setCity($collectorAddress->getCity());
 
         return $address;
