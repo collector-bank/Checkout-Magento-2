@@ -4,17 +4,19 @@
     "type": "magento2-module",
     "description": "Magento 2 Collector Bank Checkout Module",
     "require": {
-		"collector-bank/collector-payment-sdk": "1.0.2",
-		"collector-bank/collector-checkout-sdk": "^1.0"
+        "collector-bank/collector-payment-sdk": "1.0.2",
+        "collector-bank/collector-checkout-sdk": "^1.0.3"
     },
     "authors": [
         {
-            "name":"Webbhuset",
-            "email":"info@webbhuset.com"
+            "name": "Webbhuset",
+            "email": "info@webbhuset.com"
         }
     ],
     "autoload": {
-        "files": [ "src/registration.php" ],
+        "files": [
+            "src/registration.php"
+        ],
         "psr-4": {
             "Webbhuset\\CollectorCheckout\\": "src/"
         }
