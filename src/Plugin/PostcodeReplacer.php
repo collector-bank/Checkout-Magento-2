@@ -21,6 +21,7 @@ class PostcodeReplacer
      * @var \Webbhuset\CollectorCheckout\Config\Config
      */
     protected $config;
+    protected $collectorAdapter;
 
     /**
      * PostcodeReplacer constructor.
@@ -32,12 +33,13 @@ class PostcodeReplacer
     public function __construct(
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteDataHandler,
-        \Webbhuset\CollectorCheckout\Config\Config $config
+        \Webbhuset\CollectorCheckout\Config\Config $config,
+        \Webbhuset\CollectorCheckout\Adapter $collectorAdapter
     ) {
         $this->quoteRepository = $quoteRepository;
         $this->quoteDataHandler = $quoteDataHandler;
         $this->config = $config;
-
+        $this->collectorAdapter = $collectorAdapter;
     }
 
     /**
@@ -66,6 +68,20 @@ class PostcodeReplacer
         }
 
         return [$cartId, $addressInformation];
+    }
+
+    public function afterCalculate($subject, $result, $cartId, \Magento\Checkout\Api\Data\TotalsInformationInterface $addressInformation)
+    {
+        $quote = $this->quoteRepository->getActive($cartId);
+        if (
+            $this->quoteDataHandler->getPublicToken($quote)
+            && $this->config->getIsActive($quote->getStoreId())
+        ) {
+            $quote->setNeedsCollectorUpdate(true);
+            $this->collectorAdapter->synchronize($quote);
+        }
+
+        return $result;
     }
 
     /**
