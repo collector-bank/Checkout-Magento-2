@@ -56,6 +56,8 @@ class QuoteUpdater
                 ->setCountryId($checkoutData->getCountryCode());
             $shippingAddress = $this->setPrivateAddressData($shippingAddress, $customer, $collectorDeliveryAddress)
                 ->setCountryId($checkoutData->getCountryCode());
+
+            $this->quoteHandler->setNationalIdentificationNumber($quote, $customer->getNationalIdentificationNumber());
         }
 
         if ($customer instanceof SDK\BusinessCustomer) {
@@ -204,9 +206,11 @@ class QuoteUpdater
         SDK\PrivateCustomer $customer,
         SDK\PrivateAddress $collectorAddress
     ) {
+        $ssn  = $customer->getNationalIdentificationNumber();
         $address->setEmail($customer->getEmail())
             ->setTelephone($customer->getMobilePhoneNumber())
             ->setFirstname($collectorAddress->getFirstName())
+            ->setNationalIdentificationNumber($ssn)
             ->setLastname($collectorAddress->getLastName())
             ->setStreet(
                 implode("\n", [

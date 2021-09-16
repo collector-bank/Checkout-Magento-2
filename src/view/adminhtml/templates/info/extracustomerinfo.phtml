@@ -1,0 +1,16 @@
+<?php
+    $block->init();
+    $ssn = $block->getNationalIdentificationNumber();
+?>
+<?php if (!empty($block->getNationalIdentificationNumber())): ?>
+    <table class="admin__table-secondary order-information-table">
+        <tbody>
+        <?php if ($ssn): ?>
+        <tr>
+            <th><?=__('National Identification Number')?></th>
+            <td><?=$ssn?></td>
+        </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+<?php endif; ?>
