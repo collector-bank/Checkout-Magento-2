@@ -125,6 +125,29 @@ class OrderHandler
     }
 
     /**
+     * Set national identification number on order
+     *
+     * @param Order $order
+     * @param       $ssn
+     * @return OrderHandler
+     */
+    public function setNationalIdentificationNumber(Order $order, $ssn)
+    {
+        return $this->setAdditionalData($order, 'national_identification_number', $ssn);
+    }
+
+    /**
+     * Get org number from order
+     *
+     * @param Order $order
+     * @return mixed|null
+     */
+    public function getNationalIdentificationNumber(Order $order)
+    {
+        return $this->getAdditionalData($order, 'national_identification_number');
+    }
+
+    /**
      * Set reference on order
      *
      * @param Order $order

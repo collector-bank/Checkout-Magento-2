@@ -126,6 +126,26 @@ class QuoteHandler
     }
 
     /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @param                                       $ssn
+     *
+     * @return \Webbhuset\CollectorCheckout\Data\QuoteHandler
+     */
+    public function setNationalIdentificationNumber(Quote $quote, $ssn)
+    {
+        return $this->setAdditionalData($quote, 'national_identification_number', $ssn);
+    }
+
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     */
+    public function getNationalIdentificationNumber(Quote $quote, $order)
+    {
+        return $this->getAdditionalData($quote, 'national_identification_number');
+    }
+
+
+    /**
      * Get org number from quote
      *
      * @param Quote $quote
