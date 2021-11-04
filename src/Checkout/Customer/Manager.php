@@ -119,11 +119,65 @@ class Manager
 
         $websiteId  = $this->storeManager->getWebsite()->getId();
 
+        $dateOfBirth = $this->extractDateOfBirthFromQuote($quote);
+        if (!$dateOfBirth instanceof \DateTime) {
+            $dateOfBirth = null;
+        } else {
+            $dateOfBirth = $dateOfBirth->format('Y-m-d');
+        }
+
         $customer->setWebsiteId($websiteId)
             ->setLastname($quote->getCustomerLastname())
             ->setFirstname($quote->getCustomerFirstname())
-            ->setEmail($email);
+            ->setEmail($email)
+            ->setDob($dateOfBirth);
+
         return $this->accountManagement->createAccount($customer);
+    }
+
+    protected function extractDateOfBirthFromQuote($quote)
+    {
+        if ($quote->getData('collectorbank_customer_type') != 1) {
+
+            return false;
+        }
+        $data = json_decode($quote->getCollectorbankData(), true);
+        $ssn = $data['national_identification_number'] ?? false;
+        $format = $this->detectSsnFormat($quote);
+        return ($ssn && $format)
+            ? $this->normalizeDateFromFormat($format, $ssn)
+            : false;
+    }
+
+    protected function normalizeDateFromFormat($format, $ssn)
+    {
+        switch($format) {
+            case 'ÅÅMMDD-NNNN':
+                $datePart = mb_substr($ssn, 0, 8);
+                return \DateTime::createFromFormat('Ymd', $datePart);
+            case 'DDMMÅÅSNNNK':
+            case 'DDMMÅÅNNNNN':
+                $datePart = mb_substr($ssn, 0, 6);
+                return \DateTime::createFromFormat('dmy', $datePart);
+            default:
+                return false;
+        }
+    }
+
+    protected function detectSsnFormat($quote)
+    {
+        $country = $quote->getshippingAddress()->getCountryId();
+
+        switch($country) {
+            case 'SE':
+                return 'ÅÅMMDD-NNNN';
+            case 'FI':
+                return 'DDMMÅÅSNNNK';
+            case 'NO':
+                return 'DDMMÅÅNNNNN';
+            default:
+                return false;
+        }
     }
 
     /**
