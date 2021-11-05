@@ -137,11 +137,26 @@ class Index extends \Magento\Framework\App\Action\Action
             $page->getConfig()->addBodyClass('delivery-checkout');
         }
 
+        if (
+            $this->config->getDisplayCheckoutVersion() != 'v1'
+            && !($this->config->getIsDeliveryCheckoutActive())
+            && (
+                $this->quoteDataHandler->getCustomerType($quote) !=
+                 \Webbhuset\CollectorCheckout\Config\Source\Customer\Type::BUSINESS_CUSTOMERS
+            )
+
+        ) {
+            $dataVersion = 'v2';
+        } else {
+            $dataVersion = 'v1';
+        }
+
         $block = $page
             ->getLayout()
             ->getBlock('collectorbank_checkout_iframe')
             ->setIframe($iframe)
             ->setDataToken($iframeToken)
+            ->setDataVersion($dataVersion)
             ->setIframeSrc($iframeSrc);
 
         return $page;

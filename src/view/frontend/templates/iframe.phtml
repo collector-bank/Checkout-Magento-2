@@ -11,7 +11,8 @@ $iframe = $block->getIframe();
                         "component": "collectorIframe",
                         "config":{
                             "src": "<?=$block->escapeUrl($block->getIframeSrc())?>",
-                            "dataToken": "<?=$block->escapeHtml($block->getDataToken())?>"
+                            "dataToken": "<?=$block->escapeHtml($block->getDataToken())?>",
+                            "dataVersion": "<?=$block->escapeHtml($block->getDataVersion())?>"
                         }
                     }
                 }
