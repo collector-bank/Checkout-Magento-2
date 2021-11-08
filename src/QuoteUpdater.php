@@ -180,14 +180,15 @@ class QuoteUpdater
     ) : Quote {
         $customer = $checkoutData->getCustomer();
         $customerAddress = $customer->getInvoiceAddress();
-
         $firstname = $customerAddress->getFirstName();
         $lastname  = $customerAddress->getLastName();
         $email = $customer->getEmail();
-
+        $countryCode = $checkoutData->getCountryCode();
+        $basicAddress = $quote->getShippingAddress()->setCountryId($countryCode);
         $quote->setCustomerFirstname($firstname)
             ->setCustomerLastname($lastname)
-            ->setCustomerEmail($email);
+            ->setCustomerEmail($email)
+            ->setShippingAddress($basicAddress);
 
         return $quote;
     }

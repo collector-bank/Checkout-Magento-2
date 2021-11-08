@@ -12,11 +12,5 @@
                 <argument name="template" xsi:type="string">Webbhuset_CollectorCheckout::info/shipping.phtml</argument>
             </action>
         </referenceBlock>
-        <referenceContainer name="extra_customer_info">
-            <block class="Webbhuset\CollectorCheckout\Block\Admin\CustomerExtraInfo"
-                   name="sales_order_view_customer_extra"
-                   template="Webbhuset_CollectorCheckout::info/extracustomerinfo.phtml" before="-"
-            />
-        </referenceContainer>
     </body>
 </page>
