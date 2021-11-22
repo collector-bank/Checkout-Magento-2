@@ -179,6 +179,12 @@ class Config implements
         return $this->getIsTestMode() ? $this->getTestModeB2B() : $this->getProductionModeB2B();
     }
 
+    public function getDisplayCheckoutVersion(): string
+    {
+
+        return $this->getConfigValue('checkout_version') ?? 'v1';
+    }
+
     /**
      * Get customer types allowed to checkout
      *

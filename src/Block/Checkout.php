@@ -23,6 +23,7 @@ class Checkout extends \Magento\Framework\View\Element\Template
     protected $configProvider;
 
     protected $dataToken;
+    protected $dataVersion;
     protected $iframeSrc;
 
     /**
@@ -84,6 +85,13 @@ class Checkout extends \Magento\Framework\View\Element\Template
         return $this;
     }
 
+    public function setDataVersion($dataVersion)
+    {
+        $this->dataVersion = $dataVersion;
+
+        return $this;
+    }
+
     public function setIframeSrc($iframeSrc)
     {
         $this->iframeSrc = $iframeSrc;
@@ -94,6 +102,11 @@ class Checkout extends \Magento\Framework\View\Element\Template
     public function getDataToken()
     {
         return $this->dataToken;
+    }
+
+    public function getDataVersion()
+    {
+        return $this->dataVersion;
     }
 
     public function getIframeSrc()

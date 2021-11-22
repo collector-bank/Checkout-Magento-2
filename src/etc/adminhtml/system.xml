@@ -222,6 +222,22 @@
 
 
                     <field
+                        id="checkout_version"
+                        translate="label"
+                        type="select"
+                        sortOrder="34"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <label>Display checkout version</label>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <source_model>Webbhuset\CollectorCheckout\Config\Source\Checkout\Version</source_model>
+                    </field>
+
+                    <field
                             id="customer_type"
                             translate="label"
                             type="select"

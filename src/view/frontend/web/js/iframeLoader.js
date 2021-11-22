@@ -6,12 +6,14 @@ define([
         defaults: {
             isLoaded: false,
             src: "",
-            dataToken: ""
+            dataToken: "",
+            dataVersion: ""
         },
         initialize: function (config) {
             this._super();
             this.src = config.src;
             this.dataToken = config.dataToken;
+            this.dataVersion = config.dataVersion;
 
             if (this.src && this.dataToken) {
                 this.isLoaded = true;
@@ -22,6 +24,7 @@ define([
             var collectorIframe = document.createElement("script");
             collectorIframe.src = this.src;
             collectorIframe.setAttribute('data-token',this.dataToken);
+            collectorIframe.setAttribute('data-version',this.dataVersion);
             document.getElementById("collectorIframe").appendChild(collectorIframe);
         }
     });
