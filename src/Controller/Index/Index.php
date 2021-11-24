@@ -137,15 +137,7 @@ class Index extends \Magento\Framework\App\Action\Action
             $page->getConfig()->addBodyClass('delivery-checkout');
         }
 
-        if (
-            $this->config->getDisplayCheckoutVersion() != 'v1'
-            && !($this->config->getIsDeliveryCheckoutActive())
-            && (
-                $this->quoteDataHandler->getCustomerType($quote) !=
-                 \Webbhuset\CollectorCheckout\Config\Source\Customer\Type::BUSINESS_CUSTOMERS
-            )
-
-        ) {
+        if ($this->config->getDisplayCheckoutVersion() != 'v1') {
             $dataVersion = 'v2';
         } else {
             $dataVersion = 'v1';
