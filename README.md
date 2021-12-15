@@ -1,6 +1,10 @@
+<<<<<<< HEAD
 # Walley Checkout for Magento 2 (previous Collector Checkout)
+=======
+# Walley Checkout for Magento 2
+>>>>>>> Name change to Walley
 
-Configuration manual here: [Collector Bank Magento 2 configuration manual](docs/manual.md)
+Configuration manual here: [Walley Magento 2 configuration manual](docs/manual.md)
 
 Technical information how to fetch delivery checkout data from the order. [Delivery checkout technical integration](docs/deliveryCheckoutIntegration.md)
 
@@ -15,7 +19,7 @@ Run these commands from the Magento base folder:
 * bin/magento setup:upgrade && bin/magento setup:di:compile && bin/magento cache:flush
 
 ## Configure
-After that, head to administration -> Stores -> Configuration -> Payment methods -> Collector Bank Checkout and click configure to configure Collector Checkout.
+After that, head to administration -> Stores -> Configuration -> Payment methods -> Walley Checkout and click configure to configure Walley Checkout.
 
 ## Upgrade
 To upgrade run 
