@@ -345,13 +345,13 @@ class CollectorBankCommand implements CommandInterface
     ) {
         $invoiceRows = [];
 
-        if (0 < $creditMemo->getBaseAdjustmentNegative()) {
-            $adjustmentFee = $creditMemo->getBaseAdjustmentNegative();
+        if (0 < $creditMemo->getAdjustmentNegative()) {
+            $adjustmentFee = $creditMemo->getAdjustmentNegative();
             $invoiceRows[] = $this->rowMatcher->adjustmentToInvoiceRows($adjustmentFee)->toArray();
         }
 
-        if (0 < $creditMemo->getBaseAdjustmentPositive()) {
-            $adjustmentFee = (-1)*$creditMemo->getBaseAdjustmentPositive();
+        if (0 < $creditMemo->getAdjustmentPositive()) {
+            $adjustmentFee = (-1)*$creditMemo->getAdjustmentPositive();
             $invoiceRows[] = $this->rowMatcher->adjustmentToInvoiceRows($adjustmentFee)->toArray();
         }
 
