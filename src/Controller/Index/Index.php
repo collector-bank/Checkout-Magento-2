@@ -103,7 +103,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $quote = $this->checkoutSession->getQuote();
 
         if (!$this->quoteComparer->create()->isCurrencyMatching()) {
-            $this->messageManager->addErrorMessage(__('Currencies are not matching with what is allowed in CollectorBank checkout'));
+            $this->messageManager->addErrorMessage(__('Currencies are not matching with what is allowed in Walley checkout'));
         }
 
         $quoteCheckoutErrors = $this->quoteValidator->getErrors($quote);

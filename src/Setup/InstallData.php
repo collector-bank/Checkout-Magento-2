@@ -51,19 +51,19 @@ class InstallData implements \Magento\Framework\Setup\InstallDataInterface
         $orderStatuses = [];
         $orderStatuses[\Magento\Sales\Model\Order::STATE_NEW] = [
             'status' => 'collectorbank_new',
-            'label' => 'Collector Bank - Payment Review'
+            'label' => 'Walley - Payment Review'
         ];
         $orderStatuses[\Magento\Sales\Model\Order::STATE_PROCESSING] = [
             'status' => 'collectorbank_acknowledged',
-            'label' => 'Collector Bank - Acknowledged'
+            'label' => 'Walley - Acknowledged'
         ];
         $orderStatuses[\Magento\Sales\Model\Order::STATE_HOLDED] = [
             'status' => 'collectorbank_onhold',
-            'label' => 'Collector Bank - On Hold'
+            'label' => 'Walley - On Hold'
         ];
         $orderStatuses[\Magento\Sales\Model\Order::STATE_CANCELED] = [
             'status' => 'collectorbank_canceled',
-            'label' => 'Collector Bank - Cancelled'
+            'label' => 'Walley - Cancelled'
         ];
 
         foreach ($orderStatuses as $state => $orderStatus) {
