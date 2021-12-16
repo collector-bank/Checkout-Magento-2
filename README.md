@@ -1,4 +1,4 @@
-# Collector Checkout for Magento 2
+# Walley Checkout for Magento 2 (previous Collector Checkout)
 
 Configuration manual here: [Collector Bank Magento 2 configuration manual](docs/manual.md)
 
