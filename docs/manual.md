@@ -27,7 +27,7 @@ The latest installation instructions can be found in the README.md file in the o
 #### Magento setup
 
 * Installing HTTPS (a SSL/TLS certificate) in your web store is strongly recommended.
-* Base currency for the store must be the same as you are using in Collector. Currency for the collector checkout is set in the Country setting, see below Collector Magento configuration below.
+* Currency for the store must be the same as you are using in Collector (however base currency may differ). Currency for the collector checkout is set in the Country setting, see below Collector Magento configuration below.
 * The module is tested with the common tax settings for B2C and B2B. If you are using non-standard tax settings and/or additional testing on your side will be to recommend.
 * If you are using currency switches it might require additional testing.
 
