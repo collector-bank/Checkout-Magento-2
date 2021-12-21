@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 # Walley Checkout for Magento 2 (previous Collector Checkout)
-=======
-# Walley Checkout for Magento 2
->>>>>>> Name change to Walley
 
 Configuration manual here: [Walley Magento 2 configuration manual](docs/manual.md)
 
