@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Webbhuset\CollectorCheckout\Setup\Patch\Data;
 
-class UpdateOrderStatuses implements \Magento\Framework\Setup\Patch\DataPatchInterface
+class ChangeOrderStatuses implements \Magento\Framework\Setup\Patch\DataPatchInterface
 {
     private $setup;
     private $statusFactory;
@@ -23,10 +23,17 @@ class UpdateOrderStatuses implements \Magento\Framework\Setup\Patch\DataPatchInt
 
         $statusCollection = $this->statusFactory->create();
         $models = $statusCollection->addFieldToFilter('status', ['like' => 'collectorbank_%']);
+
         foreach($models as $model){
-            $newLabel = str_replace(['collector', 'Collector'], 'Walley', $model->getLabel());
-            $model->setLabel($newLabel);
+
+            $newLabel = str_replace([
+                'collector bank', 'Collector Bank',
+                'collector', 'Collector', 'Walley Bank'
+            ], 'Walley', $model->getLabel());
+
+            $model->setLabel(trim($newLabel));
         }
+
         $models->save();
 
         $this->setup->endSetup();
