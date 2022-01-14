@@ -6,7 +6,7 @@ Technical information how to fetch delivery checkout data from the order. [Deliv
 
 ## Requirements
 * Magento Open Source 2.2.0 or above
-* PHP 7.2 and above
+* PHP 7.4 and above
 
 ## Install
 Run these commands from the Magento base folder:
