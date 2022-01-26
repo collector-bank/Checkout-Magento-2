@@ -7,7 +7,7 @@
 "Cancel coupon", "Ta bort rabattkod"
 "Private", "Privat"
 "Business", "Företag"
-"Currencies are not matching with what is allowed in CollectorBank checkout","Butikens valuta stämmer inte överens med valutan hos Collector Bank Checkout"
+"Currencies are not matching with what is allowed in Walley checkout","Butikens valuta stämmer inte överens med valutan hos Walley Checkout"
 "Could not save order","Kan inte spara order"
 "Cart not found","Kan inte hitta varukorgen"
 "Quote not found","Kan inte hitta varukorgen"

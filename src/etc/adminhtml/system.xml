@@ -17,7 +17,7 @@
                     <![CDATA[
                     <div class="collectorbank-payment-logo"></div>
                     <div class="collectorbank-payment-byline">
-                        The Collector Checkout is a user-friendly payment solution, both for you as a merchant but also for the most important part, the end customer.
+                        The Walley Checkout is a user-friendly payment solution, both for you as a merchant but also for the most important part, the end customer.
                         </div>
                 ]]>
                 </label>
@@ -34,7 +34,7 @@
                 >
 
 
-                    <label>Collector Bank Checkout Configuration</label>
+                    <label>Walley Checkout Configuration</label>
                     <field
                             id="active"
                             translate="label"
@@ -402,7 +402,7 @@
                     >
                         <label>Profile Name B2C</label>
                         <comment>
-                           If you have been provided with a profile name from Collector Bank, enter it here, otherwise leave this field empty.
+                           If you have been provided with a profile name from Walley, enter it here, otherwise leave this field empty.
                         </comment>
                         <depends>
                             <field id='active'>1</field>
@@ -420,7 +420,7 @@
                     >
                         <label>Profile Name B2B</label>
                         <comment>
-                            If you have been provided with a profile name from Collector Bank, enter it here, otherwise leave this field empty.
+                            If you have been provided with a profile name from Walley, enter it here, otherwise leave this field empty.
                         </comment>
                         <depends>
                             <field id='active'>1</field>
@@ -549,7 +549,7 @@
                         showInWebsite="1"
                         showInStore="1"
                 >
-                    <label>Collector Bank Delivery Checkout Configuration</label>
+                    <label>Walley Delivery Checkout Configuration</label>
                     <field
                             id="active"
                             translate="label"

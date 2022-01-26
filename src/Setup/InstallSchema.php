@@ -39,25 +39,25 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 'length' => '255',
                 'nullable' => true,
-                'comment' => 'Collector Bank private id',
+                'comment' => 'Walley private id',
             ],
             'collectorbank_public_id' => [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 'length' => '255',
                 'nullable' => true,
-                'comment' => 'Collector Bank public id',
+                'comment' => 'Walley public id',
             ],
             'collectorbank_customer_type' => [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 'length' => '255',
                 'nullable' => true,
-                'comment' => 'Collector Bank customer type',
+                'comment' => 'Walley customer type',
             ],
             'collectorbank_data' => [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 'length' => '64k',
                 'nullable' => true,
-                'comment' => 'Collector Bank data'
+                'comment' => 'Walley data'
             ]
         ];
         $this->addColumns($columns, $table, $setup);
@@ -72,25 +72,25 @@ class InstallSchema implements \Magento\Framework\Setup\InstallSchemaInterface
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 'length' => '255',
                 'nullable' => true,
-                'comment' => 'Collector Bank private id',
+                'comment' => 'Walley private id',
             ],
             'collectorbank_public_id' => [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 'length' => '255',
                 'nullable' => true,
-                'comment' => 'Collector Bank public id',
+                'comment' => 'Walley public id',
             ],
             'collectorbank_customer_type' => [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 'length' => '255',
                 'nullable' => true,
-                'comment' => 'Collector Bank customer type',
+                'comment' => 'Walley customer type',
             ],
             'collectorbank_data' => [
                 'type' => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
                 'length' => '64k',
                 'nullable' => true,
-                'comment' => 'Collector Bank data',
+                'comment' => 'Walley data',
             ]
         ];
         $this->addColumns($columns, $table, $setup);

@@ -18,9 +18,9 @@ class Config implements ConfigProviderInterface
     /**
      *
      */
-    const PAYMENT_METHOD_NAME = "Collector Bank Checkout";
+    const PAYMENT_METHOD_NAME = "Walley Checkout";
     /**
-     * The method code of collector bank payment method
+     * The method code of Walley payment method
      */
     const CHECKOUT_URL_KEY = "collectorcheckout";
     /**
@@ -109,7 +109,7 @@ class Config implements ConfigProviderInterface
     }
 
     /**
-     * Get url for reinitalizing collector checkout
+     * Get url for reinitalizing Walley checkout
      *
      * @return string
      */
@@ -119,7 +119,7 @@ class Config implements ConfigProviderInterface
     }
 
     /**
-     * Get url for updating information in the collector checkout
+     * Get url for updating information in the Walley checkout
      *
      * @return string
      */
