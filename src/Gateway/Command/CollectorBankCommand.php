@@ -274,7 +274,9 @@ class CollectorBankCommand implements CommandInterface
                 $e->getMessage()
             );
 
-            return false;
+            throw new \Webbhuset\CollectorCheckout\Exception\Exception(
+                __($e->getMessage())
+            )
         }
 
         return true;
@@ -383,7 +385,9 @@ class CollectorBankCommand implements CommandInterface
                 "Response error on void / cancel increment orderId: {$incrementOrderId} invoiceNo; {$invoiceNo}" .
                 $e->getMessage()
             );
-            return false;
+            throw new \Webbhuset\CollectorCheckout\Exception\Exception(
+                __($e->getMessage())
+            )
         }
 
         $this->transaction->create()->addTransaction(
