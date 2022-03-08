@@ -276,7 +276,7 @@ class CollectorBankCommand implements CommandInterface
 
             throw new \Webbhuset\CollectorCheckout\Exception\Exception(
                 __($e->getMessage())
-            )
+            );
         }
 
         return true;
@@ -387,7 +387,7 @@ class CollectorBankCommand implements CommandInterface
             );
             throw new \Webbhuset\CollectorCheckout\Exception\Exception(
                 __($e->getMessage())
-            )
+            );
         }
 
         $this->transaction->create()->addTransaction(
