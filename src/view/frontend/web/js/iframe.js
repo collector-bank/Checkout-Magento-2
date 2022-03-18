@@ -3,10 +3,19 @@ define([
     'use strict';
 
     function suspend() {
-        window.collector.checkout.api.suspend();
+        if (typeof window.collector.suspendCount == 'undefined') {
+            window.collector.suspendCount = 0;
+        }
+        window.collector.suspendCount++;
+        if (window.collector.suspendCount == 1) {
+            window.collector.checkout.api.suspend();
+        }
     };
     function resume() {
-        window.collector.checkout.api.resume();
+        window.collector.suspendCount--;
+        if (window.collector.suspendCount == 0) {
+            window.collector.checkout.api.resume();
+        }
     };
 
     return {

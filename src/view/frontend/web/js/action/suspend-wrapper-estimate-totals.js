@@ -6,7 +6,6 @@ define([
 
     return function (totalsDefaultProvider) {
         totalsDefaultProvider.estimateTotals = wrapper.wrapSuper(totalsDefaultProvider.estimateTotals, function (address) {
-
             if (!window.collector) {
                 return this._super(address);
             }
@@ -15,7 +14,6 @@ define([
                 collectorIframe.resume();
             });
         });
-
         return totalsDefaultProvider;
     };
 });
