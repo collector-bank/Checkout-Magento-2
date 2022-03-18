@@ -418,13 +418,14 @@ define([
                         alert({
                             content: msg
                         });
-
-                        collectorIframe.resume();
                     }
                 }
             })
             .fail(function (error) {
                 console.log(JSON.stringify(error));
+            })
+            .always(function () {
+                collectorIframe.resume();
             });
         },
     });
