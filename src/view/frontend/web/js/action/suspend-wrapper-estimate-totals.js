@@ -9,7 +9,6 @@ define([
             if (!window.collector) {
                 return this._super(address);
             }
-            collectorIframe.suspend();
             return this._super(address).done(function () {
                 collectorIframe.resume();
             });
