@@ -55,13 +55,11 @@ define([
 
             $(document).on('ajax:updateCartItemQty', function() {
                 collectorIframe.suspend();
-                collectorIframe.resume();
                 self.fetchShippingRates();
             });
 
             $(document).on('ajax:removeFromCart', function() {
                 collectorIframe.suspend();
-                collectorIframe.resume();
                 self.fetchShippingRates();
             });
 
@@ -217,8 +215,6 @@ define([
             rateProcessors[type] ?
                 rateProcessors[type].getRates(quote.shippingAddress()) :
                 rateProcessors['default'].getRates(quote.shippingAddress());
-
-            totalsDefaultProvider.estimateTotals(quote.shippingAddress());
         },
         setCheckoutData: function () {
             var self = this;
@@ -246,8 +242,6 @@ define([
                     cartCache.clear('totals');
 
                     self.fetchShippingRates();
-
-                    totalsDefaultProvider.estimateTotals(quote.shippingAddress());
                 }
             );
         },
@@ -278,9 +272,6 @@ define([
                     cartCache.clear('totals');
 
                     self.fetchShippingRates();
-
-                    totalsDefaultProvider.estimateTotals(quote.shippingAddress());
-                    collectorIframe.resume();
                 }
             );
         },
@@ -418,13 +409,14 @@ define([
                         alert({
                             content: msg
                         });
-
-                        collectorIframe.resume();
                     }
                 }
             })
             .fail(function (error) {
                 console.log(JSON.stringify(error));
+            })
+            .always(function () {
+                collectorIframe.resume();
             });
         },
     });

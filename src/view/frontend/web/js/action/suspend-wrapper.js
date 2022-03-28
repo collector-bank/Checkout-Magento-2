@@ -14,9 +14,7 @@ define([
                 return originalAction();
             }
 
-            collectorIframe.suspend();
             return originalAction().done(function () {
-                collectorIframe.resume();
             });
         });
     }

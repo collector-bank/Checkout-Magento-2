@@ -6,16 +6,13 @@ define([
 
     return function (totalsDefaultProvider) {
         totalsDefaultProvider.estimateTotals = wrapper.wrapSuper(totalsDefaultProvider.estimateTotals, function (address) {
-
             if (!window.collector) {
                 return this._super(address);
             }
-            collectorIframe.suspend();
             return this._super(address).done(function () {
                 collectorIframe.resume();
             });
         });
-
         return totalsDefaultProvider;
     };
 });
