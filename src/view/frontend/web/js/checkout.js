@@ -33,7 +33,6 @@ define([
             template: 'Webbhuset_CollectorCheckout/checkout',
         },
         timeout: null,
-        isInit: true,
         cartData: {},
         initialize: function (config) {
             var self = this;
@@ -44,7 +43,7 @@ define([
             localStorage.remove('checkout-data');
             localStorage.remove('cart');
 
-          //  self.setCheckoutData();
+            // self.setCheckoutData();
             this.cartData = customerData.get('cart');
 
             // Reload page if we cannot use collector checkout
@@ -250,7 +249,6 @@ define([
                     cartCache.clear('totals');
 
                     self.fetchShippingRates();
-
                 }
             );
         },
@@ -425,7 +423,6 @@ define([
             .fail(function (error) {
                 console.log(JSON.stringify(error));
             });
-            
         },
     });
 });
