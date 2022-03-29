@@ -2,23 +2,20 @@ define([
 ], function () {
     'use strict';
 
+    var currentState = '';
+    
     function suspend() {
-        if (typeof window.collector.suspendCount == 'undefined') {
-            window.collector.suspendCount = 0;
-        }
-        window.collector.suspendCount++;
-        if (window.collector.suspendCount == 1) {
+        if (currentState == '' || currentState== 'resumed') {
             window.collector.checkout.api.suspend();
+            console.log("suspended");
+            currentState = 'suspended';
         }
     };
     function resume() {
-        if (typeof window.collector.suspendCount == 'undefined') {
-            window.collector.suspendCount = 1;
-        }
-        window.collector.suspendCount--;
-        if (window.collector.suspendCount <= 0) {
+                if (currentState == '' || currentState== 'suspended') {
             window.collector.checkout.api.resume();
-            window.collector.suspendCount = 0;
+            console.log("resumed");
+            currentState = 'resumed';
         }
     };
 

@@ -33,6 +33,7 @@ define([
             template: 'Webbhuset_CollectorCheckout/checkout',
         },
         timeout: null,
+        isInit: true,
         cartData: {},
         initialize: function (config) {
             var self = this;
@@ -43,7 +44,7 @@ define([
             localStorage.remove('checkout-data');
             localStorage.remove('cart');
 
-            self.setCheckoutData();
+          //  self.setCheckoutData();
             this.cartData = customerData.get('cart');
 
             // Reload page if we cannot use collector checkout
@@ -85,7 +86,14 @@ define([
                         such as a changed email, mobile phone number or delivery address.
                         This event is also fired the first time the customer is identified.
                     */
-                    this.addressUpdated(event);
+                    console.log("customer updated");
+					// TODO - This should be possible to be nicer!
+                    if(typeof this.FirstTimeHasTriggered === 'undefined')
+                    {
+                            this.FirstTimeHasTriggered= true;
+                    }else{
+                             this.addressUpdated(event);
+                    }
                     break;
 
                 case 'collectorCheckoutShippingUpdated':
@@ -242,6 +250,7 @@ define([
                     cartCache.clear('totals');
 
                     self.fetchShippingRates();
+
                 }
             );
         },
@@ -409,15 +418,14 @@ define([
                         alert({
                             content: msg
                         });
+                        collectorIframe.resume();
                     }
                 }
             })
             .fail(function (error) {
                 console.log(JSON.stringify(error));
-            })
-            .always(function () {
-                collectorIframe.resume();
             });
+            
         },
     });
 });
