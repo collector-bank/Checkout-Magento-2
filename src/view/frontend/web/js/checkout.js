@@ -43,6 +43,7 @@ define([
             localStorage.remove('checkout-data');
             localStorage.remove('cart');
 
+            // Why do we need this? Can it be removed?
             // self.setCheckoutData();
             this.cartData = customerData.get('cart');
 
@@ -54,12 +55,10 @@ define([
             });
 
             $(document).on('ajax:updateCartItemQty', function() {
-                collectorIframe.suspend();
                 self.fetchShippingRates();
             });
 
             $(document).on('ajax:removeFromCart', function() {
-                collectorIframe.suspend();
                 self.fetchShippingRates();
             });
 
@@ -87,9 +86,9 @@ define([
                     */
                     console.log("customer updated");
 					// TODO - This should be possible to be nicer!
-                    if(typeof this.FirstTimeHasTriggered === 'undefined')
+                    if(typeof this.FirstCustomerUpdateHasBeenTriggered === 'undefined')
                     {
-                            this.FirstTimeHasTriggered= true;
+                            this.FirstCustomerUpdateHasBeenTriggered = true;
                     }else{
                              this.addressUpdated(event);
                     }
@@ -397,7 +396,7 @@ define([
 
                 /** @inheritdoc */
                 beforeSend: function () {
-                    collectorIframe.suspend();
+                   collectorIframe.suspend();
                 },
 
                 /** @inheritdoc */

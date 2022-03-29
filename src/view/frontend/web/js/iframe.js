@@ -1,22 +1,20 @@
 define([
 ], function () {
     'use strict';
-
-    var currentState = '';
+    
+    // Make sure we dont do any resumes before user done a action that sends a suspend
+    var suspendActionHaveBeenTriggered = false;
     
     function suspend() {
-        if (currentState == '' || currentState== 'resumed') {
             window.collector.checkout.api.suspend();
             console.log("suspended");
-            currentState = 'suspended';
-        }
+            suspendActionHaveBeenTriggered = true;
     };
     function resume() {
-                if (currentState == '' || currentState== 'suspended') {
+         if (suspendActionHaveBeenTriggered === true) {
             window.collector.checkout.api.resume();
             console.log("resumed");
-            currentState = 'resumed';
-        }
+         }
     };
 
     return {
