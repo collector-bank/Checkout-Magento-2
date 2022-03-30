@@ -1,25 +1,20 @@
 define([
 ], function () {
     'use strict';
-
+    
+    // Make sure we dont do any resumes before user done a action that sends a suspend
+    var suspendActionHaveBeenTriggered = false;
+    
     function suspend() {
-        if (typeof window.collector.suspendCount == 'undefined') {
-            window.collector.suspendCount = 0;
-        }
-        window.collector.suspendCount++;
-        if (window.collector.suspendCount == 1) {
             window.collector.checkout.api.suspend();
-        }
+            console.log("suspended");
+            suspendActionHaveBeenTriggered = true;
     };
     function resume() {
-        if (typeof window.collector.suspendCount == 'undefined') {
-            window.collector.suspendCount = 1;
-        }
-        window.collector.suspendCount--;
-        if (window.collector.suspendCount <= 0) {
+         if (suspendActionHaveBeenTriggered === true) {
             window.collector.checkout.api.resume();
-            window.collector.suspendCount = 0;
-        }
+            console.log("resumed");
+         }
     };
 
     return {

@@ -7,13 +7,14 @@ define([
     'ko',
     'underscore',
     'uiComponent',
+    'Webbhuset_CollectorCheckout/js/iframe',
     'Magento_Checkout/js/model/shipping-service',
     'Magento_Catalog/js/price-utils',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/action/select-shipping-method',
     'Magento_Checkout/js/action/set-shipping-information',
     'Magento_Checkout/js/checkout-data'
-], function (ko, _, Component, shippingService, priceUtils, quote, selectShippingMethodAction, setShippingInformationAction, checkoutData) {
+], function (ko, _, Component, collectorIframe, shippingService, priceUtils, quote, selectShippingMethodAction, setShippingInformationAction, checkoutData) {
     'use strict';
 
     return Component.extend({
@@ -76,6 +77,7 @@ define([
          * @returns bool
          */
         selectShippingMethod: function (methodData) {
+            collectorIframe.suspend();  
             selectShippingMethodAction(methodData);
             checkoutData.setSelectedShippingRate(methodData['carrier_code'] + '_' + methodData['method_code']);
 

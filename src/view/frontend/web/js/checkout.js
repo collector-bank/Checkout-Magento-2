@@ -43,7 +43,8 @@ define([
             localStorage.remove('checkout-data');
             localStorage.remove('cart');
 
-            self.setCheckoutData();
+            // Why do we need this? Can it be removed?
+            // self.setCheckoutData();
             this.cartData = customerData.get('cart');
 
             // Reload page if we cannot use collector checkout
@@ -54,12 +55,10 @@ define([
             });
 
             $(document).on('ajax:updateCartItemQty', function() {
-                collectorIframe.suspend();
                 self.fetchShippingRates();
             });
 
             $(document).on('ajax:removeFromCart', function() {
-                collectorIframe.suspend();
                 self.fetchShippingRates();
             });
 
@@ -85,7 +84,14 @@ define([
                         such as a changed email, mobile phone number or delivery address.
                         This event is also fired the first time the customer is identified.
                     */
-                    this.addressUpdated(event);
+                    console.log("customer updated");
+					// TODO - This should be possible to be nicer!
+                    if(typeof this.FirstCustomerUpdateHasBeenTriggered === 'undefined')
+                    {
+                            this.FirstCustomerUpdateHasBeenTriggered = true;
+                    }else{
+                             this.addressUpdated(event);
+                    }
                     break;
 
                 case 'collectorCheckoutShippingUpdated':
@@ -390,7 +396,7 @@ define([
 
                 /** @inheritdoc */
                 beforeSend: function () {
-                    collectorIframe.suspend();
+                   collectorIframe.suspend();
                 },
 
                 /** @inheritdoc */
@@ -409,14 +415,12 @@ define([
                         alert({
                             content: msg
                         });
+                        collectorIframe.resume();
                     }
                 }
             })
             .fail(function (error) {
                 console.log(JSON.stringify(error));
-            })
-            .always(function () {
-                collectorIframe.resume();
             });
         },
     });
