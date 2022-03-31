@@ -43,8 +43,7 @@ define([
             localStorage.remove('checkout-data');
             localStorage.remove('cart');
 
-            // Why do we need this? Can it be removed?
-            // self.setCheckoutData();
+            self.setCheckoutData();
             this.cartData = customerData.get('cart');
 
             // Reload page if we cannot use collector checkout
@@ -55,10 +54,12 @@ define([
             });
 
             $(document).on('ajax:updateCartItemQty', function() {
+                collectorIframe.suspend();
                 self.fetchShippingRates();
             });
 
             $(document).on('ajax:removeFromCart', function() {
+                collectorIframe.suspend();
                 self.fetchShippingRates();
             });
 
@@ -85,11 +86,9 @@ define([
                         This event is also fired the first time the customer is identified.
                     */
                     console.log("customer updated");
-					// TODO - This should be possible to be nicer!
-                    if(typeof this.FirstCustomerUpdateHasBeenTriggered === 'undefined')
-                    {
+                    if (typeof this.FirstCustomerUpdateHasBeenTriggered === 'undefined') {
                             this.FirstCustomerUpdateHasBeenTriggered = true;
-                    }else{
+                    } else {
                              this.addressUpdated(event);
                     }
                     break;
@@ -253,8 +252,8 @@ define([
         },
         addressUpdated: function(event) {
             var self = this;
-            collectorIframe.suspend();
             var payload = {}
+            collectorIframe.suspend();
 
             return storage.post(
                 self.getUpdateUrl(event.type, event.detail), JSON.stringify(payload), true
@@ -321,9 +320,7 @@ define([
 
         updateItemQty: function(itemId) {
             var self = this;
-
             return function() {
-
                 self._ajax(window.checkout.updateItemQtyUrl, {
                     'item_id': itemId,
                     'item_qty': $('#collector-cart-item-' + itemId + '-qty').val()

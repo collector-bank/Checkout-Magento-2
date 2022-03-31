@@ -7,13 +7,11 @@ define([
     
     function suspend() {
             window.collector.checkout.api.suspend();
-            console.log("suspended");
             suspendActionHaveBeenTriggered = true;
     };
     function resume() {
          if (suspendActionHaveBeenTriggered === true) {
             window.collector.checkout.api.resume();
-            console.log("resumed");
          }
     };
 
