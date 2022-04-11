@@ -10,9 +10,12 @@ $iframe = $block->getIframe();
                     "collectorIframe": {
                         "component": "collectorIframe",
                         "config":{
-                            "src": "<?=$block->escapeUrl($block->getIframeSrc())?>",
-                            "dataToken": "<?=$block->escapeHtml($block->getDataToken())?>",
-                            "dataVersion": "<?=$block->escapeHtml($block->getDataVersion())?>"
+                            "src": "<?= $block->escapeUrl($block->getIframeSrc()) ?>",
+                            "dataToken": "<?= $block->escapeHtml($block->getDataToken()) ?>",
+                            "dataVersion": "<?= $block->escapeHtml($block->getDataVersion()) ?>",
+                            "dataLang": "<?= $block->escapeHtml($block->getDataLang()) ?>",
+                            "dataActionColor": "<?= $block->escapeHtml($block->getDataActionColor()) ?>",
+                            "dataActionTextColor": "<?= $block->escapeHtml($block->getDataActionTextColor()) ?>"
                         }
                     }
                 }

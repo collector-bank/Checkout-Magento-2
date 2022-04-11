@@ -125,6 +125,9 @@ class Index extends \Magento\Framework\App\Action\Action
 
         $iframeSrc = $iframeConfig->getSrc($this->config->getMode());
         $iframeToken = $iframeConfig->getDataToken();
+        $iframeLang = $iframeConfig->getDataLang();
+        $iframeActionColor = $iframeConfig->getDataActionColor();
+        $iframeActionTextColor = $iframeConfig->getDataActionTextColor();
 
         if ($this->config->getIsDeliveryCheckoutActive()) {
             $page->getConfig()->addBodyClass('delivery-checkout');
@@ -142,6 +145,9 @@ class Index extends \Magento\Framework\App\Action\Action
             ->setIframe($iframe)
             ->setDataToken($iframeToken)
             ->setDataVersion($dataVersion)
+            ->setDataLang($iframeLang)
+            ->setDataActionColor($iframeActionColor)
+            ->setDataActionTextColor($iframeActionTextColor)
             ->setIframeSrc($iframeSrc);
 
         return $page;
