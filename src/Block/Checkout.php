@@ -24,6 +24,9 @@ class Checkout extends \Magento\Framework\View\Element\Template
 
     protected $dataToken;
     protected $dataVersion;
+    protected $dataLang;
+    protected $dataActionColor;
+    protected $dataActionTextColor;
     protected $iframeSrc;
 
     /**
@@ -92,6 +95,27 @@ class Checkout extends \Magento\Framework\View\Element\Template
         return $this;
     }
 
+    public function setDataLang($dataLang)
+    {
+        $this->dataLang = $dataLang;
+
+        return $this;
+    }
+
+    public function setDataActionColor($dataActionColor)
+    {
+        $this->dataActionColor = $dataActionColor;
+
+        return $this;
+    }
+
+    public function setDataActionTextColor($dataActionTextColor)
+    {
+        $this->dataActionTextColor = $dataActionTextColor;
+
+        return $this;
+    }
+
     public function setIframeSrc($iframeSrc)
     {
         $this->iframeSrc = $iframeSrc;
@@ -107,6 +131,21 @@ class Checkout extends \Magento\Framework\View\Element\Template
     public function getDataVersion()
     {
         return $this->dataVersion;
+    }
+
+    public function getDataLang()
+    {
+        return $this->dataLang;
+    }
+
+    public function getDataActionColor()
+    {
+        return $this->dataActionColor;
+    }
+
+    public function getDataActionTextColor()
+    {
+        return $this->dataActionTextColor;
     }
 
     public function getIframeSrc()
