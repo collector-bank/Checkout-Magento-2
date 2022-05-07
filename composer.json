@@ -1,8 +1,8 @@
 {
-    "name": "collector-bank/collector-checkout-magento2-php8",
+    "name": "walleypay/walleypay-checkout-magento2",
     "license": "Apache-2.0",
     "type": "magento2-module",
-    "description": "Magento 2 Collector Bank Checkout Module",
+    "description": "Magento 2 WalleyPay Checkout Module",
     "require": {
         "collector-bank/collector-payment-sdk": "1.0.2",
         "collector-bank/collector-checkout-sdk": "^1.0.7",
