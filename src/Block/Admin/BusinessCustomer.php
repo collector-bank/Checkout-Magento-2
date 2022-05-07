@@ -42,7 +42,7 @@ class BusinessCustomer extends \Magento\Backend\Block\Template
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Sales\Model\OrderRepository $orderRepository,
-array $data = []
+        array $data = []
     ) {
         parent::__construct($context, $data);
 

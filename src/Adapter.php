@@ -202,7 +202,6 @@ class Adapter
         $collectorSession = new \Webbhuset\CollectorCheckoutSDK\Session($adapter);
 
         try {
-
             $collectorSession->initialize(
                 $config,
                 $fees,
