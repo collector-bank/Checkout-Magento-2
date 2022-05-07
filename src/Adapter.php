@@ -97,7 +97,7 @@ class Adapter
                     $publicToken = $collectorSession->getPublicToken();
                 } else {
                     $errorMsg = $responseError->getErrorLogMessageFromResponse();
-                    $this->logger->addCritical("Response error when updating fees. " . $errorMsg);
+                    $this->logger->critical("Response error when updating fees. " . $errorMsg);
 
                     throw new ResponseErrorOnCartUpdate(
                         new Phrase(
@@ -202,6 +202,7 @@ class Adapter
         $collectorSession = new \Webbhuset\CollectorCheckoutSDK\Session($adapter);
 
         try {
+
             $collectorSession->initialize(
                 $config,
                 $fees,
@@ -223,7 +224,7 @@ class Adapter
             $this->quoteRepository->save($quote);
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
             $errorMsg = $e->getErrorLogMessageFromResponse();
-            $this->logger->addCritical("Response error when initiating iframe " . $errorMsg);
+            $this->logger->critical("Response error when initiating iframe " . $errorMsg);
 
             throw new CanNotInitiateIframeException(
                 new Phrase(
@@ -331,7 +332,7 @@ class Adapter
             }
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
             $errorMsg = $e->getErrorLogMessageFromResponse();
-            $this->logger->addCritical("Response error when updating fees. " . $errorMsg);
+            $this->logger->critical("Response error when updating fees. " . $errorMsg);
 
             throw new ResponseErrorOnCartUpdate(
                 new Phrase(
@@ -366,7 +367,7 @@ class Adapter
             }
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
             $errorMsg = $e->getErrorLogMessageFromResponse();
-            $this->logger->addCritical("Response error when updating cart. " . $errorMsg);
+            $this->logger->critical("Response error when updating cart. " . $errorMsg);
 
             throw new ResponseErrorOnCartUpdate(
                 new Phrase(

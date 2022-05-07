@@ -37,7 +37,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
         if (!$quote->getId()) {
 
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Tried to reinitialize quote but could not find one with publicId: {$publicId}"
             );
 
@@ -56,7 +56,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->checkoutSession->replaceQuote($quote)
             ->unsLastRealOrderId();
 
-        $this->logger->addCritical(
+        $this->logger->critical(
             "Restored quoteId: {$quote->getId()}, publicId: {$publicId}"
         );
 

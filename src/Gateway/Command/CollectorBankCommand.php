@@ -139,7 +139,7 @@ class CollectorBankCommand implements CommandInterface
             );
         } catch (ResponseError $e) {
             $incrementOrderId = (string)$payment->getOrder()->getIncrementId();
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Response error on capture. increment orderId: {$incrementOrderId} invoiceNo {$invoiceNo}" .
                 $e->getMessage()
             );
@@ -269,7 +269,7 @@ class CollectorBankCommand implements CommandInterface
             );
         } catch (ResponseError $e) {
             $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Response error on refund increment orderId: {$incrementOrderId} invoiceNo {$invoiceNo}" .
                 $e->getMessage()
             );
@@ -326,7 +326,7 @@ class CollectorBankCommand implements CommandInterface
             return true;
         } catch (ResponseError $e) {
             $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Response error on adjustment of invoice: {$incrementOrderId} invoiceNo {$invoiceNo}" .
                 $e->getMessage()
             );
@@ -381,7 +381,7 @@ class CollectorBankCommand implements CommandInterface
             );
         } catch (ResponseError $e) {
             $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Response error on void / cancel increment orderId: {$incrementOrderId} invoiceNo; {$invoiceNo}" .
                 $e->getMessage()
             );

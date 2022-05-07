@@ -86,7 +86,7 @@ class Index extends \Magento\Framework\App\Action\Action
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
             $page->getLayout()
                 ->getBlock('collectorbank_success_iframe');
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Failed to load success page - Could not open order by publicToken: $reference. "
                 . $e->getMessage()
             );

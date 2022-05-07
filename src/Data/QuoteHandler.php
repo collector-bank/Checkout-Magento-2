@@ -94,6 +94,9 @@ class QuoteHandler
      */
     public function getData(Quote $quote)
     {
+        if(is_null($quote)) return [];
+        $collectorbankData = $quote->getCollectorbankData();
+        if(is_null($collectorbankData)) return [];
         $data = json_decode($quote->getCollectorbankData());
 
         return ($data) ? get_object_vars($data) : [];
@@ -224,6 +227,7 @@ class QuoteHandler
     public function getDeliveryCheckoutData(Quote $quote)
     {
         $shippingData = $this->getAdditionalData($quote, 'delivery_checkout_data');
+        if(is_null($shippingData)) return [];
         $shippingData = json_decode($shippingData);
 
         return ($shippingData) ? get_object_vars($shippingData) : [];

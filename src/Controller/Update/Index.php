@@ -79,7 +79,7 @@ class Index extends \Magento\Framework\App\Action\Action
 
         if (!$quote->getId()) {
             $result->setHttpResponseCode(404);
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Quote updater controller - Quote not found quoteId: $publicId event: $eventName"
             );
             return $result->setData(['message' => __('Quote not found')]);

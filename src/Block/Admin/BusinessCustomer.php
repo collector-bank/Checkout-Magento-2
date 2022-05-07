@@ -39,10 +39,10 @@ class BusinessCustomer extends \Magento\Backend\Block\Template
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
-        array $data = [],
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Magento\Framework\App\Request\Http $request,
-        \Magento\Sales\Model\OrderRepository $orderRepository
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+array $data = []
     ) {
         parent::__construct($context, $data);
 

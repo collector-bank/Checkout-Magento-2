@@ -81,7 +81,7 @@ class Administration
 
         $result = $invoiceAdmin->activateInvoice($invoiceNo, $orderId);
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Invoice activated online orderId: {$orderId} invoiceNo: {$invoiceNo} "
         );
 
@@ -104,7 +104,7 @@ class Administration
         $adapter = new SoapAdapter($config);
         $invoiceAdmin = new InvoiceAdministration($adapter);
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Invoice cancelled online orderId: {$orderId} invoiceNo: {$invoiceNo} "
         );
 
@@ -130,7 +130,7 @@ class Administration
         $adapter = new SoapAdapter($config);
         $invoiceAdmin = new InvoiceAdministration($adapter);
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Invoice credited online orderId: {$orderId} invoiceNo: {$invoiceNo} "
         );
 
@@ -158,7 +158,7 @@ class Administration
         $adapter = new SoapAdapter($config);
         $invoiceAdmin = new InvoiceAdministration($adapter);
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Invoice activated online orderId: {$orderId} invoiceNo: {$invoiceNo} "
         );
 
@@ -182,7 +182,7 @@ class Administration
         $adapter = new SoapAdapter($config);
         $invoiceAdmin = new InvoiceAdministration($adapter);
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Invoice credited online orderId: {$orderId} invoiceNo: {$invoiceNo} "
         );
 
@@ -210,7 +210,7 @@ class Administration
         $adapter = new SoapAdapter($config);
         $invoiceAdmin = new InvoiceAdministration($adapter);
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Invoice adjusted online orderId: {$orderId} invoiceNo: {$invoiceNo} "
         );
 
@@ -250,7 +250,7 @@ class Administration
         $invoice = $this->invoiceService->prepareInvoice($order);
         $invoice->setRequestedCaptureCase(\Magento\Sales\Model\Order\Invoice::CAPTURE_OFFLINE);
         $invoice->register();
-        $this->logger->addInfo(
+        $this->logger->info(
             "Invoice order offline orderId: {$order->getIncrementId()} qouteId: {$order->getQuoteId()} "
         );
 

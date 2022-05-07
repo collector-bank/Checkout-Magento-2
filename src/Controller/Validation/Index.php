@@ -139,7 +139,7 @@ class Index extends \Magento\Framework\App\Action\Action
                 'message' => __($e->getMessage())
             ];
             $jsonResult->setHttpResponseCode(404);
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Validation callback CouldNotSaveException. qouteId: {$quote->getId()} " .
                 " orderId: {$quote->getReservedOrderId()} publicToken: $reference. {$e->getMessage()}"
             );
@@ -149,7 +149,7 @@ class Index extends \Magento\Framework\App\Action\Action
                 'message' => __($e->getMessage())
             ];
             $jsonResult->setHttpResponseCode(404);
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Validation callback NoSuchEntityException publicToken: $reference. {$e->getMessage()}"
             );
         } catch (\Webbhuset\CollectorCheckout\Exception\QuoteNotInSyncException $e) {
@@ -158,7 +158,7 @@ class Index extends \Magento\Framework\App\Action\Action
                 'message' => __('Please refresh the page and try again.')
             ];
             $jsonResult->setHttpResponseCode(404);
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Cart not in sync on callback QuoteNotInSyncException publicToken: $reference. {$e->getMessage()}"
             );
         } catch (\Throwable $e) {
@@ -167,7 +167,7 @@ class Index extends \Magento\Framework\App\Action\Action
                 'message' => __($e->getMessage())
             ];
             $jsonResult->setHttpResponseCode(404);
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Validation callback Unrecoverable exception publicToken: $reference. {$e->getMessage()}"
             );
         }

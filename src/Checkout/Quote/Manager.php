@@ -67,7 +67,7 @@ class Manager
         $quoteList = $this->quoteRepository->getList($searchCriteria)->getItems();
 
         if (sizeof($quoteList) == 0) {
-            $this->logger->addCritical("Could not find a quotes with column: : $column : value $value and quote-table");
+            $this->logger->critical("Could not find a quotes with column: : $column : value $value and quote-table");
 
             throw new \Magento\Framework\Exception\NoSuchEntityException();
         }

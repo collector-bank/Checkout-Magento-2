@@ -145,7 +145,7 @@ class Manager
         $order = $this->orderRepository->get($orderId);
         $incrementOrderId = $order->getIncrementId();
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Submitted order order id: {$incrementOrderId}. qouteId: {$quoteId} "
         );
 
@@ -164,7 +164,7 @@ class Manager
         }
 
         $this->orderRepository->delete($order);
-        $this->logger->addInfo(
+        $this->logger->info(
             "Delete order {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
         );
 
@@ -219,12 +219,12 @@ class Manager
             $cancelSuccess = $this->orderManagement->cancel((int) $order->getId());
 
             if (!$cancelSuccess) {
-                $this->logger->addCritical(
+                $this->logger->critical(
                     "Failed to cancel the order: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
                 );
                 return false;
             }
-            $this->logger->addInfo(
+            $this->logger->info(
                 "Order is cancelled: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
             );
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
@@ -251,7 +251,7 @@ class Manager
         }
         if ($order->getTotalInvoiced() > 0) {
             $totalAmount = $order->getTotalInvoiced();
-            $this->logger->addCritical(
+            $this->logger->critical(
                 "Can not invoice order, already invoiced: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
             );
 
@@ -340,7 +340,7 @@ class Manager
             \Magento\Sales\Model\Order::STATE_PROCESSING
         );
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Acknowledged order orderId: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
         );
 
@@ -384,7 +384,7 @@ class Manager
             \Magento\Sales\Model\Order::STATE_HOLDED
         );
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Hold order orderId: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
         );
 
@@ -431,7 +431,7 @@ class Manager
 
         $this->orderManagement->cancel($order->getId());
 
-        $this->logger->addInfo(
+        $this->logger->info(
             "Cancel order orderId: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
         );
 
@@ -463,7 +463,7 @@ class Manager
         $this->acknowledgeOrder($order, $checkoutData);
 
         if (!$order->canInvoice()) {
-            $this->logger->addInfo(
+            $this->logger->info(
                 "Could not create Magento invoice: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
             );
             return [
