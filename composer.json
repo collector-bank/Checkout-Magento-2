@@ -1,5 +1,5 @@
 {
-    "name": "collector-bank/collector-checkout-magento2",
+    "name": "collector-bank/collector-checkout-magento2-php8",
     "license": "Apache-2.0",
     "type": "magento2-module",
     "description": "Magento 2 Collector Bank Checkout Module",
