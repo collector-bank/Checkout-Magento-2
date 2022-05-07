@@ -1,5 +1,5 @@
 {
-    "name": "walleypay/walleypay-checkout-magento2",
+    "name": "walleypay/checkout-magento2",
     "license": "Apache-2.0",
     "type": "magento2-module",
     "description": "Magento 2 WalleyPay Checkout Module",
