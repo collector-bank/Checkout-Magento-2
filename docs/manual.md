@@ -14,7 +14,7 @@ To get started with Walley Checkout, you need to create an account with Walley. 
 
 #### Demo
 
-If you want to try the checkout before installing it in your store you can check out our demo store: [https://collector-stage.webbhuset.com/] (https://collector-stage.webbhuset.com/).
+If you want to try the checkout before installing it in your store you can check out our demo store: https://collector-stage.webbhuset.com/.
 
 To make test purchases you will need customer test data. This information can be found here: [https://dev.walleypay.com/docs/checkout/test-data/](https://dev.walleypay.com/docs/checkout/test-data/).
  use newest available docs, this one is old by now
