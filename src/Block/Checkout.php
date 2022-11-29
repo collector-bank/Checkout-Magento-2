@@ -160,7 +160,7 @@ class Checkout extends \Magento\Framework\View\Element\Template
      */
     public function getUpdateUrl()
     {
-        return $this->getUrl('collectorcheckout/update');
+        return $this->getUrl('walleycheckout/update');
     }
 
     /**
