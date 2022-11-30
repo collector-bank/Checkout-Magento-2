@@ -183,6 +183,9 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
         /** @var \Magento\Quote\Model\Quote\Item\Interceptor $quote */
         $quote = $quoteItems[0];
         $quoteId = $quote->getQuoteId();
+        if (!$quoteId) {
+            return $result;
+        }
 
         $method = $this->getMethodForQuote($quoteId);
         if (!empty($method)) {
