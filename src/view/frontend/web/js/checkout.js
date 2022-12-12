@@ -205,6 +205,7 @@ define([
         },
 
         getUpdateUrl: function(eventName, publicId) {
+            console.log(window.checkoutConfig.payment.collector_checkout.update_url + '?event=' + eventName + '&quoteid=' + publicId);
             return window.checkoutConfig.payment.collector_checkout.update_url + '?event=' + eventName + '&quoteid=' + publicId
         },
 
@@ -223,10 +224,11 @@ define([
         },
         setCheckoutData: function () {
             var self = this;
-            var payload = {}
-
+            if (!payload) {
+                var payload = {};
+            }
             return storage.post(
-                self.getUpdateUrl(event.type, event.detail), JSON.stringify(payload), true
+                self.getUpdateUrl("update", window.checkoutConfig.quoteData.collectorbank_public_id), JSON.stringify(payload), true
             ).fail(
                 function (response) {
                     console.error(response);
