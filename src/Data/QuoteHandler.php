@@ -183,6 +183,31 @@ class QuoteHandler
         return $this->getAdditionalData($quote, 'reference');
     }
 
+
+    /**
+     * Set invoice tag on quote
+     *
+     * @param Quote $quote
+     * @param       $reference
+     * @return QuoteHandler
+     */
+    public function setInvoiceTag(Quote $quote, $reference)
+    {
+        return $this->setAdditionalData($quote, 'invoiceTag', $reference);
+    }
+
+    /**
+     * Get invoice tag from quote
+     *
+     * @param Quote $quote
+     * @return mixed|null
+     */
+    public function getInvoiceTag(Quote $quote)
+    {
+        return $this->getAdditionalData($quote, 'invoiceTag');
+    }
+
+
     /**
      * Set collector bank store id on quote
      *

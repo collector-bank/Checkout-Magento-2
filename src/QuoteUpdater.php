@@ -67,7 +67,8 @@ class QuoteUpdater
                 ->setCountryId($checkoutData->getCountryCode());
 
             $this->quoteHandler->setOrgNumber($quote, $customer->getOrganizationNumber())
-                ->setReference($quote, $customer->getInvoiceReference());
+                ->setReference($quote, $customer->getInvoiceReference())
+                ->setInvoiceTag($quote, $customer->getInvoiceTag());
         }
 
         $quote->setDefaultShippingAddress($shippingAddress);

@@ -70,6 +70,16 @@ class BusinessCustomer extends \Magento\Backend\Block\Template
     }
 
     /**
+     * Gets the collector invoice tag / Public Token for the current order
+     *
+     * @return mixed|null
+     */
+    public function getInvoiceTag()
+    {
+        return $this->orderHandler->getInvoiceTag($this->order);
+    }
+
+    /**
      * Returns true if the customer is of type business customer
      *
      * @return bool
