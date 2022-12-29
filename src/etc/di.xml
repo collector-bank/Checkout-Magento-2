@@ -103,4 +103,15 @@
             for="Magento\Sales\Block\Adminhtml\Order\AbstractOrder"
             type="Webbhuset\CollectorCheckout\Block\Admin\Carrier"
     />
+
+    <preference
+        for="Webbhuset\CollectorCheckout\Api\Data\IframeDataInterface"
+        type="Webbhuset\CollectorCheckout\Data\IframeData"
+    />
+
+    <preference
+        for="Webbhuset\CollectorCheckout\Api\GetIframeSrcInterface"
+        type="Webbhuset\CollectorCheckout\Checkout\GetIframeSrc"
+    />
+
 </config>
