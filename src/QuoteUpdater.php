@@ -56,7 +56,6 @@ class QuoteUpdater
                 ->setCountryId($checkoutData->getCountryCode());
             $shippingAddress = $this->setPrivateAddressData($shippingAddress, $customer, $collectorDeliveryAddress)
                 ->setCountryId($checkoutData->getCountryCode());
-
             $this->quoteHandler->setNationalIdentificationNumber($quote, $customer->getNationalIdentificationNumber());
         }
 
@@ -69,6 +68,9 @@ class QuoteUpdater
             $this->quoteHandler->setOrgNumber($quote, $customer->getOrganizationNumber())
                 ->setReference($quote, $customer->getInvoiceReference())
                 ->setInvoiceTag($quote, $customer->getInvoiceTag());
+        }
+        if ($customer->getDeliveryMobilePhoneNumber()) {
+            $shippingAddress->setTelephone($customer->getDeliveryMobilePhoneNumber());
         }
 
         $quote->setDefaultShippingAddress($shippingAddress);
