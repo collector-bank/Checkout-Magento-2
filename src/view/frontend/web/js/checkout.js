@@ -205,7 +205,6 @@ define([
         },
 
         getUpdateUrl: function(eventName, publicId) {
-            console.log(window.checkoutConfig.payment.collector_checkout.update_url + '?event=' + eventName + '&quoteid=' + publicId);
             return window.checkoutConfig.payment.collector_checkout.update_url + '?event=' + eventName + '&quoteid=' + publicId
         },
 
