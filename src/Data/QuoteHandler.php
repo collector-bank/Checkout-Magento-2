@@ -94,7 +94,11 @@ class QuoteHandler
      */
     public function getData(Quote $quote)
     {
-        $data = json_decode($quote->getCollectorbankData());
+        $collectorData = $quote->getCollectorbankData();
+        if (!$collectorData) {
+            return [];
+        }
+        $data = json_decode($collectorData);
 
         return ($data) ? get_object_vars($data) : [];
     }
@@ -179,6 +183,31 @@ class QuoteHandler
         return $this->getAdditionalData($quote, 'reference');
     }
 
+
+    /**
+     * Set invoice tag on quote
+     *
+     * @param Quote $quote
+     * @param       $reference
+     * @return QuoteHandler
+     */
+    public function setInvoiceTag(Quote $quote, $reference)
+    {
+        return $this->setAdditionalData($quote, 'invoiceTag', $reference);
+    }
+
+    /**
+     * Get invoice tag from quote
+     *
+     * @param Quote $quote
+     * @return mixed|null
+     */
+    public function getInvoiceTag(Quote $quote)
+    {
+        return $this->getAdditionalData($quote, 'invoiceTag');
+    }
+
+
     /**
      * Set collector bank store id on quote
      *
@@ -224,6 +253,9 @@ class QuoteHandler
     public function getDeliveryCheckoutData(Quote $quote)
     {
         $shippingData = $this->getAdditionalData($quote, 'delivery_checkout_data');
+        if (!$shippingData) {
+            return [];
+        }
         $shippingData = json_decode($shippingData);
 
         return ($shippingData) ? get_object_vars($shippingData) : [];

@@ -223,10 +223,11 @@ define([
         },
         setCheckoutData: function () {
             var self = this;
-            var payload = {}
-
+            if (!payload) {
+                var payload = {};
+            }
             return storage.post(
-                self.getUpdateUrl(event.type, event.detail), JSON.stringify(payload), true
+                self.getUpdateUrl("update", window.checkoutConfig.quoteData.collectorbank_public_id), JSON.stringify(payload), true
             ).fail(
                 function (response) {
                     console.error(response);

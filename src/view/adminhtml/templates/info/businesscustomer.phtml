@@ -1,7 +1,9 @@
 <?php
+    /** @var $block \Webbhuset\CollectorCheckout\Block\Admin\BusinessCustomer */
     $block->init();
     $orgNumber = $block->getOrgNumber();
     $reference = $block->getReference();
+    $invoiceTag = $block->getInvoiceTag();
 ?>
 <?php if ($block->isBusinessCustomer()): ?>
 <section class="admin__page-section order-view-billing-shipping">
@@ -24,6 +26,12 @@
                         <th><?=__('Reference')?></th>
                         <td><?=$reference;?></td>
                     </tr>
+                    <?php endif; ?>
+                    <?php if ($invoiceTag): ?>
+                        <tr>
+                            <th><?=__('Invoice tag')?></th>
+                            <td><?=$invoiceTag;?></td>
+                        </tr>
                     <?php endif; ?>
                     </tbody>
                 </table>

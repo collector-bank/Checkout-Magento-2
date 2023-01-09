@@ -159,6 +159,7 @@ class OrderHandler
         return $this->setAdditionalData($order, 'reference', $reference);
     }
 
+
     /**
      * Get reference from order
      *
@@ -169,6 +170,31 @@ class OrderHandler
     {
         return $this->getAdditionalData($order, 'reference');
     }
+
+    /**
+     * Set invoice tag on order
+     *
+     * @param Order $order
+     * @param       $invoiceTag
+     * @return OrderHandler
+     */
+    public function setInvoiceTag(Order $order, $invoiceTag)
+    {
+        return $this->setAdditionalData($order, 'invoiceTag', $invoiceTag);
+    }
+
+
+    /**
+     * Get invoice tag from order
+     *
+     * @param Order $order
+     * @return mixed|null
+     */
+    public function getInvoiceTag(Order $order)
+    {
+        return $this->getAdditionalData($order, 'invoiceTag');
+    }
+
 
     /**
      * Set store id on order
@@ -277,7 +303,7 @@ class OrderHandler
 
         return ($shippingData) ? get_object_vars($shippingData) : [];
     }
-    
+
     /**
      * @param Order  $order
      * @param string $name
