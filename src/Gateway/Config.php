@@ -22,7 +22,7 @@ class Config implements ConfigProviderInterface
     /**
      * The method code of Walley payment method
      */
-    const CHECKOUT_URL_KEY = "collectorcheckout";
+    const CHECKOUT_URL_KEY = "walleycheckout";
     /**
      * Remove order older than this number
      */
@@ -105,7 +105,7 @@ class Config implements ConfigProviderInterface
      */
     public function getNewsletterUrl()
     {
-        return $this->urlBuilder->getUrl('collectorcheckout/newsletter');
+        return $this->urlBuilder->getUrl('walleycheckout/newsletter');
     }
 
     /**
@@ -115,7 +115,7 @@ class Config implements ConfigProviderInterface
      */
     public function getReinitUrl()
     {
-        return $this->urlBuilder->getUrl('collectorcheckout/reinit');
+        return $this->urlBuilder->getUrl('walleycheckout/reinit');
     }
 
     /**
@@ -125,7 +125,7 @@ class Config implements ConfigProviderInterface
      */
     public function getUpdateUrl()
     {
-        return $this->urlBuilder->getUrl('collectorcheckout/update');
+        return $this->urlBuilder->getUrl('walleycheckout/update');
     }
 
     /**

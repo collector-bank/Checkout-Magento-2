@@ -2,6 +2,8 @@
 
 namespace Webbhuset\CollectorCheckout\Config;
 
+use Webbhuset\CollectorCheckout\Config\Source\Checkout\Version;
+
 /**
  * Class Config
  *
@@ -181,8 +183,7 @@ class Config implements
 
     public function getDisplayCheckoutVersion(): string
     {
-
-        return $this->getConfigValue('checkout_version') ?? 'v1';
+        return Version::V2;
     }
 
     /**

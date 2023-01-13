@@ -4,7 +4,7 @@
     xsi:noNamespaceSchemaLocation="urn:magento:framework:App/etc/routes.xsd"
 >
     <router id="standard">
-        <route id="collectorcheckout" frontName="collectorcheckout">
+        <route id="collectorcheckout" frontName="walleycheckout">
             <module name="Webbhuset_CollectorCheckout" />
         </route>
         <route id="collectorbank" frontName="collectorbank">

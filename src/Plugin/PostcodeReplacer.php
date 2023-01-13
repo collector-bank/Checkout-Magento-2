@@ -95,6 +95,13 @@ class PostcodeReplacer
      */
     public function beforeCalculate($subject, $cartId, \Magento\Checkout\Api\Data\TotalsInformationInterface $addressInformation)
     {
+        if ($addressInformation
+            && $addressInformation->getAddress()
+            && $addressInformation->getAddress()->getPostcode()) {
+
+            return [$cartId, $addressInformation];
+        }
+
         $quote = $this->quoteRepository->getActive($cartId);
         if (
             $this->quoteDataHandler->getPublicToken($quote)
