@@ -86,11 +86,7 @@ define([
                         This event is also fired the first time the customer is identified.
                     */
                     console.log("customer updated");
-                    if (typeof this.FirstCustomerUpdateHasBeenTriggered === 'undefined') {
-                            this.FirstCustomerUpdateHasBeenTriggered = true;
-                    } else {
-                             this.addressUpdated(event);
-                    }
+                    this.addressUpdated(event);
                     break;
 
                 case 'collectorCheckoutShippingUpdated':
@@ -278,6 +274,7 @@ define([
                     cartCache.clear('totals');
 
                     self.fetchShippingRates();
+                    collectorIframe.resume();
                 }
             );
         },
