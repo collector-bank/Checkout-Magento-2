@@ -141,8 +141,13 @@ class Manager
 
             return false;
         }
-        $data = json_decode($quote->getCollectorbankData(), true);
+        $collectorData = $quote->getCollectorbankData();
+        $data = [];
+        if ($collectorData) {
+            $data = json_decode($collectorData, true);
+        }
         $ssn = $data['national_identification_number'] ?? false;
+
         $format = $this->detectSsnFormat($quote);
         return ($ssn && $format)
             ? $this->normalizeDateFromFormat($format, $ssn)

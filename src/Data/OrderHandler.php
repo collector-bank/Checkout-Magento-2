@@ -88,7 +88,10 @@ class OrderHandler
 
     protected function getData(Order $order)
     {
-        $data = json_decode($order->getCollectorbankData());
+        $data = [];
+        if ($order->getCollectorbankData()) {
+            $data = json_decode($order->getCollectorbankData());
+        }
 
         return ($data) ? get_object_vars($data) : [];
     }
@@ -96,6 +99,10 @@ class OrderHandler
 
     protected function setData(Order $order, $data)
     {
+        if (!$data) {
+            $data = [];
+        }
+
         $order->setCollectorbankData(json_encode($data));
 
         return $this;
@@ -272,6 +279,9 @@ class OrderHandler
     public function getDeliveryCheckoutShipmentData(Order $order)
     {
         $shippingData = $this->getAdditionalData($order, 'delivery_checkout_shipment_data');
+        if (!$shippingData) {
+            return [];
+        }
         $shippingData = json_decode($shippingData);
 
         return ($shippingData) ? get_object_vars($shippingData) : [];
@@ -299,6 +309,9 @@ class OrderHandler
     public function getDeliveryCheckoutData(Order $order)
     {
         $shippingData = $this->getAdditionalData($order, 'delivery_checkout_data');
+        if (!$shippingData) {
+            return [];
+        }
         $shippingData = json_decode($shippingData);
 
         return ($shippingData) ? get_object_vars($shippingData) : [];
