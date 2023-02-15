@@ -253,7 +253,7 @@ define([
             collectorIframe.suspend();
 
             return storage.post(
-                self.getUpdateUrl(event.type, event.detail), JSON.stringify(payload), true
+                self.getUpdateUrl(event.type, event.detail.publicToken), JSON.stringify(payload), true
             ).fail(
                 function (response) {
                     console.error(response);
@@ -261,13 +261,13 @@ define([
             ).success(
                 function (response) {
                     var address = quote.shippingAddress();
-
                     if (address) {
                         address.postcode = response.postcode;
                         address.region = response.region;
                         address.countryId = response.country_id;
                     }
 
+                    quote.shippingMethod(response.shipping_method);
                     checkoutData.setSelectedShippingRate(response.shipping_method);
 
                     cartCache.clear('address');

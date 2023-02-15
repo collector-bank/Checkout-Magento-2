@@ -496,6 +496,16 @@ class Config implements
     }
 
     /**
+     * Returns true if collector delivery checkout is active
+     *
+     * @return bool
+     */
+    public function getIsCustomDeliveryAdapter(): bool
+    {
+        return 1 == $this->getDeliveryCheckoutConfigValue('custom_delivery_adapter');
+    }
+
+    /**
      * Get fallback title
      *
      * @return string

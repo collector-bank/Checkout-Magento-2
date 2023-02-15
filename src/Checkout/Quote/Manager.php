@@ -52,6 +52,18 @@ class Manager
     }
 
     /**
+     * Get quote by public token
+     *
+     * @param $privateId
+     * @return \Magento\Quote\Api\Data\CartInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getQuoteByPrivateId($privateId): \Magento\Quote\Api\Data\CartInterface
+    {
+        return $this->getColumnFromQuote("collectorbank_private_id", $privateId);
+    }
+
+    /**
      * Gets a the specified column from quote table
      *
      * @param $column

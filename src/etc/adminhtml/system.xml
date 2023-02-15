@@ -599,6 +599,38 @@
                             <field id='active'>1</field>
                         </depends>
                     </field>
+
+                    <field
+                        id="custom_delivery_adapter"
+                        translate="label"
+                        type="select"
+                        sortOrder="110"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <label>Use custom delivery adapter</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="icons"
+                           translate="label"
+                           sortOrder="120"
+                           showInDefault="1"
+                           showInWebsite="0"
+                           showInStore="0"
+                    >
+                        <depends>
+                            <field id='custom_delivery_adapter'>1</field>
+                        </depends>
+                        <label>Shipping method -> Walley icon</label>
+                        <frontend_model>Webbhuset\CollectorCheckout\Block\Admin\Form\Field\IconMapper</frontend_model>
+                        <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    </field>
+
                 </group>
             </group>
         </section>
