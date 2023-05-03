@@ -224,11 +224,7 @@ define([
             }
             return storage.post(
                 self.getUpdateUrl("update", window.checkoutConfig.quoteData.collectorbank_public_id), JSON.stringify(payload), true
-            ).fail(
-                function (response) {
-                    console.error(response);
-                }
-            ).success(
+            ).done(
                 function (response) {
                     var address = quote.shippingAddress();
 
@@ -245,6 +241,10 @@ define([
 
                     self.fetchShippingRates();
                 }
+            ).fail(
+                function (response) {
+                    console.error(response);
+                }
             );
         },
         addressUpdated: function(event) {
@@ -254,11 +254,7 @@ define([
 
             return storage.post(
                 self.getUpdateUrl(event.type, event.detail), JSON.stringify(payload), true
-            ).fail(
-                function (response) {
-                    console.error(response);
-                }
-            ).success(
+            ).done(
                 function (response) {
                     var address = quote.shippingAddress();
 
@@ -275,6 +271,10 @@ define([
 
                     self.fetchShippingRates();
                     collectorIframe.resume();
+                }
+            ).fail(
+                function (response) {
+                    console.error(response);
                 }
             );
         },

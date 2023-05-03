@@ -45,6 +45,7 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $quoteUpdater;
     protected $cartTotalManagement;
     protected $configFactory;
+    protected $shippingMethodManagement;
     /**
      * Index constructor.
      *

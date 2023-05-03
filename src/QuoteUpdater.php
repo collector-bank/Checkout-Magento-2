@@ -17,6 +17,8 @@ class QuoteUpdater
     protected $session;
     protected $customerRepositoryInterface;
     protected $quoteHandler;
+    protected $shippingAssignmentProcessor;
+    protected $cartExtensionFactory;
 
     public function __construct(
         \Magento\Tax\Model\Config $taxConfig,
