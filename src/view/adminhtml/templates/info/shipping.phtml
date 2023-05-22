@@ -29,7 +29,7 @@
             <?= /* @escapeNotVerified */ __('No shipping information available') ?>
         <?php endif; ?>
     </div>
-    <?php if ($block->isDeliveryCheckoutActive()): ?>
+    <?php if ($block->isDeliveryCheckoutActive() && !$block->isCustomDeliveryAdapterActive()): ?>
         <?php
             $shippingData = $block->getCarrierInformation();
         ?>
