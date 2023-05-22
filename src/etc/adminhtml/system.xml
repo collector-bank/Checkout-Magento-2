@@ -613,6 +613,7 @@
                             <field id='active'>1</field>
                         </depends>
                         <label>Use custom delivery adapter</label>
+                        <comment>This setting needs to be combined with a Profile Name with the custom delivery adapter</comment>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
 
