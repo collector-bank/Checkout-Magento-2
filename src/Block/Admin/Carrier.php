@@ -65,4 +65,12 @@ class Carrier extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
     {
         return $this->config->getIsDeliveryCheckoutActive();
     }
+
+    /**
+     * @return bool
+     */
+    public function isCustomDeliveryAdapterActive()
+    {
+        return (bool) $this->config->getIsCustomDeliveryAdapter();
+    }
 }
