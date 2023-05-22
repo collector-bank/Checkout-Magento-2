@@ -52,7 +52,7 @@ class ConvertToShipment
             'id' => $shippingMethod->getMethodCode(),
             'name' => $shippingMethod->getMethodTitle(),
             'description' => $shippingMethod->getCarrierTitle(),
-            'fee' => (float)$shippingMethod->getAmount(),
+            'fee' => (float)$shippingMethod->getPriceInclTax(),
             'icon' => $this->getIconForShippingMethod->execute($shippingMethod->getMethodCode()),
             'destinations' => null,
         ];
