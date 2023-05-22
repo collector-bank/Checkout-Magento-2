@@ -188,7 +188,8 @@ class Adapter
 
         $cart = $this->quoteConverter->getCart($quote);
 
-        if (!$this->isFallbackDeliveryMethodConfigured()) {
+        if (!$this->isFallbackDeliveryMethodConfigured()
+            || $config->getIsCustomDeliveryAdapter()) {
             $fees = $this->quoteConverter->getFees($quote);
         } else {
             $fees = $this->quoteConverter->getFallbackFees($quote);
