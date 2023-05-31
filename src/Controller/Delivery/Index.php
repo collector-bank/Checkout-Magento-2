@@ -89,6 +89,10 @@ class Index extends Action
         $privateId = $this->request->getParam('privateId');
         try {
             $quote = $this->quoteManager->getQuoteByPrivateId($privateId);
+            $shippingAddress = $quote->getShippingAddress();
+            $shippingAddress->setPostcode($this->request->getParam('postalCode'));
+            $shippingAddress->setCountryId($this->request->getParam('countryCode'));
+
             $shippingMethods = $this->shippingMethodManagement->estimateByExtendedAddress(
                 $quote->getId(),
                 $quote->getShippingAddress()

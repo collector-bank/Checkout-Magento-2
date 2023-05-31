@@ -88,15 +88,20 @@ class Index extends \Magento\Framework\App\Action\Action
         $quote = $this->collectorAdapter->synchronize($quote, $eventName);
         $shippingAddress = $quote->getShippingAddress();
 
-        $result->setData(
-            [
-                'postcode' => $shippingAddress->getPostcode(),
-                'region' => $shippingAddress->getRegion(),
-                'country_id' => $shippingAddress->getCountryId(),
-                'shipping_method' => $shippingAddress->getShippingMethod(),
-                'updated' => true
-            ]
-        );
+        $data = [
+            'postcode' => $shippingAddress->getPostcode(),
+            'region' => $shippingAddress->getRegion(),
+            'country_id' => $shippingAddress->getCountryId(),
+            'shipping_method' => $shippingAddress->getShippingMethod(),
+            'updated' => true
+        ];
+
+        $shippingMethod = $shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod());
+        if ($shippingMethod && $shippingMethod->getRateId()) {
+            $data['carrier_title'] = $shippingMethod->getCarrierTitle();
+            $data['shipping_method_title'] = $shippingMethod->getMethodTitle();
+        }
+        $result->setData($data);
 
         return $result;
     }

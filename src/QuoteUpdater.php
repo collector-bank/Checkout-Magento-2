@@ -138,7 +138,7 @@ class QuoteUpdater
         $shipment = $checkoutData->getShipping()->getData();
         $code = $shipment["shipments"][0]['shippingChoice']['id'];
 
-        return $code . '_' . $code;
+        return $code;
     }
 
     public function setDeliveryCheckoutData(

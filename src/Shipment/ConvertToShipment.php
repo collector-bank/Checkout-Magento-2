@@ -38,7 +38,6 @@ class ConvertToShipment
                     'name' => (string)__('Select delivery method'),
                     "metadata" => [
                         "key-for-shipment" => "metadata-for-shipment",
-                        "from-store-id" => "2057"
                     ],
                     'shippingChoices' => $shippingChoices
                 ]
@@ -49,7 +48,7 @@ class ConvertToShipment
     public function shippingMethodToShipmentChoice(ShippingMethodInterface $shippingMethod):array
     {
         return [
-            'id' => $shippingMethod->getMethodCode(),
+            'id' => $shippingMethod->getCarrierCode() . '_' . $shippingMethod->getMethodCode(),
             'name' => $shippingMethod->getMethodTitle(),
             'description' => $shippingMethod->getCarrierTitle(),
             'fee' => (float)$shippingMethod->getPriceInclTax(),

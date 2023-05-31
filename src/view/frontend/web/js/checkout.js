@@ -96,7 +96,7 @@ define([
                         This event is also fired the first time the customer is identified.
                     */
                     console.log("shipping updated");
-                    this.addressUpdated(event);
+                    this.shippingMethodUpdated(event);
                     break;
 
 
@@ -247,9 +247,33 @@ define([
                 }
             );
         },
-        addressUpdated: function(event) {
+        shippingMethodUpdated: function (event) {
             var self = this;
             var payload = {}
+
+            return storage.post(
+                self.getUpdateUrl(event.type, event.detail.publicToken), JSON.stringify(payload), true
+            ).fail(
+                function (response) {
+                    console.error(response);
+                }
+            ).success(
+                function (response) {
+                    let shippingMethod  = [];
+                    shippingMethod['method_code'] = response.shipping_method;
+                    shippingMethod['method_title'] = response.shipping_method_title;
+                    shippingMethod['carrier_title'] = response.carrier_title;
+                    quote.shippingMethod(shippingMethod);
+                    checkoutData.setSelectedShippingRate(response.shipping_method);
+                    cartCache.clear('totals');
+                }
+            );
+        },
+        addressUpdated: function(event) {
+            var self = this;
+            var payload = {};
+            let isFirstLoad = true;
+
             collectorIframe.suspend();
 
             return storage.post(
@@ -260,20 +284,20 @@ define([
                 }
             ).success(
                 function (response) {
+                    console.log(response);
                     var address = quote.shippingAddress();
                     if (address) {
                         address.postcode = response.postcode;
                         address.region = response.region;
                         address.countryId = response.country_id;
                     }
-
+                    self.fetchShippingRates();
                     quote.shippingMethod(response.shipping_method);
                     checkoutData.setSelectedShippingRate(response.shipping_method);
 
                     cartCache.clear('address');
                     cartCache.clear('totals');
 
-                    self.fetchShippingRates();
                     collectorIframe.resume();
                 }
             );
