@@ -134,8 +134,7 @@ class Adapter
             ->collectShippingRates();
 
         $checkoutData = $this->acquireCheckoutInformationFromQuote($quote);
-        $oldFees = $checkoutData->getFees();
-        $oldCart = $checkoutData->getCart();
+
         $quote = $this->quoteUpdater->setQuoteData($quote, $checkoutData);
 
         $rate = $shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod());
