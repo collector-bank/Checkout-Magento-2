@@ -278,13 +278,8 @@ define([
 
             return storage.post(
                 self.getUpdateUrl(event.type, event.detail.publicToken), JSON.stringify(payload), true
-            ).fail(
+            ).done(
                 function (response) {
-                    console.error(response);
-                }
-            ).success(
-                function (response) {
-                    console.log(response);
                     var address = quote.shippingAddress();
                     if (address) {
                         address.postcode = response.postcode;
