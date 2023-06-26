@@ -17,6 +17,8 @@ class QuoteUpdater
     protected $session;
     protected $customerRepositoryInterface;
     protected $quoteHandler;
+    protected $shippingAssignmentProcessor;
+    protected $cartExtensionFactory;
 
     public function __construct(
         \Magento\Tax\Model\Config $taxConfig,
@@ -221,8 +223,8 @@ class QuoteUpdater
     ) : Quote {
         $customer = $checkoutData->getCustomer();
         $customerAddress = $customer->getInvoiceAddress();
-        $firstname = $customerAddress->getFirstName();
-        $lastname  = $customerAddress->getLastName();
+        $firstname = $customerAddress->getFirstName() ?? $customer->getFirstName();
+        $lastname  = $customerAddress->getLastName() ?? $customer->getLastName();
         $email = $customer->getEmail();
         $countryCode = $checkoutData->getCountryCode();
         $basicAddress = $quote->getShippingAddress()->setCountryId($countryCode);

@@ -224,11 +224,7 @@ define([
             }
             return storage.post(
                 self.getUpdateUrl("update", window.checkoutConfig.quoteData.collectorbank_public_id), JSON.stringify(payload), true
-            ).fail(
-                function (response) {
-                    console.error(response);
-                }
-            ).success(
+            ).done(
                 function (response) {
                     var address = quote.shippingAddress();
 
@@ -244,6 +240,10 @@ define([
                     cartCache.clear('totals');
 
                     self.fetchShippingRates();
+                }
+            ).fail(
+                function (response) {
+                    console.error(response);
                 }
             );
         },
@@ -299,6 +299,10 @@ define([
                     cartCache.clear('totals');
 
                     collectorIframe.resume();
+                }
+            ).fail(
+                function (response) {
+                    console.error(response);
                 }
             );
         },

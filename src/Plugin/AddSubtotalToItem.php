@@ -11,6 +11,8 @@ class AddSubtotalToItem
      * @var \Magento\Checkout\Helper\Data
      */
     protected $checkoutHelper;
+    protected $checkoutSession;
+    protected $itemPriceRenderer;
 
     /**
      * @param \Magento\Checkout\Model\Session $checkoutSession
