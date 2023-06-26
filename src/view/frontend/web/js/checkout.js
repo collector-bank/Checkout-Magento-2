@@ -257,7 +257,7 @@ define([
                 function (response) {
                     console.error(response);
                 }
-            ).success(
+            ).done(
                 function (response) {
                     let shippingMethod  = [];
                     shippingMethod['method_code'] = response.shipping_method;
