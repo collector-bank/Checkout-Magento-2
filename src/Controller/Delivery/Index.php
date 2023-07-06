@@ -9,9 +9,11 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\ShippingMethodManagement;
 use Webbhuset\CollectorCheckout\Checkout\Quote\Manager;
 use Webbhuset\CollectorCheckout\Shipment\ConvertToShipment;
+use Webbhuset\CollectorCheckout\Shipment\GetIconForShippingMethod;
 
 /**
  * Class Index
@@ -49,9 +51,17 @@ class Index extends Action
      */
     private $json;
     /**
-     * @var \Webbhuset\CollectorCheckout\Shipment\GetIconForShippingMethod
+     * @var GetIconForShippingMethod
      */
     private $getIconForShippingMethod;
+    /**
+     * @var CartRepositoryInterface
+     */
+    private $cartRepository;
+    /**
+     * @var Context
+     */
+    private $context;
 
     public function __construct(
         Context $context,
@@ -60,8 +70,9 @@ class Index extends Action
         ConvertToShipment $convertToShipment,
         RequestInterface $request,
         Json $json,
+        CartRepositoryInterface $cartRepository,
         SimpleDataObjectConverter $simpleDataObjectConverter,
-        \Webbhuset\CollectorCheckout\Shipment\GetIconForShippingMethod $getIconForShippingMethod,
+        GetIconForShippingMethod $getIconForShippingMethod,
         JsonFactory $resultJsonFactory
     ) {
         parent::__construct($context);
@@ -74,6 +85,8 @@ class Index extends Action
         $this->simpleDataObjectConverter = $simpleDataObjectConverter;
         $this->json = $json;
         $this->getIconForShippingMethod = $getIconForShippingMethod;
+        $this->cartRepository = $cartRepository;
+        $this->context = $context;
     }
 
     /**
@@ -90,13 +103,23 @@ class Index extends Action
         try {
             $quote = $this->quoteManager->getQuoteByPrivateId($privateId);
             $shippingAddress = $quote->getShippingAddress();
-            $shippingAddress->setPostcode($this->request->getParam('postalCode'));
-            $shippingAddress->setCountryId($this->request->getParam('countryCode'));
+            $postalCode = $this->request->getParam('postalCode');
+            if ($postalCode) {
+                $shippingAddress->setPostcode($postalCode);
+            }
+            $countryCode = $this->request->getParam('countryCode');
+            if ($countryCode) {
+                $shippingAddress->setCountryId($countryCode);
+            }
 
             $shippingMethods = $this->shippingMethodManagement->estimateByExtendedAddress(
                 $quote->getId(),
                 $quote->getShippingAddress()
             );
+            if ($countryCode || $postalCode) {
+                $this->cartRepository->save($quote);
+            }
+
             $shipment = $this->convertToShipment->execute($shippingMethods);
         } catch (NoSuchEntityException $e) {
             $shipment = [];
