@@ -238,6 +238,7 @@ define([
 
                     cartCache.clear('address');
                     cartCache.clear('totals');
+                    checkoutData.setShippingAddressFromData(address);
 
                     self.fetchShippingRates();
                 }
@@ -289,7 +290,7 @@ define([
                     self.fetchShippingRates();
                     quote.shippingMethod(response.shipping_method);
                     checkoutData.setSelectedShippingRate(response.shipping_method);
-
+                    checkoutData.setShippingAddressFromData(address);
                     cartCache.clear('address');
                     cartCache.clear('totals');
 

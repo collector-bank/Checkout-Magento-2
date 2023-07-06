@@ -2,6 +2,8 @@
 
 namespace Webbhuset\CollectorCheckout\Controller\Reinit;
 
+use Magento\Framework\Exception\NoSuchEntityException;
+
 class Index extends \Magento\Framework\App\Action\Action
 {
     protected $resultJsonFactory;
@@ -9,22 +11,34 @@ class Index extends \Magento\Framework\App\Action\Action
     protected $logger;
     protected $quoteRepository;
     protected $quoteCollection;
+    /**
+     * @var \Webbhuset\CollectorCheckout\Config\OrderConfig
+     */
+    private $orderConfig;
+    /**
+     * @var \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory
+     */
+    private $orderManager;
 
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
+        \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory $orderManager,
+        \Webbhuset\CollectorCheckout\Config\OrderConfig $orderConfig,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Quote\Model\ResourceModel\Quote\Collection $quoteCollection
     ) {
+        parent::__construct($context);
+
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession   = $checkoutSession;
         $this->logger            = $logger;
         $this->quoteRepository   = $quoteRepository;
         $this->quoteCollection   = $quoteCollection;
-
-        return parent::__construct($context);
+        $this->orderConfig       = $orderConfig;
+        $this->orderManager      = $orderManager;
     }
 
     public function execute()
@@ -36,16 +50,25 @@ class Index extends \Magento\Framework\App\Action\Action
             ->getFirstItem();
 
         if (!$quote->getId()) {
-
-            $this->logger->addCritical(
-                "Tried to reinitialize quote but could not find one with publicId: {$publicId}"
-            );
-
             return $this->createResult(
                 'Could not find quote',
                 404,
                 false
             );
+        }
+
+        try {
+            $order = $this->orderManager->create()->getOrderByPublicToken($publicId);
+            $acknowledged  = $this->orderConfig->getOrderStatusAcknowledged();
+            if ($order->getStatus() == $acknowledged) {
+                return $this->createResult(
+                    'Quote not restored',
+                    200,
+                    false
+                );
+            }
+        } catch (NoSuchEntityException $e) {
+
         }
 
         $customerId = $this->checkoutSession->getCustomerId();
@@ -55,10 +78,6 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->quoteRepository->save($quote);
         $this->checkoutSession->replaceQuote($quote)
             ->unsLastRealOrderId();
-
-        $this->logger->addCritical(
-            "Restored quoteId: {$quote->getId()}, publicId: {$publicId}"
-        );
 
         return $this->createResult(
             'Quote restored',
