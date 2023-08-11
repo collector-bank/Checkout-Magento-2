@@ -103,4 +103,13 @@
             for="Magento\Sales\Block\Adminhtml\Order\AbstractOrder"
             type="Webbhuset\CollectorCheckout\Block\Admin\Carrier"
     />
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="testinitiatecheckout" xsi:type="object">
+                    Webbhuset\CollectorCheckout\Console\Command\TestInitiateCheckout
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>

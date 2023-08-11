@@ -49,6 +49,7 @@ class Config implements
      * @var int
      */
     protected $magentoStoreId = null;
+    private \Webbhuset\CollectorCheckout\Oath\AccessKeyManager $accessKeyManager;
 
     /**
      * Config constructor.
@@ -65,12 +66,14 @@ class Config implements
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Webbhuset\CollectorCheckout\Config\Source\Country\Country $countryData
+        \Webbhuset\CollectorCheckout\Config\Source\Country\Country $countryData,
+        \Webbhuset\CollectorCheckout\Oath\AccessKeyManager $accessKeyManager
     ) {
         $this->scopeConfig      = $scopeConfig;
         $this->encryptor        = $encryptor;
         $this->storeManager     = $storeManager;
         $this->countryData      = $countryData;
+        $this->accessKeyManager = $accessKeyManager;
     }
 
     /**
@@ -81,6 +84,18 @@ class Config implements
     public function getIsActive(): bool
     {
         return 1 == $this->getConfigValue('active');
+    }
+
+    public function getStoreScopeId(): int
+    {
+        return (int) $this->storeManager->getStore()->getId();
+    }
+
+    public function getAccessKey(): string
+    {
+        $storeId = $this->getStoreScopeId();
+
+        return $this->accessKeyManager->getAccessKeyByStore($storeId);
     }
 
     /**
@@ -226,6 +241,53 @@ class Config implements
         return $this->getConfigValue('test_mode') ? $this->getConfigValue('test_mode') : false;
     }
 
+    public function getIsOath(): bool
+    {
+        if ($this->getIsTestModeOath()) {
+            return true;
+        }
+
+        return (bool) $this->getConfigValue('activeoath');
+    }
+
+    public function getClientId(): string
+    {
+        if ($this->getIsTestModeOath()) {
+            return $this->getTestModeClientId();
+        }
+
+        return (string) $this->getConfigValue('client_id');
+    }
+
+    public function getClientSecret(): string
+    {
+        if ($this->getIsTestModeOath()) {
+            return $this->getTestModeClientSecret();
+        }
+
+        return (string) $this->getConfigValue('client_secret');
+    }
+
+    public function getIsTestModeOath(): bool
+    {
+        $isTestMode = $this->getIsTestMode();
+        if (!$isTestMode) {
+            return false;
+        }
+
+        return (bool) $this->getConfigValue('test_mode_activeoath');
+    }
+
+    public function getTestModeClientSecret(): string
+    {
+        return (string) $this->getConfigValue('client_secret');
+    }
+
+    public function getTestModeClientId(): string
+    {
+        return (string) $this->getConfigValue('client_id');
+    }
+
     /**
      * Get the url for customer / merchant terms
      *
@@ -360,10 +422,10 @@ class Config implements
         $customerType = $this->getDefaultCustomerType();
 
         if (\Webbhuset\CollectorCheckout\Config\Source\Customer\DefaultType::PRIVATE_CUSTOMERS == $customerType) {
-            return $this->getB2CStoreId();
+            return $this->getB2CProfileName();
         }
 
-        return $this->getB2BStoreId();
+        return $this->getB2BProfileName();
     }
 
     /**

@@ -13,6 +13,7 @@ class OrderConfig extends \Webbhuset\CollectorCheckout\Config\Config
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Webbhuset\CollectorCheckout\Config\Source\Country\Country $countryData,
+        \Webbhuset\CollectorCheckout\Oath\AccessKeyManager $accessKeyManager,
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderDataHandler,
         \Magento\Sales\Api\Data\OrderInterface $order,
         $magentoStoreId = null
@@ -21,7 +22,7 @@ class OrderConfig extends \Webbhuset\CollectorCheckout\Config\Config
         $this->order = $order;
         $this->magentoStoreId = $magentoStoreId;
 
-        parent::__construct($scopeConfig, $encryptor, $storeManager, $countryData);
+        parent::__construct($scopeConfig, $encryptor, $storeManager, $countryData, $accessKeyManager);
     }
 
     protected function getOrder() : \Magento\Sales\Api\Data\OrderInterface
@@ -38,6 +39,11 @@ class OrderConfig extends \Webbhuset\CollectorCheckout\Config\Config
         }
 
         return parent::getStoreId();
+    }
+
+    public function getScopeStoreId() : string
+    {
+        return $this->order->getStoreId();
     }
 
     protected function getConfigValue($name)
