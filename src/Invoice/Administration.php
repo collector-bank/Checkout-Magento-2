@@ -2,6 +2,7 @@
 
 namespace Webbhuset\CollectorCheckout\Invoice;
 
+use Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey;
 use Webbhuset\CollectorPaymentSDK\Adapter\SoapAdapter;
 use Webbhuset\CollectorPaymentSDK\Invoice\Administration as InvoiceAdministration;
 
@@ -36,6 +37,12 @@ class Administration
      * @var \Webbhuset\CollectorCheckout\Data\OrderHandler
      */
     protected $orderHandler;
+    private \Webbhuset\CollectorCheckout\Adapter $adapter;
+    private \Webbhuset\CollectorCheckout\Data\ExtractWalleyOrderId $extractWalleyOrderId;
+    /**
+     * @var RowMatcher
+     */
+    private RowMatcher $rowMatcher;
 
     /**
      * Administration constructor.
@@ -50,8 +57,11 @@ class Administration
     public function __construct(
         \Webbhuset\CollectorCheckout\Config\OrderConfigFactory $configFactory,
         \Magento\Sales\Model\Service\InvoiceService $invoiceService,
+        \Webbhuset\CollectorCheckout\Adapter $adapter,
         \Webbhuset\CollectorCheckout\Invoice\Transaction\ManagerFactory $transaction,
+        \Webbhuset\CollectorCheckout\Data\ExtractWalleyOrderId $extractWalleyOrderId,
         \Magento\Sales\Model\OrderRepository $orderRepository,
+        \Webbhuset\CollectorCheckout\Invoice\RowMatcher $rowMatcher,
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger
     ) {
@@ -61,6 +71,9 @@ class Administration
         $this->logger          = $logger;
         $this->orderRepository = $orderRepository;
         $this->orderHandler    = $orderHandler;
+        $this->adapter = $adapter;
+        $this->extractWalleyOrderId = $extractWalleyOrderId;
+        $this->rowMatcher = $rowMatcher;
     }
 
     /**
@@ -100,15 +113,30 @@ class Administration
     public function cancelInvoice(string $invoiceNo, string $orderId):array
     {
         $config = $this->getConfig($orderId);
+        if ($config->getIsOath()) {
+            /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
+            $adapter = $this->adapter->getAdapter($config);
+            $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
+            $order = $this->orderRepository->get($orderId);
+            $articleList = $this->rowMatcher->checkoutDataToArticleList($order);
+            $uniqid = uniqid();
+            $adapter->cancelInvoice($walleyOrderId, $articleList, $uniqid);
 
-        $adapter = new SoapAdapter($config);
-        $invoiceAdmin = new InvoiceAdministration($adapter);
+            $this->logger->addInfo(
+                "Invoice cancelled online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
+            );
 
-        $this->logger->addInfo(
-            "Invoice cancelled online orderId: {$orderId} invoiceNo: {$invoiceNo} "
-        );
+            return ['NewInvoiceNo' => $uniqid];
+        } else {
+            $adapter = new SoapAdapter($config);
+            $invoiceAdmin = new InvoiceAdministration($adapter);
 
-        return $invoiceAdmin->cancelInvoice($invoiceNo, $orderId);
+            $this->logger->addInfo(
+                "Invoice cancelled online orderId: {$orderId} invoiceNo: {$invoiceNo} "
+            );
+
+            return $invoiceAdmin->cancelInvoice($invoiceNo, $orderId);
+        }
     }
 
     /**
@@ -126,15 +154,26 @@ class Administration
         string $orderId
     ):array {
         $config = $this->getConfig($orderId);
+        if ($config->getIsOath()) {
+            /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
+            $adapter = $this->adapter->getAdapter($config);
+            $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
+            $uniqid = uniqid();
+            $adapter->partCreditInvoice($walleyOrderId, $articleList, $uniqid);
+            $this->logger->addInfo(
+                "Invoice credited online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
+            );
 
-        $adapter = new SoapAdapter($config);
-        $invoiceAdmin = new InvoiceAdministration($adapter);
+            return ['NewInvoiceNo' => $uniqid];
+        } else {
+            $adapter = new SoapAdapter($config);
+            $invoiceAdmin = new InvoiceAdministration($adapter);
+            $this->logger->addInfo(
+                "Invoice credited online orderId: {$orderId} invoiceNo: {$invoiceNo} "
+            );
 
-        $this->logger->addInfo(
-            "Invoice credited online orderId: {$orderId} invoiceNo: {$invoiceNo} "
-        );
-
-        return $invoiceAdmin->partCreditInvoice($invoiceNo, $articleList, $orderId);
+            return $invoiceAdmin->partCreditInvoice($invoiceNo, $articleList, $orderId);
+        }
     }
 
 
@@ -154,15 +193,30 @@ class Administration
         string $correlationId
     ):array {
         $config = $this->getConfig($orderId);
+        if ($config->getIsOath()) {
+            /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
+            $adapter = $this->adapter->getAdapter($config);
+            $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
+            $uniq = uniqid();
+            $adapter->partActivateInvoice($walleyOrderId, $articleList, $uniq);
 
-        $adapter = new SoapAdapter($config);
-        $invoiceAdmin = new InvoiceAdministration($adapter);
+            $this->logger->addInfo(
+                "Invoice activated online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
+            );
 
-        $this->logger->addInfo(
-            "Invoice activated online orderId: {$orderId} invoiceNo: {$invoiceNo} "
-        );
+            return ['NewInvoiceNo' => $uniq];
+        } else {
+            $adapter = new SoapAdapter($config);
+            $invoiceAdmin = new InvoiceAdministration($adapter);
 
-        return $invoiceAdmin->partActivateInvoice($invoiceNo, $articleList, $correlationId);
+            $this->logger->addInfo(
+                "Invoice activated online orderId: {$orderId} invoiceNo: {$invoiceNo} "
+            );
+
+            return $invoiceAdmin->partActivateInvoice($invoiceNo, $articleList, $correlationId);
+        }
+
+
     }
 
 

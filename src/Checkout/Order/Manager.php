@@ -615,7 +615,8 @@ class Manager
             'payment_name'            => $purchaseData->getPaymentName(),
             'amount_to_pay'           => $purchaseData->getAmountToPay(),
             'invoice_delivery_method' => $purchaseData->getInvoiceDeliveryMethod(),
-            'purchase_identifier'     => $purchaseData->getPurchaseIdentifier()
+            'purchase_identifier'     => $purchaseData->getPurchaseIdentifier(),
+            'order_id'                => $purchaseData->getOrderId(),
         ];
         $payment->setAdditionalInformation($info);
 
