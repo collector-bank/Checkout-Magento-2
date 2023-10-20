@@ -350,7 +350,12 @@ class Manager
         $this->logger->addInfo(
             "Acknowledged order orderId: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
         );
-        $this->orderManagement->notify($order->getEntityId());
+        try {
+            $this->orderManagement->notify($order->getEntityId());
+        } catch (\Exception $e) {
+
+        }
+
 
         if ($this->orderHandler->getNewsletterSubscribe($order)) {
             $this->subscriberFactory->create()->subscribe($order->getCustomerEmail());

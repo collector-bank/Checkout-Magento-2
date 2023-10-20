@@ -78,6 +78,7 @@ define([
 
         },
         listener: function(event) {
+            event.detail.publicToken = event.detail.token;
             switch(event.type) {
                 case 'collectorCheckoutCustomerUpdated':
                     /*
@@ -123,7 +124,7 @@ define([
                         For instance after a purchase has been processed (regardless of whether the purchase was successful or not).
                     */
                     var url = this.getReinitUrl();
-                    var data = { publicId: event.detail };
+                    var data = { publicId: event.detail.publicToken };
                     $.ajax({
                         url: url,
                         data: data,
@@ -201,7 +202,7 @@ define([
         },
 
         getUpdateUrl: function(eventName, publicId) {
-            return window.checkoutConfig.payment.collector_checkout.update_url + '?event=' + eventName + '&quoteid=' + publicId
+            return window.checkoutConfig.payment.collector_checkout.update_url + '?event=' + eventName + '&publicToken=' + publicId
         },
 
         fetchShippingRates: function() {
@@ -251,7 +252,7 @@ define([
         shippingMethodUpdated: function (event) {
             var self = this;
             var payload = {}
-
+            console.log(event);
             return storage.post(
                 self.getUpdateUrl(event.type, event.detail.publicToken), JSON.stringify(payload), true
             ).fail(
