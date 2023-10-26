@@ -5,7 +5,6 @@ namespace Webbhuset\CollectorCheckout\Controller\Delivery;
 use Magento\Framework\Api\SimpleDataObjectConverter;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\Result\Json;
@@ -24,9 +23,6 @@ use Webbhuset\CollectorCheckout\Shipment\GetIconForShippingMethod;
  */
 class Index extends Action
 {
-    const CACHE_TTL = 60*5;
-    const CACHE_NAME = 'WALLEY_DELIVERY_RESPONSE';
-    const CACHE_TAGS = 'WALLEY_DELIVERY';
 
     /**
      * @var JsonFactory
@@ -72,7 +68,6 @@ class Index extends Action
      * @var Logger
      */
     private Logger $logger;
-    private CacheInterface $cache;
 
     public function __construct(
         Context $context,
@@ -80,7 +75,6 @@ class Index extends Action
         ShippingMethodManagement $shippingMethodManagement,
         ConvertToShipment $convertToShipment,
         Logger $logger,
-        CacheInterface $cache,
         RequestInterface $request,
         Json $json,
         CartRepositoryInterface $cartRepository,
@@ -101,7 +95,6 @@ class Index extends Action
         $this->cartRepository = $cartRepository;
         $this->context = $context;
         $this->logger = $logger;
-        $this->cache = $cache;
     }
 
     /**
@@ -112,24 +105,7 @@ class Index extends Action
     public function execute()
     {
         $result = $this->resultJsonFactory->create();
-
-        $params = $this->request->getParams();
-        $key = sha1(\json_encode($params));
-        $cachedResponse = $this->cache->load($key);
-        if ($cachedResponse) {
-            $shipment = \json_decode($cachedResponse, true);
-            $result->setData($shipment);
-
-            return $result;
-        }
-
-        $this->getIconForShippingMethod->execute('test');
-
-
         $privateId = $this->request->getParam('privateId');
-
-
-        $this->logger->addCritical("Delivery adapter request: ", $this->request->getParams());
         try {
             $quote = $this->quoteManager->getQuoteByPrivateId($privateId);
             $shippingAddress = $quote->getShippingAddress();
@@ -153,11 +129,8 @@ class Index extends Action
         } catch (NoSuchEntityException $e) {
             $shipment = [];
         }
-        $this->logger->addCritical("Delivery adapter response:", $shipment);
         $result->setData($shipment);
-
-        $shipmentDecoded = \json_encode($shipment);
-        $this->cache->save($shipmentDecoded, $key, [self::CACHE_TAGS],self::CACHE_TTL);
+        $result->setHeader('Expires', date('Y-m-d H:i:s', strtotime('+ 1 day')));
 
         return $result;
     }

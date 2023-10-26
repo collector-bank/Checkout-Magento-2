@@ -82,7 +82,6 @@ class Index extends \Magento\Framework\App\Action\Action
         $publicToken = $this->getRequest()->getParam('publicToken');
         $eventName = $this->getRequest()->getParam('event');
         $quote = $this->quoteManager->getQuoteByPublicToken($publicToken);
-        $someData = $this->checkoutSession->getQuote();
 
         if (!$quote->getId()) {
             $result->setHttpResponseCode(404);
