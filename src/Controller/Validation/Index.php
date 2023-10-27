@@ -111,7 +111,8 @@ class Index extends \Magento\Framework\App\Action\Action
             $quote = $quoteManager->getQuoteByPublicToken($reference);
             /** @var \Webbhuset\CollectorCheckout\Config\QuoteConfig $config */
             $config = $this->configFactory->create(['quote' => $quote]);
-            if($config->getIsDeliveryCheckoutActive()) {
+            if($config->getIsDeliveryCheckoutActive()
+                && !$config->getIsCustomDeliveryAdapter()) {
                 $carrierCode = !$quote->isVirtual() ? \Webbhuset\CollectorCheckout\Carrier\Collector::GATEWAY_KEY : null;
 
                 $this->cartTotalManagement->collectTotals(

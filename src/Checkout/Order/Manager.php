@@ -2,6 +2,7 @@
 
 namespace Webbhuset\CollectorCheckout\Checkout\Order;
 
+use Magento\Sales\Api\Data\OrderInterface;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Purchase\Result as PurchaseResult;
 
 /**
@@ -73,6 +74,10 @@ class Manager
      */
     protected $config;
     protected $carrierManager;
+    /**
+     * @var SetOrderStatus
+     */
+    private $setOrderStatus;
 
     /**
      * Manager constructor.
@@ -99,6 +104,7 @@ class Manager
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Webbhuset\CollectorCheckout\AdapterFactory $collectorAdapter,
         \Magento\Sales\Api\OrderManagementInterface $orderManagement,
+        \Webbhuset\CollectorCheckout\Checkout\Order\SetOrderStatus $setOrderStatus,
         \Webbhuset\CollectorCheckout\Config\OrderConfigFactory $configFactory,
         \Magento\Quote\Model\QuoteManagement $quoteManagement,
         \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory $orderManager,
@@ -126,6 +132,7 @@ class Manager
         $this->subscriberFactory     = $subscriberFactory;
         $this->config                = $config;
         $this->carrierManager        = $carrierManager;
+        $this->setOrderStatus = $setOrderStatus;
     }
 
     /**
@@ -275,7 +282,7 @@ class Manager
                 $this->orderRepository->save($order);
 
                 if ($config->getIsDeliveryCheckoutActive()) {
-                    $order = $this->carrierManager->saveShipmentDataOnOrder($order->getId(), $checkoutData);
+                    $order = $this->carrierManager->saveShipmentDataOnOrder($order->getEntityId(), $checkoutData);
                 }
                 break;
 
@@ -343,8 +350,12 @@ class Manager
         $this->logger->addInfo(
             "Acknowledged order orderId: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
         );
+        try {
+            $this->orderManagement->notify($order->getEntityId());
+        } catch (\Exception $e) {
 
-        $this->orderManagement->notify($order->getEntityId());
+        }
+
 
         if ($this->orderHandler->getNewsletterSubscribe($order)) {
             $this->subscriberFactory->create()->subscribe($order->getCustomerEmail());
@@ -576,13 +587,18 @@ class Manager
     /**
      * Updates order status and state
      *
-     * @param $order
-     * @param $status
-     * @param $state
+     * @param OrderInterface $order
+     * @param string $status
+     * @param string $state
      * @return $this
      */
-    protected function updateOrderStatus($order, $status, $state)
+    protected function updateOrderStatus(OrderInterface $order,string $status,string $state)
     {
+        $this->setOrderStatus->execute(
+            (int) $order->getEntityId(),
+            $status,
+            $state
+        );
         $order->setState($state)
             ->setStatus($status);
 
@@ -604,7 +620,8 @@ class Manager
             'payment_name'            => $purchaseData->getPaymentName(),
             'amount_to_pay'           => $purchaseData->getAmountToPay(),
             'invoice_delivery_method' => $purchaseData->getInvoiceDeliveryMethod(),
-            'purchase_identifier'     => $purchaseData->getPurchaseIdentifier()
+            'purchase_identifier'     => $purchaseData->getPurchaseIdentifier(),
+            'order_id'                => $purchaseData->getOrderId(),
         ];
         $payment->setAdditionalInformation($info);
 

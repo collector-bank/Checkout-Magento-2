@@ -79,6 +79,11 @@ class QuoteUpdater
         $quote->setDefaultBillingAddress($billingAddress);
 
         $shippingAddress->setCollectShippingRates(true);
+        if ($shippingMethod = $this->getCustomDeliveryShippingMethod($checkoutData)) {
+            $quote->getExtensionAttributes()->setShippingAssignments([]);
+            $shippingAddress->setShippingMethod($shippingMethod);
+        }
+
         $quote->setNeedsCollectorUpdate(true);
 
         $this->setCustomerData($quote, $checkoutData);
@@ -99,11 +104,43 @@ class QuoteUpdater
             $quote->setCustomer($customer);
         }
 
-        if ($this->config->create()->getIsDeliveryCheckoutActive()) {
+        if ($this->config->create()->getIsDeliveryCheckoutActive()
+            && !$this->isCustomDeliveryAdapter($checkoutData)) {
             $this->setDeliveryCheckoutData($quote, $checkoutData);
         }
 
         return $quote;
+    }
+
+    public function isCustomDeliveryAdapter(
+        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+    ): bool {
+        $shipment = $checkoutData->getShipping();
+        if (!$shipment) {
+            return false;
+        }
+        $shipmentData = $shipment->getData();
+        if (
+            isset($shipmentData["shipments"][0]["id"])
+            && $shipmentData["shipments"][0]["id"] === 'magento-delivery-methods'
+            && isset($shipmentData["shipments"][0]['shippingChoice']['id'])
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    public function getCustomDeliveryShippingMethod(
+        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+    ): ?string {
+        if (!$this->isCustomDeliveryAdapter($checkoutData)) {
+
+            return null;
+        }
+        $shipment = $checkoutData->getShipping()->getData();
+        $code = $shipment["shipments"][0]['shippingChoice']['id'];
+
+        return $code;
     }
 
     public function setDeliveryCheckoutData(
@@ -160,7 +197,8 @@ class QuoteUpdater
 
     protected function getDefaultShippingMethod(Quote $quote)
     {
-        if ($this->config->create()->getIsDeliveryCheckoutActive()) {
+        if ($this->config->create()->getIsDeliveryCheckoutActive()
+            && !$this->config->create()->getIsCustomDeliveryAdapter()) {
             $gatewayKey = \Webbhuset\CollectorCheckout\Carrier\Collector::GATEWAY_KEY;
 
             return $gatewayKey . '_' . $gatewayKey;

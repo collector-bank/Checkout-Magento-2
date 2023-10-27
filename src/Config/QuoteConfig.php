@@ -14,18 +14,24 @@ class QuoteConfig extends \Webbhuset\CollectorCheckout\Config\Config
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Webbhuset\CollectorCheckout\Config\Source\Country\Country $countryData,
+        \Webbhuset\CollectorCheckout\Oath\AccessKeyManager $accessKeyManager,
         \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteDataHandler,
         Quote $quote
     ) {
         $this->quoteDataHandler = $quoteDataHandler;
         $this->quote = $quote;
 
-        parent::__construct($scopeConfig, $encryptor, $storeManager, $countryData);
+        parent::__construct($scopeConfig, $encryptor, $storeManager, $countryData, $accessKeyManager);
     }
 
     protected function getQuote() : Quote
     {
         return $this->quote;
+    }
+
+    public function getScopeStoreId() : string
+    {
+        return $this->quote->getStoreId();
     }
 
     public function getStoreId() : string

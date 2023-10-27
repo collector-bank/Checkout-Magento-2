@@ -103,4 +103,25 @@
             for="Magento\Sales\Block\Adminhtml\Order\AbstractOrder"
             type="Webbhuset\CollectorCheckout\Block\Admin\Carrier"
     />
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="testinitiatecheckout" xsi:type="object">
+                    Webbhuset\CollectorCheckout\Console\Command\TestInitiateCheckout
+                </item>
+                <item name="testgetorder" xsi:type="object">
+                    Webbhuset\CollectorCheckout\Console\Command\GetOrderInformation
+                </item>
+                <item name="partactivate" xsi:type="object">
+                    Webbhuset\CollectorCheckout\Console\Command\PartActivate
+                </item>
+                <item name="partcredit" xsi:type="object">
+                    Webbhuset\CollectorCheckout\Console\Command\PartCredit
+                </item>
+                <item name="cancelinvoice" xsi:type="object">
+                    Webbhuset\CollectorCheckout\Console\Command\CancelInvoice
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>

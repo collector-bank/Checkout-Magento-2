@@ -33,6 +33,10 @@ class Index extends \Magento\Framework\App\Action\Action
      * @var \Webbhuset\CollectorCheckout\Logger\Logger
      */
     protected $logger;
+    /**
+     * @var \Webbhuset\CollectorCheckout\Checkout\Quote\Manager
+     */
+    protected $quoteManager;
 
     /**
      * Index constructor.
@@ -49,19 +53,21 @@ class Index extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Action\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Webbhuset\CollectorCheckout\Adapter $collectorAdapter,
+        \Webbhuset\CollectorCheckout\Checkout\Quote\Manager $quoteManager,
         \Webbhuset\CollectorCheckout\QuoteConverter $quoteConverter,
         \Webbhuset\CollectorCheckout\QuoteUpdater $quoteUpdater,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger
     ) {
+        parent::__construct($context);
+
+        $this->quoteManager = $quoteManager;
         $this->resultJsonFactory = $resultJsonFactory;
         $this->checkoutSession   = $checkoutSession;
         $this->collectorAdapter  = $collectorAdapter;
         $this->quoteConverter    = $quoteConverter;
         $this->quoteUpdater      = $quoteUpdater;
         $this->logger            = $logger;
-
-        return parent::__construct($context);
     }
 
     /**
@@ -72,31 +78,36 @@ class Index extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $result = $this->resultJsonFactory->create();
-        $quote = $this->checkoutSession->getQuote(); // get id from session or url?
 
-        $publicId = $this->getRequest()->getParam('quoteid');
+        $publicToken = $this->getRequest()->getParam('publicToken');
         $eventName = $this->getRequest()->getParam('event');
+        $quote = $this->quoteManager->getQuoteByPublicToken($publicToken);
 
         if (!$quote->getId()) {
             $result->setHttpResponseCode(404);
             $this->logger->addCritical(
-                "Quote updater controller - Quote not found quoteId: $publicId event: $eventName"
-            );
+                "Quote updater controller - Quote not found quoteId: $publicToken event: $eventName"
+            ,$this->getRequest());
             return $result->setData(['message' => __('Quote not found')]);
         }
 
         $quote = $this->collectorAdapter->synchronize($quote, $eventName);
         $shippingAddress = $quote->getShippingAddress();
 
-        $result->setData(
-            [
-                'postcode' => $shippingAddress->getPostcode(),
-                'region' => $shippingAddress->getRegion(),
-                'country_id' => $shippingAddress->getCountryId(),
-                'shipping_method' => $shippingAddress->getShippingMethod(),
-                'updated' => true
-            ]
-        );
+        $data = [
+            'postcode' => $shippingAddress->getPostcode(),
+            'region' => $shippingAddress->getRegion(),
+            'country_id' => $shippingAddress->getCountryId(),
+            'shipping_method' => $shippingAddress->getShippingMethod(),
+            'updated' => true
+        ];
+
+        $shippingMethod = $shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod());
+        if ($shippingMethod && $shippingMethod->getRateId()) {
+            $data['carrier_title'] = $shippingMethod->getCarrierTitle();
+            $data['shipping_method_title'] = $shippingMethod->getMethodTitle();
+        }
+        $result->setData($data);
 
         return $result;
     }

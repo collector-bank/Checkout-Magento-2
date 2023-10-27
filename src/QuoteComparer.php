@@ -10,15 +10,21 @@ class QuoteComparer
     protected $quoteConverter;
     protected $config;
     protected $storeManager;
+    /**
+     * @var Shipment\IsCustomDeliveryAdapter
+     */
+    private $isCustomDeliveryAdapter;
 
     public function __construct(
         \Webbhuset\CollectorCheckout\QuoteConverter $quoteConverter,
         \Webbhuset\CollectorCheckout\Config\Config $config,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Webbhuset\CollectorCheckout\Shipment\IsCustomDeliveryAdapter $isCustomDeliveryAdapter
     ) {
-        $this->quoteConverter = $quoteConverter;
-        $this->config         = $config;
-        $this->storeManager   = $storeManager;
+        $this->quoteConverter           = $quoteConverter;
+        $this->config                   = $config;
+        $this->storeManager             = $storeManager;
+        $this->isCustomDeliveryAdapter  = $isCustomDeliveryAdapter;
     }
 
     public function isQuoteInSync(
@@ -99,12 +105,24 @@ class QuoteComparer
     protected function getCollectorFeesAsArray(
         \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ) {
+        $fees = [];
+        $isCustomDeliveryAdapter = $this->isCustomDeliveryAdapter->execute($checkoutData);
+        if ($isCustomDeliveryAdapter) {
+            $fees[] = [
+                'id' =>$this->isCustomDeliveryAdapter->getDeliveryMethod($checkoutData),
+                'unitPrice' => $this->isCustomDeliveryAdapter->getDeliveryFee($checkoutData)
+            ];
+        }
+
         if (!$checkoutData->getFees()) {
-            return [];
+            return $fees;
         }
         $checkoutItems = $checkoutData->getFees()->toArray();
 
         array_walk($checkoutItems, [$this, 'removeExtraColumns']);
+        if ($isCustomDeliveryAdapter) {
+            $checkoutItems = array_merge($checkoutItems, $fees);
+        }
 
         return $checkoutItems;
     }

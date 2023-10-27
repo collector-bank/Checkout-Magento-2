@@ -134,8 +134,7 @@ class Adapter
             ->collectShippingRates();
 
         $checkoutData = $this->acquireCheckoutInformationFromQuote($quote);
-        $oldFees = $checkoutData->getFees();
-        $oldCart = $checkoutData->getCart();
+
         $quote = $this->quoteUpdater->setQuoteData($quote, $checkoutData);
 
         $rate = $shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod());
@@ -188,7 +187,8 @@ class Adapter
 
         $cart = $this->quoteConverter->getCart($quote);
 
-        if (!$this->isFallbackDeliveryMethodConfigured()) {
+        if (!$this->isFallbackDeliveryMethodConfigured()
+            || $config->getIsCustomDeliveryAdapter()) {
             $fees = $this->quoteConverter->getFees($quote);
         } else {
             $fees = $this->quoteConverter->getFallbackFees($quote);
@@ -388,6 +388,9 @@ class Adapter
     {
         if ($config->getIsMockMode()) {
             return new \Webbhuset\CollectorCheckoutSDK\Adapter\MockAdapter($config);
+        }
+        if ($config->getIsOath()) {
+            return new \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey($config);
         }
 
         return new \Webbhuset\CollectorCheckoutSDK\Adapter\CurlAdapter($config);

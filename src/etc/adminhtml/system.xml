@@ -52,7 +52,7 @@
                             id='username'
                             translate='label'
                             type='text'
-                            sortOrder='2'
+                            sortOrder='20'
                             showInDefault='1'
                             showInWebsite='1'
                             showInStore='1'
@@ -69,7 +69,7 @@
                             id='password'
                             translate='label'
                             type="obscure"
-                            sortOrder='3'
+                            sortOrder='30'
                             showInDefault='1'
                             showInWebsite='1'
                             showInStore='1'
@@ -84,10 +84,60 @@
                     </field>
 
                     <field
+                        id="activeoath"
+                        translate="label"
+                        type="select"
+                        sortOrder="35"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <label>Enabled Oath</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                        id='client_id'
+                        translate='label'
+                        type='text'
+                        sortOrder='36'
+                        showInDefault='1'
+                        showInWebsite='1'
+                        showInStore='1'
+                    >
+                        <label>Client id</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='activeoath'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                        id='client_secret'
+                        translate='label'
+                        type='text'
+                        sortOrder='38'
+                        showInDefault='1'
+                        showInWebsite='1'
+                        showInStore='1'
+                    >
+                        <label>Client secret</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='activeoath'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
                             id='b2c'
                             translate='label'
                             type='text'
-                            sortOrder='4'
+                            sortOrder='40'
                             showInDefault='1'
                             showInWebsite='1'
                             showInStore='1'
@@ -103,7 +153,7 @@
                             id='b2b'
                             translate='label'
                             type='text'
-                            sortOrder='5'
+                            sortOrder='50'
                             showInDefault='1'
                             showInWebsite='1'
                             showInStore='1'
@@ -119,7 +169,7 @@
                             id="country_code"
                             translate="label"
                             type="select"
-                            sortOrder="6"
+                            sortOrder="60"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -137,7 +187,7 @@
                             id="test_mode"
                             translate="label"
                             type="select"
-                            sortOrder="7"
+                            sortOrder="70"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -153,7 +203,7 @@
                             id='test_mode_username'
                             translate='label'
                             type='text'
-                            sortOrder='8'
+                            sortOrder='80'
                             showInDefault='1'
                             showInWebsite='1'
                             showInStore='1'
@@ -171,7 +221,7 @@
                             id='test_mode_password'
                             translate='label'
                             type="obscure"
-                            sortOrder='9'
+                            sortOrder='90'
                             showInDefault='1'
                             showInWebsite='1'
                             showInStore='1'
@@ -186,11 +236,65 @@
                         </depends>
                     </field>
 
+
+                    <field
+                        id="test_mode_activeoath"
+                        translate="label"
+                        type="select"
+                        sortOrder="91"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <label>Test mode - Enabled Oath</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='test_mode'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                        id='test_mode_client_id'
+                        translate='label'
+                        type='text'
+                        sortOrder='92'
+                        showInDefault='1'
+                        showInWebsite='1'
+                        showInStore='1'
+                    >
+                        <label>Test mode - Client id</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='test_mode'>1</field>
+                            <field id='test_mode_activeoath'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                        id='test_mode_client_secret'
+                        translate='label'
+                        type='text'
+                        sortOrder='93'
+                        showInDefault='1'
+                        showInWebsite='1'
+                        showInStore='1'
+                    >
+                        <label>Test mode - Client secret</label>
+                        <comment><![CDATA[]]></comment>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='test_mode'>1</field>
+                            <field id='test_mode_activeoath'>1</field>
+                        </depends>
+                    </field>
+
                     <field
                             id='test_mode_b2c'
                             translate='label'
                             type='text'
-                            sortOrder='10'
+                            sortOrder='100'
                             showInDefault='1'
                             showInWebsite='1'
                             showInStore='1'
@@ -200,6 +304,7 @@
                         <depends>
                             <field id='active'>1</field>
                             <field id='test_mode'>1</field>
+                            <field id='test_mode_activeoath'>1</field>
                         </depends>
                     </field>
 
@@ -207,7 +312,7 @@
                             id='test_mode_b2b'
                             translate='label'
                             type='text'
-                            sortOrder='11'
+                            sortOrder='110'
                             showInDefault='1'
                             showInWebsite='1'
                             showInStore='1'
@@ -224,7 +329,7 @@
                             id="customer_type"
                             translate="label"
                             type="select"
-                            sortOrder="35"
+                            sortOrder="350"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -240,7 +345,7 @@
                             id="default_customer_type"
                             translate="label"
                             type="select"
-                            sortOrder="36"
+                            sortOrder="360"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -256,7 +361,7 @@
                             id="order_status"
                             translate="label"
                             type="select"
-                            sortOrder="37"
+                            sortOrder="370"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -274,7 +379,7 @@
                             id="order_accepted_status"
                             translate="label"
                             type="select"
-                            sortOrder="38"
+                            sortOrder="380"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -291,7 +396,7 @@
                             id="order_holded_status"
                             translate="label"
                             type="select"
-                            sortOrder="38"
+                            sortOrder="390"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -308,7 +413,7 @@
                             id="order_denied_status"
                             translate="label"
                             type="select"
-                            sortOrder="38"
+                            sortOrder="400"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -325,7 +430,7 @@
                             id="terms_url"
                             translate="label"
                             type="text"
-                            sortOrder="95"
+                            sortOrder="950"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -341,7 +446,7 @@
                             id="custom_base_url"
                             translate="label"
                             type="text"
-                            sortOrder="100"
+                            sortOrder="1000"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -357,7 +462,7 @@
                             id="create_customer_account"
                             translate="label"
                             type="select"
-                            sortOrder="96"
+                            sortOrder="960"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -378,7 +483,7 @@
                             id="profile_name"
                             translate="label"
                             type="text"
-                            sortOrder="106"
+                            sortOrder="1060"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -396,7 +501,7 @@
                             id="profile_name_b2b"
                             translate="label"
                             type="text"
-                            sortOrder="107"
+                            sortOrder="1070"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -414,7 +519,7 @@
                             id="style_data_lang"
                             translate="label"
                             type="text"
-                            sortOrder="155"
+                            sortOrder="1550"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -432,7 +537,7 @@
                             id="style_data_padding"
                             translate="label"
                             type="text"
-                            sortOrder="160"
+                            sortOrder="1600"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -450,7 +555,7 @@
                             id="style_data_container_id"
                             translate="label"
                             type="text"
-                            sortOrder="170"
+                            sortOrder="1700"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -468,7 +573,7 @@
                             id="style_data_action_color"
                             translate="label"
                             type="text"
-                            sortOrder="180"
+                            sortOrder="1800"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -486,7 +591,7 @@
                             id="style_data_action_text_color"
                             translate="label"
                             type="text"
-                            sortOrder="190"
+                            sortOrder="1900"
                             showInDefault="1"
                             showInWebsite="1"
                             showInStore="1"
@@ -504,7 +609,7 @@
                         id="delete_pending_orders"
                         translate="label"
                         type="select"
-                        sortOrder="200"
+                        sortOrder="2000"
                         showInDefault="1"
                         showInWebsite="0"
                         showInStore="0"
@@ -599,6 +704,39 @@
                             <field id='active'>1</field>
                         </depends>
                     </field>
+
+                    <field
+                        id="custom_delivery_adapter"
+                        translate="label"
+                        type="select"
+                        sortOrder="110"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <label>Use custom delivery adapter</label>
+                        <comment>This setting needs to be combined with a Profile Name with the custom delivery adapter</comment>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field id="icons"
+                           translate="label"
+                           sortOrder="120"
+                           showInDefault="1"
+                           showInWebsite="0"
+                           showInStore="0"
+                    >
+                        <depends>
+                            <field id='custom_delivery_adapter'>1</field>
+                        </depends>
+                        <label>Shipping method -> Walley icon</label>
+                        <frontend_model>Webbhuset\CollectorCheckout\Block\Admin\Form\Field\IconMapper</frontend_model>
+                        <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    </field>
+
                 </group>
             </group>
         </section>
