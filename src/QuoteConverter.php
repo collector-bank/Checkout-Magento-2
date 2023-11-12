@@ -2,6 +2,10 @@
 
 namespace Webbhuset\CollectorCheckout;
 
+use Magento\Customer\Api\AddressRepositoryInterface;
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Cart;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Cart\Item;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Customer\InitializeCustomer;
@@ -15,11 +19,21 @@ class QuoteConverter
     protected $scopeConfig;
     protected $configurationHelper;
     protected $config;
+    /**
+     * @var CustomerRepositoryInterface
+     */
+    private CustomerRepositoryInterface $customerRepository;
+    /**
+     * @var AddressRepositoryInterface
+     */
+    private AddressRepositoryInterface $addressRepository;
 
     public function __construct(
         \Magento\Tax\Model\Config $taxConfig,
         \Magento\Tax\Model\Calculation $taxCalculator,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        CustomerRepositoryInterface $customerRepository,
+        AddressRepositoryInterface $addressRepository,
         \Magento\Catalog\Helper\Product\Configuration $configurationHelper,
         \Webbhuset\CollectorCheckout\Config\QuoteConfigFactory $config
     ) {
@@ -28,6 +42,8 @@ class QuoteConverter
         $this->scopeConfig          = $scopeConfig;
         $this->configurationHelper  = $configurationHelper;
         $this->config               = $config;
+        $this->customerRepository   = $customerRepository;
+        $this->addressRepository = $addressRepository;
     }
 
     public function getCart(\Magento\Quote\Model\Quote $quote) : Cart
@@ -341,8 +357,66 @@ class QuoteConverter
     public function getMobilePhoneNumber(\Magento\Quote\Model\Quote $quote)
     {
         $shippingAddress = $quote->getShippingAddress();
+        $quotePhoneNumber = $shippingAddress->getTelephone();
+        if ($quotePhoneNumber) {
+            return $quotePhoneNumber;
+        }
+        $defaultShippingAddressPhoneNumber = $this->getDefaultShippingAddressPhoneNumber($quote);
+        if (!$defaultShippingAddressPhoneNumber) {
+            return "";
+        }
 
-        return $shippingAddress->getTelephone();
+        return $defaultShippingAddressPhoneNumber;
+    }
+
+    private function getDefaultShippingAddressId(\Magento\Quote\Model\Quote $quote):?int
+    {
+        $customerId = (int) $quote->getCustomerId();
+        if (!$customerId) {
+            return null;
+        }
+        try {
+            $customer = $this->customerRepository->getById($customerId);
+        } catch (\Exception $e) {
+            return null;
+        }
+
+        return (int) $customer->getDefaultShipping();
+    }
+
+    private function getDefaultShippingAddress(\Magento\Quote\Model\Quote $quote)
+    {
+        $defaultAddressId = $this->getDefaultShippingAddressId($quote);
+        if (!$defaultAddressId) {
+            return null;
+        }
+        try {
+            $address = $this->addressRepository->getById($defaultAddressId);
+        } catch (LocalizedException $e) {
+            return null;
+        }
+
+        return $address;
+    }
+
+    private function getDefaultShippingAddressPhoneNumber(\Magento\Quote\Model\Quote $quote):?string
+    {
+        $address = $this->getDefaultShippingAddress($quote);
+        if (!$address) {
+            return null;
+        }
+
+        return (string) $address->getTelephone();
+    }
+
+    private function getDefaultShippingAddressPostCode(\Magento\Quote\Model\Quote $quote):?string
+    {
+        $address = $this->getDefaultShippingAddress($quote);
+        if (!$address) {
+            return null;
+        }
+
+        return (string) $address->getPostcode();
     }
 
     public function getNationalIdentificationNumber(\Magento\Quote\Model\Quote $quote)
@@ -353,8 +427,16 @@ class QuoteConverter
     public function getPostalCode(\Magento\Quote\Model\Quote $quote)
     {
         $shippingAddress = $quote->getShippingAddress();
+        $postCode = $shippingAddress->getPostcode();
+        if ($postCode) {
+            return $postCode;
+        }
+        $defaultAddressPostalCode = $this->getDefaultShippingAddressPostCode($quote);
+        if (!$defaultAddressPostalCode) {
+            return "";
+        }
 
-        return $shippingAddress->getPostcode();
+        return $defaultAddressPostalCode;
     }
 
     public function getReference(\Magento\Quote\Model\Quote $quote)
