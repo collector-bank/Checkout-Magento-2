@@ -6,6 +6,7 @@ use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Webbhuset\CollectorCheckout\Config\Source\Customer\DefaultType;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Cart;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Cart\Item;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Customer\InitializeCustomer;
@@ -337,7 +338,7 @@ class QuoteConverter
         $nationalIdentificationNumber   = (string) $this->getNationalIdentificationNumber($quote);
         $postalCode                     = (string) $this->getPostalCode($quote);
         $deliveryAddress                = $this->getDeliveryAddress($quote);
-        $customerType                   = $this->quoteHandler->getCustomerType($quote);
+        $customerType                   = $this->quoteHandler->getCustomerType($quote) ? $this->quoteHandler->getCustomerType($quote): DefaultType::PRIVATE_CUSTOMERS;
 
         // Email and mobile phone number are required. If we don't have both, we return null
         if ($email && $mobilePhoneNumber) {
