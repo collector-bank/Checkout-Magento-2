@@ -27,11 +27,16 @@ class QuoteConverter
      * @var AddressRepositoryInterface
      */
     private AddressRepositoryInterface $addressRepository;
+    /**
+     * @var Data\QuoteHandler
+     */
+    private Data\QuoteHandler $quoteHandler;
 
     public function __construct(
         \Magento\Tax\Model\Config $taxConfig,
         \Magento\Tax\Model\Calculation $taxCalculator,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteHandler,
         CustomerRepositoryInterface $customerRepository,
         AddressRepositoryInterface $addressRepository,
         \Magento\Catalog\Helper\Product\Configuration $configurationHelper,
@@ -44,6 +49,7 @@ class QuoteConverter
         $this->config               = $config;
         $this->customerRepository   = $customerRepository;
         $this->addressRepository = $addressRepository;
+        $this->quoteHandler = $quoteHandler;
     }
 
     public function getCart(\Magento\Quote\Model\Quote $quote) : Cart
@@ -330,6 +336,8 @@ class QuoteConverter
         $mobilePhoneNumber              = (string) $this->getMobilePhoneNumber($quote);
         $nationalIdentificationNumber   = (string) $this->getNationalIdentificationNumber($quote);
         $postalCode                     = (string) $this->getPostalCode($quote);
+        $deliveryAddress                = $this->getDeliveryAddress($quote);
+        $customerType                   = $this->quoteHandler->getCustomerType($quote);
 
         // Email and mobile phone number are required. If we don't have both, we return null
         if ($email && $mobilePhoneNumber) {
@@ -337,7 +345,9 @@ class QuoteConverter
                 $email,
                 $mobilePhoneNumber,
                 $nationalIdentificationNumber,
-                $postalCode
+                $postalCode,
+                $deliveryAddress,
+                $customerType
             );
 
             return $customer;
@@ -497,5 +507,23 @@ class QuoteConverter
     private function getSelectedOptionsOfQuoteItem(\Magento\Catalog\Model\Product\Configuration\Item\ItemInterface $item)
     {
         return $this->configurationHelper->getCustomOptions($item);
+    }
+
+    public function getDeliveryAddress(\Magento\Quote\Model\Quote $quote)
+    {
+        $shippingAddress = $this->getDefaultShippingAddress($quote);
+        if (!$shippingAddress) {
+            return [];
+        }
+        return [
+            'firstName' => $shippingAddress->getFirstname(),
+            'lastName' => $shippingAddress->getLastname(),
+            'companyName' => $shippingAddress->getCompany(),
+            'address' => $shippingAddress->getStreet()[0] ?? '',
+            'address2' => $shippingAddress->getStreet()[1] ?? '',
+            'postalCode' => $shippingAddress->getPostcode(),
+            'city' => $shippingAddress->getCity(),
+        ];
+
     }
 }
