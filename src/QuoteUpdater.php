@@ -225,10 +225,10 @@ class QuoteUpdater
         $customerAddress = $customer->getInvoiceAddress();
         $firstname = is_string($customerAddress->getFirstName()) && strlen($customerAddress->getFirstName()) > 0
             ? $customerAddress->getFirstName()
-            : $customer->getFirstName();
+            : "";
         $lastname = is_string($customerAddress->getLastName()) && strlen($customerAddress->getLastName()) > 0
             ? $customerAddress->getLastName()
-            : $customer->getLastName();
+            : "";
         $email = $customer->getEmail();
         $countryCode = $checkoutData->getCountryCode();
         $basicAddress = $quote->getShippingAddress()->setCountryId($countryCode);
