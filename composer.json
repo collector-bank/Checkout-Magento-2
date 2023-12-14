@@ -5,7 +5,7 @@
     "description": "Magento 2 Collector Bank Checkout Module",
     "require": {
         "collector-bank/collector-payment-sdk": "1.0.5",
-        "collector-bank/collector-checkout-sdk": "1.0.13",
+        "collector-bank/collector-checkout-sdk": "1.0.14",
         "php": ">=7.4"
     },
     "authors": [

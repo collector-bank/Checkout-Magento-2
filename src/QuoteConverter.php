@@ -4,8 +4,10 @@ namespace Webbhuset\CollectorCheckout;
 
 use Magento\Customer\Api\AddressRepositoryInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Quote\Model\Quote;
 use Webbhuset\CollectorCheckout\Config\Source\Customer\DefaultType;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Cart;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Cart\Item;
@@ -382,6 +384,20 @@ class QuoteConverter
 
     private function getDefaultShippingAddressId(\Magento\Quote\Model\Quote $quote):?int
     {
+        $customer = $this->getLoggedInCustomer($quote);
+        if (!$customer) {
+            return null;
+        }
+
+        return (int) $customer->getDefaultShipping();
+    }
+
+    /**
+     * @param Quote $quote
+     * @return CustomerInterface|null
+     */
+    private function getLoggedInCustomer(\Magento\Quote\Model\Quote $quote)
+    {
         $customerId = (int) $quote->getCustomerId();
         if (!$customerId) {
             return null;
@@ -392,7 +408,7 @@ class QuoteConverter
             return null;
         }
 
-        return (int) $customer->getDefaultShipping();
+        return $customer;
     }
 
     private function getDefaultShippingAddress(\Magento\Quote\Model\Quote $quote)
@@ -432,6 +448,8 @@ class QuoteConverter
 
     public function getNationalIdentificationNumber(\Magento\Quote\Model\Quote $quote)
     {
+        // Override this to set organization number for company customers
+        // Possible to get current customer using $this->getLoggedInCustomer($quote);
         return null;
     }
 
