@@ -105,6 +105,14 @@ class Manager
         }
         if (!$config->getCreateCustomerAccount()) {
             return false;
+        } else {
+            $customerEmail = $quote->getCustomerEmail();
+            $websiteId = (int) $this->storeManager->getStore((int) $quote->getStoreId())->getWebsiteId();
+            try {
+                return $this->customerRepository->get($customerEmail, $websiteId);
+            } catch (NoSuchEntityException $e) {
+            } catch (LocalizedException $e) {
+            }
         }
 
         return $this->createCustomerFromQuote($quote);
