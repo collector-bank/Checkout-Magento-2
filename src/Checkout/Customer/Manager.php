@@ -2,6 +2,9 @@
 
 namespace Webbhuset\CollectorCheckout\Checkout\Customer;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
+
 /**
  * Class Manager
  *
@@ -92,6 +95,14 @@ class Manager
         \Magento\Quote\Model\Quote $quote
     ) {
         $config = $this->config->create();
+        $customerId = (int) $quote->getCustomerId();
+        if ($customerId) {
+            try {
+                return $this->customerRepository->getById($customerId);
+            } catch (NoSuchEntityException $e) {
+            } catch (LocalizedException $e) {
+            }
+        }
         if (!$config->getCreateCustomerAccount()) {
             return false;
         }
