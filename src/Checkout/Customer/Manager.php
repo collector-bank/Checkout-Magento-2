@@ -92,11 +92,6 @@ class Manager
         \Magento\Quote\Model\Quote $quote
     ) {
         $config = $this->config->create();
-        $customer = $this->getCustomerByEmail($quote->getCustomerEmail());
-
-        if ($customer->getId()) {
-            return $customer;
-        }
         if (!$config->getCreateCustomerAccount()) {
             return false;
         }
