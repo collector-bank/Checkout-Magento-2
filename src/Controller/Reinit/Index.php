@@ -70,10 +70,15 @@ class Index extends \Magento\Framework\App\Action\Action
         } catch (NoSuchEntityException $e) {
 
         }
+        if ($quote->getIsActive()) {
+            return $this->createResult(
+                'Quote not restored',
+                200,
+                true
+            );
+        }
 
-        $customerId = $this->checkoutSession->getCustomerId();
-        $quote->setIsActive(1)->setReservedOrderId(null)
-            ->setCustomerId($customerId);
+        $quote->setIsActive(1)->setReservedOrderId(null);
 
         $this->quoteRepository->save($quote);
         $this->checkoutSession->replaceQuote($quote)
