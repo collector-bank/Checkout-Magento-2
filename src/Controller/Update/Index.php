@@ -101,6 +101,12 @@ class Index extends \Magento\Framework\App\Action\Action
             'shipping_method' => $shippingAddress->getShippingMethod(),
             'updated' => true
         ];
+        if ($quote->getShippingAddress()->getShippingMethod() === 'collectorshipping_collectorshipping') {
+            $data['carrier_title'] = __('Delivery');;
+            $data['shipping_method_title'] = $shippingAddress->getShippingDescription();
+            $result->setData($data);
+            return $result;
+        }
 
         $shippingMethod = $shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod());
         if ($shippingMethod && $shippingMethod->getRateId()) {
