@@ -125,7 +125,7 @@ class Index extends Action
                 $this->cartRepository->save($quote);
             }
 
-            $shipment = $this->convertToShipment->execute($shippingMethods);
+            $shipment = $this->convertToShipment->execute($shippingMethods, $quote);
         } catch (NoSuchEntityException $e) {
             $shipment = [];
         }

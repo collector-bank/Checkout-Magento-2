@@ -736,6 +736,21 @@
                         <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                     </field>
 
+                    <field id="badges"
+                           translate="label"
+                           sortOrder="130"
+                           showInDefault="1"
+                           showInWebsite="1"
+                           showInStore="1"
+                    >
+                        <depends>
+                            <field id='custom_delivery_adapter'>1</field>
+                        </depends>
+                        <label>Shipping method -> Walley badges</label>
+                        <frontend_model>Webbhuset\CollectorCheckout\Block\Admin\Form\Field\BadgesMapper</frontend_model>
+                        <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    </field>
+
                 </group>
             </group>
         </section>

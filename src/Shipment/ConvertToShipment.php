@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Webbhuset\CollectorCheckout\Shipment;
 
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Shipping\Helper\Carrier;
 
@@ -16,13 +17,16 @@ class ConvertToShipment
      * @var Carrier
      */
     private $carrier;
+    private GetBadgesForShippingMethod $getBadgesForShippingMethod;
 
     public function __construct(
         GetIconForShippingMethod $getIconForShippingMethod,
-        Carrier $carrier
+        Carrier $carrier,
+        GetBadgesForShippingMethod $getBadgesForShippingMethod
     ) {
         $this->getIconForShippingMethod = $getIconForShippingMethod;
         $this->carrier = $carrier;
+        $this->getBadgesForShippingMethod = $getBadgesForShippingMethod;
     }
 
     /**
@@ -31,11 +35,11 @@ class ConvertToShipment
      * @param ShippingMethodInterface[] $shippingMethods
      * @return array
      */
-    public function execute(array $shippingMethods):array
+    public function execute(array $shippingMethods, CartInterface $quote):array
     {
         $shippingChoices = [];
         foreach ($shippingMethods as $shippingMethod) {
-            $shippingChoices[] = $this->shippingMethodToShipmentChoice($shippingMethod);
+            $shippingChoices[] = $this->shippingMethodToShipmentChoice($shippingMethod, $quote);
         }
         $sortOrder = array_column($shippingChoices, 'sort_order');
         array_multisort($sortOrder, SORT_ASC, $shippingChoices);
@@ -54,14 +58,15 @@ class ConvertToShipment
         ];
     }
 
-    public function shippingMethodToShipmentChoice(ShippingMethodInterface $shippingMethod):array
+    public function shippingMethodToShipmentChoice(ShippingMethodInterface $shippingMethod, CartInterface $quote):array
     {
         return [
             'id' => $shippingMethod->getCarrierCode() . '_' . $shippingMethod->getMethodCode(),
             'name' => $shippingMethod->getMethodTitle(),
             'description' => $shippingMethod->getCarrierTitle(),
             'fee' => (float)$shippingMethod->getPriceInclTax(),
-            'icon' => $this->getIconForShippingMethod->execute($shippingMethod->getMethodCode()),
+            'icon' => $this->getIconForShippingMethod->execute($shippingMethod->getCarrierCode()),
+            'badges' => $this->getBadgesForShippingMethod->execute($shippingMethod->getCarrierCode(), (int) $quote->getStoreId()),
             'destinations' => null,
             'sort_order' => (int) $this->carrier->getCarrierConfigValue($shippingMethod->getCarrierCode(), 'sort_order'),
         ];
