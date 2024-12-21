@@ -1,19 +1,26 @@
-<div id="checkout-newsletter-block" data-bind="scope:'newsletter'" class="content" data-role="content" aria-labelledby="block-newsletter-heading">
-    <!-- ko template: getTemplate() --><!-- /ko -->
-    <script type="text/x-magento-init">
-        {
-            "#checkout-newsletter-block": {
-                "Magento_Ui/js/core/app": <?= /* @escapeNotVerified */ $block->getJsLayout() ?>
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Webbhuset\CollectorCheckout\ViewModel\NewsletterConfigProvider $viewModel */
+$viewModel = $block->getViewModel();
+?>
+<?php if (!$viewModel->isNewsletterInIframe()): ?>
+    <div id="checkout-newsletter-block" data-bind="scope:'newsletter'" class="content" data-role="content" aria-labelledby="block-newsletter-heading">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+            {
+                "#checkout-newsletter-block": {
+                    "Magento_Ui/js/core/app": <?= /* @escapeNotVerified */ $block->getJsLayout() ?>
+                }
             }
-        }
-    </script>
-    <script>
-        require([
-            'mage/url',
-            'Magento_Ui/js/block-loader'
-        ], function(url, blockLoader) {
-            blockLoader("<?= /* @escapeNotVerified */ $block->getViewFileUrl('images/loader-1.gif') ?>");
-            return url.setBaseUrl('<?= /* @escapeNotVerified */ $block->getBaseUrl() ?>');
-        })
-    </script>
-</div>
+        </script>
+        <script>
+            require([
+                'mage/url',
+                'Magento_Ui/js/block-loader'
+            ], function(url, blockLoader) {
+                blockLoader("<?= /* @escapeNotVerified */ $block->getViewFileUrl('images/loader-1.gif') ?>");
+                return url.setBaseUrl('<?= /* @escapeNotVerified */ $block->getBaseUrl() ?>');
+            })
+        </script>
+    </div>
+<?php endif; ?>
