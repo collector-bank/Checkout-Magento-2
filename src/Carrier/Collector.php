@@ -156,7 +156,6 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
         }
 
         $price = $shippingData['unitPrice'];
-        $title = $shippingData['id'];
         $description = $shippingData['description'];
 
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
@@ -164,9 +163,7 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
 
         $method->setCarrier($this->_code);
         $method->setCarrierTitle($description);
-        $method->setMethodDescription($description);
         $method->setMethod($this->_code);
-        $method->setMethodTitle($description);
         $method->setPrice($price);
 
         return $method;
