@@ -102,8 +102,9 @@ class Index extends \Magento\Framework\App\Action\Action
             'updated' => true
         ];
         if ($quote->getShippingAddress()->getShippingMethod() === 'collectorshipping_collectorshipping') {
-            $data['carrier_title'] = __('Delivery');;
-            $data['shipping_method_title'] = $shippingAddress->getShippingDescription();
+            $shippingTitle = trim(preg_replace('/(.*)( - \1)/', '$1', $shippingAddress->getShippingDescription()));
+            $data['carrier_title'] = $shippingTitle;
+            $data['shipping_method_title'] = "";
             $result->setData($data);
             return $result;
         }

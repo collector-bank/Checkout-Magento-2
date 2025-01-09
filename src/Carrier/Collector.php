@@ -164,9 +164,9 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
 
         $method->setCarrier($this->_code);
         $method->setCarrierTitle($description);
-        $method->setMethodDescription('method description');
+        $method->setMethodDescription($description);
         $method->setMethod($this->_code);
-        $method->setMethodTitle('method title');
+        $method->setMethodTitle($description);
         $method->setPrice($price);
 
         return $method;
