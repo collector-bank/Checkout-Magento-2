@@ -15,7 +15,6 @@ class IsCustomDeliveryAdapter
         $shipmentData = $shipment->getData();
         if (
             isset($shipmentData["shipments"][0]["id"])
-            && $shipmentData["shipments"][0]["id"] === 'magento-delivery-methods'
             && isset($shipmentData["shipments"][0]['shippingChoice']['id'])
         ) {
             return true;
