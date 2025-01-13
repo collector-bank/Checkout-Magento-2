@@ -263,7 +263,11 @@ define([
                 function (response) {
                     let shippingMethod  = [];
                     shippingMethod['method_code'] = response.shipping_method;
-                    shippingMethod['method_title'] = response.shipping_method_title;
+                    if (response.shipping_method_title === '') {
+                        shippingMethod['method_title'] = undefined;
+                    } else {
+                        shippingMethod['method_title'] = response.shipping_method_title;
+                    }
                     shippingMethod['carrier_title'] = response.carrier_title;
                     quote.shippingMethod(shippingMethod);
                     checkoutData.setSelectedShippingRate(response.shipping_method);

@@ -314,6 +314,64 @@ class Config implements
         return $url;
     }
 
+    public function getCustomFields():array
+    {
+        if (empty($this->getFields())) {
+            return [];
+        }
+        return [
+            [
+                "id" => "myGroup",
+                "metadata"=> [
+                    "groupMeta" => "content"
+                ],
+                'fields' => $this->getFields()
+            ]
+        ];
+    }
+
+    public function getFields()
+    {
+        $fields = [];
+        $newsletter = $this->getNewsletterField();
+        if (!empty($newsletter)) {
+            $fields[] = $newsletter;
+        }
+        $comments = $this->getCommentField();
+        if (!empty($comments)) {
+            $fields[] = $comments;
+        }
+
+        return  $fields;
+    }
+
+    public function getNewsletterField():array
+    {
+        if (!$this->isNewsletter() || !$this->getNewsletterText()) {
+            return [];
+        }
+        return [
+            "id" => "newsConsent",
+            "name" => $this->getNewsletterText(),
+            "type" => "Checkbox",
+            "value" => true,
+            "metadata" => [
+                "field1Meta" => "field-newsletter-consent"
+            ],
+        ];
+    }
+
+    public function getCommentField()
+    {
+        if (!$this->isComment() || !$this->getCommentText()) {
+            return [];
+        }
+        return [
+            "id" => "comments",
+            "name" => $this->getCommentText(),
+            "type" => "Text",
+        ];
+    }
     /**
      * Get the notification url - Used by collector to update order state after order has been placed
      *
@@ -650,6 +708,26 @@ class Config implements
     public function getCustomBaseUrl()
     {
         return $this->getConfigValue('custom_base_url');
+    }
+
+    public function isNewsletter(): bool
+    {
+        return (bool) $this->getConfigValue('newsletter');
+    }
+
+    public function getNewsletterText():string
+    {
+        return $this->getConfigValue('newsletter_text');
+    }
+
+    public function isComment(): bool
+    {
+        return (bool) $this->getConfigValue('comment');
+    }
+
+    public function getCommentText():string
+    {
+        return $this->getConfigValue('comment_text');
     }
 
     /**

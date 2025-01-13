@@ -3,7 +3,9 @@
 namespace Webbhuset\CollectorCheckout\Checkout\Order;
 
 use Magento\Sales\Api\Data\OrderInterface;
+use Webbhuset\CollectorCheckout\Config\OrderConfig;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Purchase\Result as PurchaseResult;
+use Webbhuset\CollectorCheckoutSDK\CheckoutData;
 
 /**
  * Class Manager
@@ -78,6 +80,7 @@ class Manager
      * @var SetOrderStatus
      */
     private $setOrderStatus;
+    private  $subscriptionManager;
 
     /**
      * Manager constructor.
@@ -103,6 +106,7 @@ class Manager
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Webbhuset\CollectorCheckout\AdapterFactory $collectorAdapter,
+        \Magento\Newsletter\Model\SubscriptionManager $subscriptionManager,
         \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         \Webbhuset\CollectorCheckout\Checkout\Order\SetOrderStatus $setOrderStatus,
         \Webbhuset\CollectorCheckout\Config\OrderConfigFactory $configFactory,
@@ -116,6 +120,7 @@ class Manager
         \Webbhuset\CollectorCheckout\Config\Config $config,
         \Webbhuset\CollectorCheckout\Carrier\Manager $carrierManager
     ) {
+        $this->subscriptionManager   = $subscriptionManager;
         $this->cartManagement        = $cartManagement;
         $this->collectorAdapter      = $collectorAdapter;
         $this->orderRepository       = $orderRepository;
@@ -261,14 +266,10 @@ class Manager
             $this->logger->addCritical(
                 "Can not invoice order, already invoiced: {$order->getIncrementId()}. qouteId: {$order->getQuoteId()} "
             );
-
             throw new \Exception("Order already invoiced in Magento for $totalAmount");
         }
-
         $collectorBankPrivateId = $this->orderHandler->getPrivateId($order);
-
         $checkoutAdapter = $this->collectorAdapter->create();
-        $storeId = $this->orderHandler->getStoreId($order);
 
         $config = $this->configFactory->create(['order' => $order]);
         $checkoutData = $checkoutAdapter->acquireCheckoutInformation($config, $collectorBankPrivateId);
@@ -279,13 +280,11 @@ class Manager
         switch ($paymentResult) {
             case PurchaseResult::PRELIMINARY:
                 $result = $this->acknowledgeOrder($order, $checkoutData);
-                $this->orderRepository->save($order);
-
-                if ($config->getIsDeliveryCheckoutActive()) {
-                    $order = $this->carrierManager->saveShipmentDataOnOrder($order->getEntityId(), $checkoutData);
+                if ($result['order_status_before'] !== $result['order_status_after']) {
+                    $this->saveAdditionalData($order, $checkoutData, $config);
+                    $this->orderRepository->save($order);
                 }
                 break;
-
             case PurchaseResult::ON_HOLD:
                 $result = $this->holdOrder($order, $checkoutData);
                 $this->orderRepository->save($order);
@@ -302,9 +301,7 @@ class Manager
                 break;
 
             case PurchaseResult::COMPLETED:
-                if ($config->getIsDeliveryCheckoutActive()) {
-                    $order = $this->carrierManager->saveShipmentDataOnOrder($order->getId(), $checkoutData);
-                }
+                $this->saveAdditionalData($order, $checkoutData, $config);
                 $result = $this->completeOrder($order, $checkoutData);
                 break;
         }
@@ -312,17 +309,41 @@ class Manager
         return $result;
     }
 
+    public function saveAdditionalData(OrderInterface $order, CheckoutData $checkoutData, OrderConfig $config)
+    {
+        if ($config->getIsDeliveryCheckoutActive()) {
+            $this->carrierManager->saveShipmentDataOnOrder($order->getId(), $checkoutData);
+        }
+        if ($config->isNewsletter()) {
+            $newsletterField = $checkoutData->getCustomFieldNewsletter();
+            if (!empty($newsletterField) && isset($newsletterField['value']) && $newsletterField['value']) {
+                $this->subscribe($order);
+            }
+        }
+        if ($config->isComment()) {
+            $commentField = $checkoutData->getCustomFieldComment();
+            if (!empty($commentField) && isset($commentField['value']) && strlen($commentField['value']) > 0) {
+                $order->addCommentToStatusHistory($commentField['value']);
+            }
+        }
+    }
+
+    public function subscribe(OrderInterface $order)
+    {
+        $this->subscriptionManager->subscribe($order->getCustomerEmail(), $order->getStoreId());
+    }
+
     /**
      * Acknowledged orders by adding payment information and changes state to processing
      *
      * @param \Magento\Sales\Api\Data\OrderInterface  $order
-     * @param \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+     * @param CheckoutData $checkoutData
      * @return array
      * @throws \Exception
      */
     public function acknowledgeOrder(
         \Magento\Sales\Api\Data\OrderInterface $order,
-        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+        CheckoutData $checkoutData
     ):array {
         $orderStatusBefore = $this->orderManagement->getStatus($order->getId());
         $config = $this->configFactory->create(['order' => $order]);
@@ -371,12 +392,12 @@ class Manager
      * Sets the order to On Hold
      *
      * @param \Magento\Sales\Api\Data\OrderInterface  $order
-     * @param \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+     * @param CheckoutData $checkoutData
      * @return array
      */
     public function holdOrder(
         \Magento\Sales\Api\Data\OrderInterface $order,
-        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+        CheckoutData $checkoutData
     ):array {
         $orderStatusBefore = $this->orderManagement->getStatus($order->getId());
         $orderStatusAfter  = $this->configFactory->create(['order' => $order])->getOrderStatusHolded();
@@ -422,12 +443,12 @@ class Manager
      * Cancels the order
      *
      * @param \Magento\Sales\Api\Data\OrderInterface  $order
-     * @param \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+     * @param CheckoutData $checkoutData
      * @return array
      */
     public function cancelOrder(
         \Magento\Sales\Api\Data\OrderInterface $order,
-        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+        CheckoutData $checkoutData
     ):array {
         $orderStatusBefore = $this->orderManagement->getStatus($order->getId());
         $orderStatusAfter  = $this->configFactory->create(['order' => $order])->getOrderStatusDenied();
@@ -462,12 +483,12 @@ class Manager
      * Invoices the order offline. This function is used when orders are autoactivated in Collector
      *
      * @param \Magento\Sales\Api\Data\OrderInterface  $order
-     * @param \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+     * @param CheckoutData $checkoutData
      * @return array
      */
     public function activateOrder(
         \Magento\Sales\Api\Data\OrderInterface $order,
-        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+        CheckoutData $checkoutData
     ):array {
         $orderStatusBefore = $this->orderManagement->getStatus($order->getEntityId());
 
@@ -501,12 +522,12 @@ class Manager
      * Invoices the order offline
      *
      * @param \Magento\Sales\Api\Data\OrderInterface  $order
-     * @param \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+     * @param CheckoutData $checkoutData
      * @return array
      */
     public function completeOrder(
         \Magento\Sales\Api\Data\OrderInterface $order,
-        \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
+        CheckoutData $checkoutData
     ):array {
         return $this->activateOrder($order, $checkoutData);
     }

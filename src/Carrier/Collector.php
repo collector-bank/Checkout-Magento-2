@@ -40,6 +40,8 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
      * @var \Webbhuset\CollectorCheckout\QuoteConverter
      */
     protected $quoteConverter;
+    private \Webbhuset\CollectorCheckout\Shipment\DeliveryCheckoutData $deliveryCheckoutData;
+
     /**
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory
@@ -73,6 +75,7 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
         \Magento\Shipping\Model\Tracking\Result\StatusFactory $trackStatusFactory,
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Directory\Model\CountryFactory $countryFactory,
+        \Webbhuset\CollectorCheckout\Shipment\DeliveryCheckoutData $deliveryCheckoutData,
         \Magento\Directory\Model\CurrencyFactory $currencyFactory,
         \Magento\Directory\Helper\Data $directoryData,
         \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry,
@@ -105,6 +108,7 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
             $stockRegistry,
             $data
         );
+        $this->deliveryCheckoutData = $deliveryCheckoutData;
     }
 
     /**
@@ -140,27 +144,26 @@ class Collector extends \Magento\Shipping\Model\Carrier\AbstractCarrierOnline im
      */
     public function getMethodForQuote(int $quoteId)
     {
-        $quote = $this->quoteRepository->get($quoteId);
-
-        $shippingData = $this->quoteDataHandler->getDeliveryCheckoutData($quote);
+        if ($this->deliveryCheckoutData->getData()) {
+            $shippingData = $this->deliveryCheckoutData->getData();
+        } else {
+            $quote = $this->quoteRepository->get($quoteId);
+            $shippingData = $this->quoteDataHandler->getDeliveryCheckoutData($quote);
+        }
 
         if(empty($shippingData)) {
-
             return [];
         }
 
         $price = $shippingData['unitPrice'];
-        $title = $shippingData['id'];
         $description = $shippingData['description'];
 
         /** @var \Magento\Quote\Model\Quote\Address\RateResult\Method $method */
         $method = $this->rateResultMethodFactory->create();
 
         $method->setCarrier($this->_code);
-        $method->setCarrierTitle($title);
-        $method->setMethodDescription($description);
+        $method->setCarrierTitle($description);
         $method->setMethod($this->_code);
-        $method->setMethodTitle($description);
         $method->setPrice($price);
 
         return $method;

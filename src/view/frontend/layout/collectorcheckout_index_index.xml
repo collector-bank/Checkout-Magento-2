@@ -57,6 +57,9 @@
             </block>
             <block class="Magento\Framework\View\Element\Template" name="collector-newsletter" template="Webbhuset_CollectorCheckout::checkout/newsletter.phtml" before="collector-discount">
                 <arguments>
+                    <argument name="view_model" xsi:type="object">
+                        Webbhuset\CollectorCheckout\ViewModel\NewsletterConfigProvider
+                    </argument>
                     <argument name="jsLayout" xsi:type="array">
                         <item name="components" xsi:type="array">
                             <item name="newsletter" xsi:type="array">

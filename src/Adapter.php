@@ -129,34 +129,25 @@ class Adapter
     public function synchronize(\Magento\Quote\Model\Quote $quote, $eventName = null)
     {
         $shippingAddress = $quote->getShippingAddress();
-
-        $shippingAddress->setCollectShippingRates(true)
-            ->collectShippingRates();
-
         $checkoutData = $this->acquireCheckoutInformationFromQuote($quote);
-
         $quote = $this->quoteUpdater->setQuoteData($quote, $checkoutData);
 
         $rate = $shippingAddress->getShippingRateByCode($shippingAddress->getShippingMethod());
         if (!$rate || !$shippingAddress->getShippingMethod()) {
             $this->quoteUpdater->setDefaultShippingMethod($quote);
         }
-
-        $quote->collectTotals();
-
-        $quote->setNeedsCollectorUpdate(null);
-        $this->quoteRepository->save($quote);
-
         $config = $this->configFactory->create(['quote' => $quote]);
         if ('collectorCheckoutShippingUpdated' === $eventName
             && $config->getIsDeliveryCheckoutActive()
         ) {
+            $this->quoteRepository->save($quote);
+            $quote->getShippingAddress()->setCollectShippingRates(true)->collectShippingRates();
             return $quote;
         }
 
         $this->updateFees($quote);
         $this->updateCart($quote);
-
+        $this->quoteRepository->save($quote);
         return $quote;
     }
 

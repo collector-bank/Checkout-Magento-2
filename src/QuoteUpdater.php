@@ -19,6 +19,7 @@ class QuoteUpdater
     protected $quoteHandler;
     protected $shippingAssignmentProcessor;
     protected $cartExtensionFactory;
+    private Shipment\DeliveryCheckoutData $deliveryCheckoutData;
 
     public function __construct(
         \Magento\Tax\Model\Config $taxConfig,
@@ -26,6 +27,7 @@ class QuoteUpdater
         \Webbhuset\CollectorCheckout\Config\QuoteConfigFactory $config,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepositoryInterface,
         \Magento\Customer\Model\Session $session,
+        \Webbhuset\CollectorCheckout\Shipment\DeliveryCheckoutData $deliveryCheckoutData,
         \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteHandler,
         \Magento\Quote\Api\ShippingMethodManagementInterface $shippingMethodManagement,
         \Magento\Quote\Model\Quote\ShippingAssignment\ShippingAssignmentProcessor $shippingAssignmentProcessor,
@@ -40,6 +42,7 @@ class QuoteUpdater
         $this->quoteHandler                = $quoteHandler;
         $this->shippingAssignmentProcessor = $shippingAssignmentProcessor;
         $this->cartExtensionFactory        = $cartExtensionFactory;
+        $this->deliveryCheckoutData = $deliveryCheckoutData;
     }
 
     public function setQuoteData(
@@ -107,7 +110,8 @@ class QuoteUpdater
         }
 
         if ($this->config->create()->getIsDeliveryCheckoutActive()
-            && !$this->isCustomDeliveryAdapter($checkoutData)) {
+            && !$this->isCustomDeliveryAdapter($checkoutData)
+        ) {
             $this->setDeliveryCheckoutData($quote, $checkoutData);
         }
 
@@ -149,15 +153,18 @@ class QuoteUpdater
         Quote $quote,
         \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ) {
-        $fees = $checkoutData->getFees();
-        if (!$fees) {
+        $shipment = $checkoutData->getShipping()->getData();
+        if (!isset($shipment["shipments"][0]['shippingChoice']['id'])) {
             return;
         }
-
-        $fees = $fees->toArray();
-        if (isset($fees['shipping'])) {
-            $this->quoteHandler->setDeliveryCheckoutData($quote, $fees['shipping']);
-        }
+        $shippingOptions = $shipment["shipments"][0]['shippingChoice'];
+        $data = [
+            'unitPrice' => $shippingOptions['fee'],
+            'id' => $shippingOptions['name'],
+            'description' => $shippingOptions['name'],
+        ];
+        $this->deliveryCheckoutData->setData($data);
+        $this->quoteHandler->setDeliveryCheckoutData($quote, $data);
     }
 
     public function setDefaultShippingIfEmpty(

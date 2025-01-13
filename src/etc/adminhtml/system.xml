@@ -625,6 +625,70 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
 
+                    <field
+                        id="newsletter"
+                        translate="label"
+                        type="select"
+                        sortOrder="2100"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <label>Show newsletter subscribe</label>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field
+                        id="newsletter_text"
+                        translate="label"
+                        type="text"
+                        sortOrder="2200"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <label>Text to display in newsletter question</label>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='newsletter'>1</field>
+                        </depends>
+                    </field>
+
+                    <field
+                        id="comment"
+                        translate="label"
+                        type="select"
+                        sortOrder="2300"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <label>Show order comments</label>
+                        <depends>
+                            <field id='active'>1</field>
+                        </depends>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+
+                    <field
+                        id="comment_text"
+                        translate="label"
+                        type="text"
+                        sortOrder="2400"
+                        showInDefault="1"
+                        showInWebsite="1"
+                        showInStore="1"
+                    >
+                        <label>Text to display above comment box</label>
+                        <depends>
+                            <field id='active'>1</field>
+                            <field id='comment'>1</field>
+                        </depends>
+                    </field>
+
                 </group>
 
                 <group
@@ -733,6 +797,21 @@
                         </depends>
                         <label>Shipping method -> Walley icon</label>
                         <frontend_model>Webbhuset\CollectorCheckout\Block\Admin\Form\Field\IconMapper</frontend_model>
+                        <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    </field>
+
+                    <field id="badges"
+                           translate="label"
+                           sortOrder="130"
+                           showInDefault="1"
+                           showInWebsite="1"
+                           showInStore="1"
+                    >
+                        <depends>
+                            <field id='custom_delivery_adapter'>1</field>
+                        </depends>
+                        <label>Shipping method -> Walley badges</label>
+                        <frontend_model>Webbhuset\CollectorCheckout\Block\Admin\Form\Field\BadgesMapper</frontend_model>
                         <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
                     </field>
 
