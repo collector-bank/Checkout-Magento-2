@@ -124,4 +124,8 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Payment\Model\Checks\ZeroTotal">
+        <plugin name="webbhuset_collectorcheckout_allow_zero_total"
+                type="Webbhuset\CollectorCheckout\Plugin\AllowZeroTotal"/>
+    </type>
 </config>

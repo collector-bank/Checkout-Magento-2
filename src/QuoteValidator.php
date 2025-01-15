@@ -27,10 +27,6 @@ class QuoteValidator
     {
         $errors = [];
 
-        if ((float) $quote->getGrandTotal() <= 0) {
-            $errors[] = __('Quote total is zero');
-        }
-
         if (!$quote->hasItems()) {
             $errors[] = __('Quote is empty');
         }

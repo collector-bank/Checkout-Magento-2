@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
  */
 class Adapter extends \Magento\Payment\Model\Method\Adapter
 {
+    protected $_canUseForZeroSubtotal = true;
     protected $config;
     /**
      * Adapter constructor.
@@ -53,5 +54,18 @@ class Adapter extends \Magento\Payment\Model\Method\Adapter
     public function isActive($storeId = 0)
     {
         return $this->config->getIsActive();
+    }
+
+    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    {
+        if (!parent::isAvailable($quote)) {
+            return false;
+        }
+
+        if ($quote && (float)$quote->getBaseGrandTotal() === 0.0) {
+            return true;
+        }
+
+        return true;
     }
 }
