@@ -354,7 +354,7 @@ class Config implements
             "id" => "newsConsent",
             "name" => $this->getNewsletterText(),
             "type" => "Checkbox",
-            "value" => true,
+            "value" => false,
             "metadata" => [
                 "field1Meta" => "field-newsletter-consent"
             ],
