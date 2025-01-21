@@ -6,6 +6,8 @@ use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\State\InputMismatchException;
 use Magento\Quote\Model\Quote as Quote;
+use Webbhuset\CollectorCheckout\Data\ExtractShippingOptionFee;
+use Webbhuset\CollectorCheckout\Shipment\DeliveryCheckoutData;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Customer as SDK;
 
 class QuoteUpdater
@@ -19,7 +21,8 @@ class QuoteUpdater
     protected $quoteHandler;
     protected $shippingAssignmentProcessor;
     protected $cartExtensionFactory;
-    private Shipment\DeliveryCheckoutData $deliveryCheckoutData;
+    private DeliveryCheckoutData $deliveryCheckoutData;
+    private ExtractShippingOptionFee $extractShippingOptionFee;
 
     public function __construct(
         \Magento\Tax\Model\Config $taxConfig,
@@ -27,7 +30,8 @@ class QuoteUpdater
         \Webbhuset\CollectorCheckout\Config\QuoteConfigFactory $config,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepositoryInterface,
         \Magento\Customer\Model\Session $session,
-        \Webbhuset\CollectorCheckout\Shipment\DeliveryCheckoutData $deliveryCheckoutData,
+        ExtractShippingOptionFee $extractShippingOptionFee,
+        DeliveryCheckoutData $deliveryCheckoutData,
         \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteHandler,
         \Magento\Quote\Api\ShippingMethodManagementInterface $shippingMethodManagement,
         \Magento\Quote\Model\Quote\ShippingAssignment\ShippingAssignmentProcessor $shippingAssignmentProcessor,
@@ -38,6 +42,7 @@ class QuoteUpdater
         $this->taxCalculator               = $taxCalculator;
         $this->shippingMethodManagement    = $shippingMethodManagement;
         $this->session                     = $session;
+        $this->extractShippingOptionFee    = $extractShippingOptionFee;
         $this->customerRepositoryInterface = $customerRepositoryInterface;
         $this->quoteHandler                = $quoteHandler;
         $this->shippingAssignmentProcessor = $shippingAssignmentProcessor;
@@ -159,7 +164,7 @@ class QuoteUpdater
         }
         $shippingOptions = $shipment["shipments"][0]['shippingChoice'];
         $data = [
-            'unitPrice' => $shippingOptions['fee'],
+            'unitPrice' => $shippingOptions['fee'] + $this->extractShippingOptionFee->execute($shippingOptions),
             'id' => $shippingOptions['name'],
             'description' => $shippingOptions['name'],
         ];

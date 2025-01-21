@@ -3,8 +3,18 @@ declare(strict_types=1);
 
 namespace Webbhuset\CollectorCheckout\Shipment;
 
+use Webbhuset\CollectorCheckout\Data\ExtractShippingOptionFee;
+
 class IsCustomDeliveryAdapter
 {
+    private ExtractShippingOptionFee $extractShippingOptionFee;
+
+    public function __construct(
+        ExtractShippingOptionFee $extractShippingOptionFee
+    ) {
+        $this->extractShippingOptionFee = $extractShippingOptionFee;
+    }
+
     public function execute(
         \Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData
     ):bool {
@@ -28,8 +38,9 @@ class IsCustomDeliveryAdapter
             return null;
         }
         $shipment = $checkoutData->getShipping()->getData();
+        $shippingChoice = $shipment["shipments"][0]['shippingChoice'];
 
-        return (float) $shipment["shipments"][0]['shippingChoice']['fee'];
+        return (float) $shippingChoice['fee'] + $this->extractShippingOptionFee->execute($shippingChoice);
     }
 
     public function getDeliveryMethod(\Webbhuset\CollectorCheckoutSDK\CheckoutData $checkoutData):?string
