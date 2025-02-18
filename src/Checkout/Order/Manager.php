@@ -80,33 +80,19 @@ class Manager
      * @var SetOrderStatus
      */
     private $setOrderStatus;
-    private  $subscriptionManager;
-
+    private $subscriptionManager;
+    private $newsletterModel;
     /**
-     * Manager constructor.
-     *
-     * @param \Magento\Quote\Api\CartManagementInterface                     $cartManagement
-     * @param \Magento\Sales\Model\OrderRepository                           $orderRepository
-     * @param \Webbhuset\CollectorCheckout\Data\OrderHandler             $orderHandler
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder                   $searchCriteriaBuilder
-     * @param \Webbhuset\CollectorCheckout\AdapterFactory                $collectorAdapter
-     * @param \Magento\Sales\Api\OrderManagementInterface                    $orderManagement
-     * @param \Webbhuset\CollectorCheckout\Config\ConfigFactory          $config
-     * @param \Magento\Quote\Model\QuoteManagement                           $quoteManagement
-     * @param ManagerFactory                                                 $orderManager
-     * @param \Magento\Framework\Registry                                    $registry
-     * @param \Magento\Framework\Stdlib\DateTime\DateTimeFactory             $dateTime
-     * @param \Webbhuset\CollectorCheckout\Invoice\AdministrationFactory $invoice
-     * @param \Webbhuset\CollectorCheckout\Logger\Logger                 $logger
-     * @param \Magento\Newsletter\Model\SubscriberFactory                    $subscriberFactory
+     * @var \Magento\Framework\ObjectManagerInterface
      */
+    private $objectManager;
+
     public function __construct(
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Webbhuset\CollectorCheckout\AdapterFactory $collectorAdapter,
-        \Magento\Newsletter\Model\SubscriptionManager $subscriptionManager,
         \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         \Webbhuset\CollectorCheckout\Checkout\Order\SetOrderStatus $setOrderStatus,
         \Webbhuset\CollectorCheckout\Config\OrderConfigFactory $configFactory,
@@ -118,9 +104,9 @@ class Manager
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
         \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
         \Webbhuset\CollectorCheckout\Config\Config $config,
+        \Magento\Framework\ObjectManagerInterface $objectManager,
         \Webbhuset\CollectorCheckout\Carrier\Manager $carrierManager
     ) {
-        $this->subscriptionManager   = $subscriptionManager;
         $this->cartManagement        = $cartManagement;
         $this->collectorAdapter      = $collectorAdapter;
         $this->orderRepository       = $orderRepository;
@@ -137,7 +123,14 @@ class Manager
         $this->subscriberFactory     = $subscriberFactory;
         $this->config                = $config;
         $this->carrierManager        = $carrierManager;
-        $this->setOrderStatus = $setOrderStatus;
+        $this->objectManager         = $objectManager;
+        $this->setOrderStatus        = $setOrderStatus;
+
+        if (class_exists(\Magento\Newsletter\Model\SubscriptionManager::class)) {
+            $this->newsletterModel = $this->objectManager->create(\Magento\Newsletter\Model\SubscriptionManager::class);
+        } else {
+            $this->newsletterModel = $this->objectManager->create(\Magento\Newsletter\Model\Subscriber::class);
+        }
     }
 
     /**
@@ -330,7 +323,11 @@ class Manager
 
     public function subscribe(OrderInterface $order)
     {
-        $this->subscriptionManager->subscribe($order->getCustomerEmail(), $order->getStoreId());
+        if ($this->newsletterModel instanceof \Magento\Newsletter\Model\SubscriptionManager) {
+            $this->newsletterModel->subscribe($order->getCustomerEmail(), $order->getStoreId());
+        } else {
+            $this->newsletterModel->subscribe($order->getCustomerEmail());
+        }
     }
 
     /**
