@@ -273,7 +273,8 @@ class Manager
         switch ($paymentResult) {
             case PurchaseResult::PRELIMINARY:
                 $result = $this->acknowledgeOrder($order, $checkoutData);
-                if ($result['order_status_before'] !== $result['order_status_after']) {
+                if (isset($result['order_status_before']) && $result['order_status_before'] !== $result['order_status_after']) {
+                    $this->saveAdditionalData($order, $checkoutData, $config);
                     $this->orderRepository->save($order);
                     $this->saveAdditionalData($order, $checkoutData, $config);
                 }
