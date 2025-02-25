@@ -82,10 +82,7 @@ class Manager
     private $setOrderStatus;
     private $subscriptionManager;
     private $newsletterModel;
-    /**
-     * @var \Magento\Framework\ObjectManagerInterface
-     */
-    private $objectManager;
+    private \Magento\Newsletter\Model\Subscriber $newsletterSubscriber;
 
     public function __construct(
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
@@ -101,10 +98,10 @@ class Manager
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Stdlib\DateTime\DateTimeFactory $dateTime,
         \Webbhuset\CollectorCheckout\Invoice\AdministrationFactory $invoice,
+        \Magento\Newsletter\Model\Subscriber $newsletterSubscriber,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
         \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
         \Webbhuset\CollectorCheckout\Config\Config $config,
-        \Magento\Framework\ObjectManagerInterface $objectManager,
         \Webbhuset\CollectorCheckout\Carrier\Manager $carrierManager
     ) {
         $this->cartManagement        = $cartManagement;
@@ -123,14 +120,8 @@ class Manager
         $this->subscriberFactory     = $subscriberFactory;
         $this->config                = $config;
         $this->carrierManager        = $carrierManager;
-        $this->objectManager         = $objectManager;
         $this->setOrderStatus        = $setOrderStatus;
-
-        if (class_exists(\Magento\Newsletter\Model\SubscriptionManager::class)) {
-            $this->newsletterModel = $this->objectManager->create(\Magento\Newsletter\Model\SubscriptionManager::class);
-        } else {
-            $this->newsletterModel = $this->objectManager->create(\Magento\Newsletter\Model\Subscriber::class);
-        }
+        $this->newsletterSubscriber  = $newsletterSubscriber;
     }
 
     /**
@@ -324,11 +315,7 @@ class Manager
 
     public function subscribe(OrderInterface $order)
     {
-        if ($this->newsletterModel instanceof \Magento\Newsletter\Model\SubscriptionManager) {
-            $this->newsletterModel->subscribe($order->getCustomerEmail(), $order->getStoreId());
-        } else {
-            $this->newsletterModel->subscribe($order->getCustomerEmail());
-        }
+        $this->newsletterSubscriber->subscribe($order->getCustomerEmail());
     }
 
     /**
