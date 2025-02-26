@@ -11,11 +11,18 @@
         <policy id="script-src">
             <values>
                 <value id="uat_collector" type="host">checkout-uat.collector.se</value>
+                <value id="uat_walley" type="host">checkout.uat.walleydev.com</value>
             </values>
         </policy>
         <policy id="frame-src">
             <values>
                 <value id="uat_collector" type="host">checkout-uat.collector.se</value>
+                <value id="uat_walley" type="host">checkout.uat.walleydev.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="uat_walley" type="host">api.checkout.uat.walleydev.com</value>
             </values>
         </policy>
     </policies>
