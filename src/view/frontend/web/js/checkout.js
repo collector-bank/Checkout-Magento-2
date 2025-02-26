@@ -46,13 +46,6 @@ define([
             self.setCheckoutData();
             this.cartData = customerData.get('cart');
 
-            // Reload page if we cannot use collector checkout
-            quote.totals.subscribe(function (newTotals) {
-                if (newTotals.grand_total == 0) {
-                    window.location.reload(false);
-                }
-            });
-
             $(document).on('ajax:updateCartItemQty', function() {
                 collectorIframe.suspend();
                 self.fetchShippingRates();

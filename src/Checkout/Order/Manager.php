@@ -80,33 +80,16 @@ class Manager
      * @var SetOrderStatus
      */
     private $setOrderStatus;
-    private  $subscriptionManager;
+    private $subscriptionManager;
+    private $newsletterModel;
+    private \Magento\Newsletter\Model\Subscriber $newsletterSubscriber;
 
-    /**
-     * Manager constructor.
-     *
-     * @param \Magento\Quote\Api\CartManagementInterface                     $cartManagement
-     * @param \Magento\Sales\Model\OrderRepository                           $orderRepository
-     * @param \Webbhuset\CollectorCheckout\Data\OrderHandler             $orderHandler
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder                   $searchCriteriaBuilder
-     * @param \Webbhuset\CollectorCheckout\AdapterFactory                $collectorAdapter
-     * @param \Magento\Sales\Api\OrderManagementInterface                    $orderManagement
-     * @param \Webbhuset\CollectorCheckout\Config\ConfigFactory          $config
-     * @param \Magento\Quote\Model\QuoteManagement                           $quoteManagement
-     * @param ManagerFactory                                                 $orderManager
-     * @param \Magento\Framework\Registry                                    $registry
-     * @param \Magento\Framework\Stdlib\DateTime\DateTimeFactory             $dateTime
-     * @param \Webbhuset\CollectorCheckout\Invoice\AdministrationFactory $invoice
-     * @param \Webbhuset\CollectorCheckout\Logger\Logger                 $logger
-     * @param \Magento\Newsletter\Model\SubscriberFactory                    $subscriberFactory
-     */
     public function __construct(
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \Webbhuset\CollectorCheckout\AdapterFactory $collectorAdapter,
-        \Magento\Newsletter\Model\SubscriptionManager $subscriptionManager,
         \Magento\Sales\Api\OrderManagementInterface $orderManagement,
         \Webbhuset\CollectorCheckout\Checkout\Order\SetOrderStatus $setOrderStatus,
         \Webbhuset\CollectorCheckout\Config\OrderConfigFactory $configFactory,
@@ -115,12 +98,12 @@ class Manager
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Stdlib\DateTime\DateTimeFactory $dateTime,
         \Webbhuset\CollectorCheckout\Invoice\AdministrationFactory $invoice,
+        \Magento\Newsletter\Model\Subscriber $newsletterSubscriber,
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
         \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
         \Webbhuset\CollectorCheckout\Config\Config $config,
         \Webbhuset\CollectorCheckout\Carrier\Manager $carrierManager
     ) {
-        $this->subscriptionManager   = $subscriptionManager;
         $this->cartManagement        = $cartManagement;
         $this->collectorAdapter      = $collectorAdapter;
         $this->orderRepository       = $orderRepository;
@@ -137,7 +120,8 @@ class Manager
         $this->subscriberFactory     = $subscriberFactory;
         $this->config                = $config;
         $this->carrierManager        = $carrierManager;
-        $this->setOrderStatus = $setOrderStatus;
+        $this->setOrderStatus        = $setOrderStatus;
+        $this->newsletterSubscriber  = $newsletterSubscriber;
     }
 
     /**
@@ -280,9 +264,10 @@ class Manager
         switch ($paymentResult) {
             case PurchaseResult::PRELIMINARY:
                 $result = $this->acknowledgeOrder($order, $checkoutData);
-                if ($result['order_status_before'] !== $result['order_status_after']) {
+                if (isset($result['order_status_before']) && $result['order_status_before'] !== $result['order_status_after']) {
                     $this->saveAdditionalData($order, $checkoutData, $config);
                     $this->orderRepository->save($order);
+                    $this->saveAdditionalData($order, $checkoutData, $config);
                 }
                 break;
             case PurchaseResult::ON_HOLD:
@@ -330,7 +315,7 @@ class Manager
 
     public function subscribe(OrderInterface $order)
     {
-        $this->subscriptionManager->subscribe($order->getCustomerEmail(), $order->getStoreId());
+        $this->newsletterSubscriber->subscribe($order->getCustomerEmail());
     }
 
     /**

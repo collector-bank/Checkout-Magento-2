@@ -43,6 +43,9 @@
             </thead>
         <tbody>
         <?php foreach($shippingData as $field => $value): ?>
+            <?php if (is_array($value)): ?>
+                <?php continue; ?>
+            <?php endif; ?>
             <tr>
                 <td>
                     <?=$field?>
@@ -61,6 +64,17 @@
                 <?php endif; ?>
             </tr>
         <?php endforeach; ?>
+        <?php
+            $bookedShipmentId = $block->getBookedShipmentId((int) $order->getId());
+        ?>
+        <?php if ($bookedShipmentId): ?>
+            <td>
+                <?=__('BookedShipmentId')?>
+            </td>
+            <td>
+                <?=$bookedShipmentId?>
+            </td>
+        <?php endif;?>
         </tbody>
         </table>
     <?php endif; ?>

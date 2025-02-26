@@ -280,12 +280,12 @@ class Config implements
 
     public function getTestModeClientSecret(): string
     {
-        return (string) $this->getConfigValue('client_secret');
+        return (string) $this->getConfigValue('test_mode_client_secret');
     }
 
     public function getTestModeClientId(): string
     {
-        return (string) $this->getConfigValue('client_id');
+        return (string) $this->getConfigValue('test_mode_client_id');
     }
 
     /**
@@ -354,7 +354,7 @@ class Config implements
             "id" => "newsConsent",
             "name" => $this->getNewsletterText(),
             "type" => "Checkbox",
-            "value" => true,
+            "value" => false,
             "metadata" => [
                 "field1Meta" => "field-newsletter-consent"
             ],

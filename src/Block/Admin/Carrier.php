@@ -4,6 +4,8 @@
 namespace Webbhuset\CollectorCheckout\Block\Admin;
 
 
+use Magento\Sales\Api\Data\OrderInterface;
+
 /**
  * Class Carrier
  *
@@ -20,6 +22,8 @@ class Carrier extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
      * @var \Webbhuset\CollectorCheckout\Carrier\CarrierDataRepository
      */
     protected $carrierDataRepository;
+    private \Webbhuset\CollectorCheckout\Carrier\GetBookedShipmentIdByOrder $getBookedShipmentIdByOrder;
+
     /**
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
@@ -32,14 +36,16 @@ class Carrier extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Framework\Registry $registry,
         \Magento\Sales\Helper\Admin $adminHelper,
+        \Webbhuset\CollectorCheckout\Carrier\GetBookedShipmentIdByOrder $getBookedShipmentIdByOrder,
         \Webbhuset\CollectorCheckout\Carrier\CarrierDataRepository $carrierDataRepository,
         \Webbhuset\CollectorCheckout\Config\Config $config,
         array $data = []
     ) {
+        parent::__construct($context, $registry, $adminHelper, $data);
+
+        $this->getBookedShipmentIdByOrder = $getBookedShipmentIdByOrder;
         $this->carrierDataRepository = $carrierDataRepository;
         $this->config = $config;
-
-        parent::__construct($context, $registry, $adminHelper, $data);
     }
 
     /**
@@ -64,6 +70,11 @@ class Carrier extends \Magento\Sales\Block\Adminhtml\Order\AbstractOrder
     public function isDeliveryCheckoutActive()
     {
         return $this->config->getIsDeliveryCheckoutActive();
+    }
+
+    public function getBookedShipmentId(int $orderId):?string
+    {
+        return $this->getBookedShipmentIdByOrder->execute($orderId);
     }
 
     /**
