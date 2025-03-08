@@ -97,7 +97,12 @@ class Index extends \Magento\Framework\App\Action\Action
         $publicToken = $orderDataHandler->getPublicToken($order);
 
         $iframeConfig = new \Webbhuset\CollectorCheckoutSDK\Config\IframeConfig(
-            $publicToken
+            $publicToken,
+            $this->config->getStyleDataLang(),
+            $this->config->getStyleDataPadding(),
+            $this->config->getStyleDataContainerId(),
+            $this->config->getStyleDataActionColor(),
+            $this->config->getStyleDataActionTextColor()
         );
         $iframe = \Webbhuset\CollectorCheckoutSDK\Iframe::getScript($iframeConfig, $this->config->getMode());
 
