@@ -249,17 +249,25 @@ class QuoteConverter
         return $fees;
     }
 
-    public function getFallbackFees(\Magento\Quote\Model\Quote $quote) : Fees
+    public function getFallbackFees(\Magento\Quote\Model\Quote $quote): array
     {
-        $shippingFee        = $this->getShippingFallbackFee($quote);
-        $directInvoiceFee   = $this->getDirectInvoiceFee($quote);
-
-        $fees = new Fees(
-            $shippingFee,
-            $directInvoiceFee
-        );
-
-        return $fees;
+        $shippingFee = $this->getShippingFallbackFee($quote);
+        return [
+            'provider' => "MerchantFallback",
+            "shippingFee" => $shippingFee->getUnitPrice(),
+            "shipments" => [
+                [
+                    "id" => $shippingFee->getId(),
+                    "feeItemId" => $shippingFee->getId(),
+                    "shippingChoice" => [
+                        "id" => $shippingFee->getId(),
+                        "name" => $shippingFee->getDescription(),
+                        "fee" => $shippingFee->getUnitPrice(),
+                        "vat" => $shippingFee->getVat(),
+                    ]
+                ]
+            ]
+        ];
     }
 
     public function getShippingFallbackFee(\Magento\Quote\Model\Quote $quote)
