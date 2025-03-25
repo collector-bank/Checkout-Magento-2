@@ -179,6 +179,9 @@ class Manager
             if (\Magento\Sales\Model\Order::STATE_NEW == $order->getState()) {
                 $this->removeAndCancelOrder($order);
             }
+            if (\Magento\Sales\Model\Order::STATE_CANCELED == $order->getState()) {
+                $this->deleteOrder($order);
+            }
         } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
         }
     }
