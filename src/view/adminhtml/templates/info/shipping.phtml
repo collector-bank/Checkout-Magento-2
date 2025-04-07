@@ -34,7 +34,7 @@
             $shippingData = $block->getCarrierInformation();
         ?>
         <br><br>
-        <table class="data-grid" style="width:100px">
+        <table class="data-grid" style="width:100%">
             <thead>
                 <tr>
                     <th><?=__('Name')?></th>
@@ -43,23 +43,32 @@
             </thead>
         <tbody>
         <?php foreach($shippingData as $field => $value): ?>
-            <?php if (is_array($value)): ?>
-                <?php continue; ?>
-            <?php endif; ?>
             <tr>
                 <td>
                     <?=$field?>
                 </td>
-                <?php if(!is_object($value)) : ?>
+                <?php if(!is_object($value) && !is_array($value)) : ?>
                     <td>
                         <?=$value?>
                     </td>
                 <?php else: ?>
                     <td>
                     <?php $subShippingData = json_decode(json_encode($value), true);?>
-                    <?php foreach ($subShippingData as $subField => $subValue):?>
-                        <?=$subField?> = <?=$subValue?>
-                    <?php endforeach; ?>
+                        <?php if (isset($subShippingData[0]['shippingChoice']['id'])): ?>
+                            <?=__('Id: ')?> <?=$subShippingData[0]['shippingChoice']['id']?><br>
+                        <?php endif; ?>
+                        <?php if (isset($subShippingData[0]['shippingChoice']['name'])): ?>
+                            <?=__('Name: ')?> <?=$subShippingData[0]['shippingChoice']['name']?><br>
+                        <?php endif; ?>
+                        <?php if (isset($subShippingData[0]['shippingChoice']['destination']['id'])): ?>
+                            <br>
+                            <b><?=__('Service point')?></b>
+                            <br>
+                            <?=__('Id: ')?> <?=$subShippingData[0]['shippingChoice']['destination']['id']?><br>
+                        <?php endif; ?>
+                        <?php if (isset($subShippingData[0]['shippingChoice']['destination']['name'])): ?>
+                            <?=__('Name: ')?> <?=$subShippingData[0]['shippingChoice']['destination']['name']?><br>
+                        <?php endif; ?>
                     </td>
                 <?php endif; ?>
             </tr>

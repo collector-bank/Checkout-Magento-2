@@ -51,17 +51,6 @@ class Config implements
     protected $magentoStoreId = null;
     private \Webbhuset\CollectorCheckout\Oath\AccessKeyManager $accessKeyManager;
 
-    /**
-     * Config constructor.
-     *
-     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
-     * @param \Magento\Framework\Encryption\EncryptorInterface   $encryptor
-     * @param \Magento\Checkout\Model\Session                    $checkoutSession
-     * @param \Magento\Store\Model\StoreManagerInterface         $storeManager
-     * @param \Webbhuset\CollectorCheckout\Data\QuoteHandler $quoteDataHandler
-     * @param \Webbhuset\CollectorCheckout\Data\OrderHandler $orderDataHandler
-     * @param Source\Country\Country                             $countryData
-     */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Framework\Encryption\EncryptorInterface $encryptor,
@@ -306,12 +295,18 @@ class Config implements
      */
     public function getRedirectPageUri(): string
     {
-        $checkoutUrl = \Webbhuset\CollectorCheckout\Gateway\Config::CHECKOUT_URL_KEY;
-        $urlKey = $checkoutUrl . "/success/index/reference/{checkout.publictoken}";
+        $path = \Webbhuset\CollectorCheckout\Gateway\Config::CHECKOUT_URL_KEY
+            . '/success/index/reference/{checkout.publictoken}';
 
-        $url = $this->storeManager->getStore()->getUrl($urlKey);
+        return $this->getUrl($path);
+    }
 
-        return $url;
+    private function getUrl($urlKey):string
+    {
+        $store = $this->storeManager->getStore();
+        $baseUrl = $store->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_LINK);
+
+        return rtrim($baseUrl, '/') . '/' . ltrim($urlKey, '/');
     }
 
     public function getCustomFields():array
@@ -386,7 +381,7 @@ class Config implements
             return $this->getCustomBaseUrl() . $urlKey;
         }
 
-        return $this->storeManager->getStore()->getUrl($urlKey);
+        return $this->getUrl($urlKey);
     }
 
     /**
@@ -403,7 +398,7 @@ class Config implements
             return $this->getCustomBaseUrl() . $urlKey;
         }
 
-        return $this->storeManager->getStore()->getUrl($urlKey);
+        return $this->getUrl($urlKey);
     }
 
     /**
