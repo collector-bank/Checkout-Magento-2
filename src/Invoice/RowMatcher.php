@@ -118,6 +118,7 @@ class RowMatcher
             $order
         );
 
+
         return $matchingArticles;
     }
 
@@ -128,19 +129,21 @@ class RowMatcher
      * @return InvoiceRow
      */
     public function adjustmentToInvoiceRows(
-        $adjustmentFee
+        $adjustmentFee,
+        $taxPercent = 0
     ): \Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRow {
         if ($adjustmentFee > 0) {
-            $articleId             = __('Adjustment Fee');
-            $description     = __('Adjustment Fee');
+            $articleId = __('Discount');
+            $description = __('Discount');
+            $type = 'discount';
         } else {
-            $articleId             = __('Adjustment Refund');
-            $description     = __('Adjustment Refund');
+            $articleId  = __('Fee');
+            $description = __('Fee');
+            $type = 'fee';
         }
-        $vat = 0;
         $qty = 1;
 
-        return new InvoiceRow($articleId, $description, $qty, $adjustmentFee, $vat);
+        return new InvoiceRow($articleId, $description, $qty, $adjustmentFee, (float) $taxPercent, $type);
     }
 
     /**
