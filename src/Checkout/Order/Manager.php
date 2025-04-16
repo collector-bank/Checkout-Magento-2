@@ -598,7 +598,7 @@ class Manager
      * @param string $state
      * @return $this
      */
-    protected function updateOrderStatus(OrderInterface $order,string $status,string $state)
+    public function updateOrderStatus(OrderInterface $order,string $status,string $state)
     {
         $this->setOrderStatus->execute(
             (int) $order->getEntityId(),
