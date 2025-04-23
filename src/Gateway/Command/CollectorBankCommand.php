@@ -6,6 +6,7 @@ use Magento\Payment\Gateway\CommandInterface as CommandInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Sales\Api\Data\TransactionInterface;
 use Webbhuset\CollectorPaymentSDK\Errors\ResponseError as ResponseError;
+use Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRow;
 
 /**
  * Class CollectorBankCommand
@@ -240,13 +241,13 @@ class CollectorBankCommand implements CommandInterface
         $order      = $payment->getOrder();
         $creditMemo = $payment->getCreditmemo();
 
-        $isInvoiceAdjusted = $this->adjustInvoice($creditMemo, $payment);
-
-        if ($isInvoiceAdjusted) {
-            return true;
-        }
-
         $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $order);
+        $adjustmentsInvoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
+        /** @var InvoiceRow $adjustmentInvoiceRow */
+        foreach ($adjustmentsInvoiceRows as $adjustmentInvoiceRow) {
+            $article = $adjustmentInvoiceRow->toArticle();
+            $articleList->addArticle($article);
+        }
 
         if (count($articleList->getArticleList()) == 0) {
             return true;
@@ -282,59 +283,6 @@ class CollectorBankCommand implements CommandInterface
         return true;
     }
 
-    /**
-     * Adjust a collector invoice with negative or positive adjustment fees
-     *
-     * @param \Magento\Sales\Model\Order\Creditmemo $creditMemo
-     * @param \Magento\Payment\Model\InfoInterface $payment
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Webbhuset\CollectorCheckout\Exception\Exception
-     */
-    public function adjustInvoice(
-        \Magento\Sales\Model\Order\Creditmemo $creditMemo,
-        $payment
-    ) {
-        $adjustmentsInvoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
-
-        if (count($adjustmentsInvoiceRows) == 0) {
-            return false;
-        }
-        $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $payment->getOrder());
-        $invoiceRows = $articleList->getInvoiceRows()->toArray();
-
-        if (count($invoiceRows) > 0) {
-            $adjustmentsInvoiceRows = array_merge($adjustmentsInvoiceRows, $invoiceRows);
-        }
-
-        try {
-            $invoiceNo = $creditMemo->getInvoice()->getTransactionId();
-            $orderId = (int)$payment->getOrder()->getId();
-
-            $response = $this->invoice->adjustInvoice(
-                $invoiceNo,
-                $adjustmentsInvoiceRows,
-                $orderId
-            );
-
-            $this->transaction->create()->addTransaction(
-                $payment->getOrder(),
-                TransactionInterface::TYPE_REFUND,
-                $response
-            );
-
-            return true;
-        } catch (ResponseError $e) {
-            $incrementOrderId = (int)$payment->getOrder()->getIncrementOrderId();
-            $this->logger->addCritical(
-                "Response error on adjustment of invoice: {$incrementOrderId} invoiceNo {$invoiceNo}" .
-                $e->getMessage()
-            );
-            throw new \Webbhuset\CollectorCheckout\Exception\Exception(
-                __($e->getMessage())
-            );
-        }
-    }
 
     /**
      * Get adjustments as collector invoice rows
@@ -346,15 +294,21 @@ class CollectorBankCommand implements CommandInterface
         \Magento\Sales\Model\Order\Creditmemo $creditMemo
     ) {
         $invoiceRows = [];
+        $items = $creditMemo->getOrder()->getAllItems();
+        $taxPercent = 0;
+        if (!empty($items)) {
+            $firstItem = reset($items);
+            $taxPercent = $firstItem->getTaxPercent();
+        }
 
         if (0 < $creditMemo->getAdjustmentNegative()) {
-            $adjustmentFee = $creditMemo->getAdjustmentNegative();
-            $invoiceRows[] = $this->rowMatcher->adjustmentToInvoiceRows($adjustmentFee)->toArray();
+            $adjustmentFee = (-1) * $creditMemo->getAdjustmentNegative();
+            $invoiceRows[] = $this->rowMatcher->adjustmentToInvoiceRows($adjustmentFee, $taxPercent);
         }
 
         if (0 < $creditMemo->getAdjustmentPositive()) {
-            $adjustmentFee = (-1)*$creditMemo->getAdjustmentPositive();
-            $invoiceRows[] = $this->rowMatcher->adjustmentToInvoiceRows($adjustmentFee)->toArray();
+            $adjustmentFee = $creditMemo->getAdjustmentPositive();
+            $invoiceRows[] = $this->rowMatcher->adjustmentToInvoiceRows($adjustmentFee, $taxPercent);
         }
 
         return $invoiceRows;
