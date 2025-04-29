@@ -2,59 +2,93 @@
 
 namespace Webbhuset\CollectorCheckout\Controller\Success;
 
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\View\Result\Page;
+use Magento\Framework\View\Result\PageFactory;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Webbhuset\CollectorCheckout\Adapter;
+use Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory;
+use Webbhuset\CollectorCheckout\Config\Config;
+use Webbhuset\CollectorCheckout\Data\OrderHandlerFactory;
+use Webbhuset\CollectorCheckout\Logger\Logger;
+use Webbhuset\CollectorCheckoutSDK\Config\IframeConfig;
+use Webbhuset\CollectorCheckoutSDK\Iframe;
+
 /**
  * Class Index
  *
  * @package Webbhuset\CollectorCheckout\Controller\Success
  */
-class Index extends \Magento\Framework\App\Action\Action
+class Index extends Action
 {
     /**
-     * @var \Magento\Framework\View\Result\PageFactory
+     * @var PageFactory
      */
     protected $pageFactory;
+
     /**
-     * @var
-     */
-    protected $checkoutSession;
-    /**
-     * @var \Webbhuset\CollectorCheckout\Adapter
+     * @var Adapter
      */
     protected $collectorAdapter;
+
     /**
-     * @var \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory
+     * @var ManagerFactory
      */
     protected $orderManager;
+
     /**
-     * @var \Webbhuset\CollectorCheckout\Data\OrderHandlerFactory
+     * @var OrderHandlerFactory
      */
     protected $orderDataHandler;
+
     /**
-     * @var \Webbhuset\CollectorCheckout\Logger\Logger
+     * @var Logger
      */
     protected $logger;
 
+    /**
+     * @var Config
+     */
     protected $config;
+
+    /**
+     * @var CartRepositoryInterface
+     */
     protected $quoteRepository;
+
+    /**
+     * @var CheckoutSession
+     */
+    protected $checkoutSession;
+
     /**
      * Index constructor.
      *
-     * @param \Magento\Framework\App\Action\Context                          $context
-     * @param \Webbhuset\CollectorCheckout\Adapter                       $collectorAdapter
-     * @param \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory $orderManager
-     * @param \Webbhuset\CollectorCheckout\Data\OrderHandlerFactory      $orderDataHandler
-     * @param \Magento\Framework\View\Result\PageFactory                     $pageFactory
-     * @param \Webbhuset\CollectorCheckout\Logger\Logger                 $logger
+     * @param Context                 $context
+     * @param Adapter                 $collectorAdapter
+     * @param ManagerFactory          $orderManager
+     * @param OrderHandlerFactory     $orderDataHandler
+     * @param PageFactory             $pageFactory
+     * @param Logger                  $logger
+     * @param Config                   $config
+     * @param CartRepositoryInterface $quoteRepository
+     * @param CheckoutSession         $checkoutSession
      */
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
-        \Webbhuset\CollectorCheckout\Adapter $collectorAdapter,
-        \Webbhuset\CollectorCheckout\Checkout\Order\ManagerFactory $orderManager,
-        \Webbhuset\CollectorCheckout\Data\OrderHandlerFactory $orderDataHandler,
-        \Magento\Framework\View\Result\PageFactory $pageFactory,
-        \Webbhuset\CollectorCheckout\Logger\Logger $logger,
-        \Webbhuset\CollectorCheckout\Config\Config $config,
-        \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+        Context $context,
+        Adapter $collectorAdapter,
+        ManagerFactory $orderManager,
+        OrderHandlerFactory $orderDataHandler,
+        PageFactory $pageFactory,
+        Logger $logger,
+        Config $config,
+        CartRepositoryInterface $quoteRepository,
+        CheckoutSession $checkoutSession
     ) {
         $this->pageFactory      = $pageFactory;
         $this->collectorAdapter = $collectorAdapter;
@@ -63,12 +97,19 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->logger           = $logger;
         $this->config           = $config;
         $this->quoteRepository  = $quoteRepository;
+        $this->checkoutSession  = $checkoutSession;
 
         parent::__construct($context);
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface|\Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Page
+     * Execute success page controller action
+     *
+     * Loads the order by the reference token from the URL, updates the checkout
+     * session with order information, and renders the success page with the
+     * Collector iframe.
+     *
+     * @return ResponseInterface|ResultInterface|Page
      */
     public function execute()
     {
@@ -83,7 +124,18 @@ class Index extends \Magento\Framework\App\Action\Action
             $quote->setIsActive(0);
             $this->quoteRepository->save($quote);
 
-        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            $orderId = $order->getId();
+            $incrementOrderId = $order->getIncrementId();
+
+            if (!$this->checkoutSession->getLastOrderId()) {
+                $this->checkoutSession
+                    ->setLastQuoteId($quoteId)
+                    ->setLastSuccessQuoteId($quoteId)
+                    ->setLastOrderId($orderId)
+                    ->setLastRealOrderId($incrementOrderId)
+                    ->setLastOrderStatus($order->getStatus());
+            }
+        } catch (NoSuchEntityException $e) {
             $page->getLayout()
                 ->getBlock('collectorbank_success_iframe');
             $this->logger->addCritical(
@@ -96,7 +148,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $orderDataHandler = $this->orderDataHandler->create();
         $publicToken = $orderDataHandler->getPublicToken($order);
 
-        $iframeConfig = new \Webbhuset\CollectorCheckoutSDK\Config\IframeConfig(
+        $iframeConfig = new IframeConfig(
             $publicToken,
             $this->config->getStyleDataLang(),
             $this->config->getStyleDataPadding(),
@@ -104,7 +156,7 @@ class Index extends \Magento\Framework\App\Action\Action
             $this->config->getStyleDataActionColor(),
             $this->config->getStyleDataActionTextColor()
         );
-        $iframe = \Webbhuset\CollectorCheckoutSDK\Iframe::getScript($iframeConfig, $this->config->getMode());
+        $iframe = Iframe::getScript($iframeConfig, $this->config->getMode());
 
         $page->getLayout()
             ->getBlock('collectorbank_success_iframe')
