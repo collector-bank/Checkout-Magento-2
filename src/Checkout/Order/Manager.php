@@ -6,6 +6,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Webbhuset\CollectorCheckout\Config\OrderConfig;
 use Webbhuset\CollectorCheckoutSDK\Checkout\Purchase\Result as PurchaseResult;
 use Webbhuset\CollectorCheckoutSDK\CheckoutData;
+use Magento\Checkout\Model\Session as CheckoutSession;
 
 /**
  * Class Manager
@@ -84,6 +85,11 @@ class Manager
     private $newsletterModel;
     private \Magento\Newsletter\Model\Subscriber $newsletterSubscriber;
 
+    /**
+     * @var CheckoutSession
+     */
+    protected $checkoutSession;
+
     public function __construct(
         \Magento\Quote\Api\CartManagementInterface $cartManagement,
         \Magento\Sales\Model\OrderRepository $orderRepository,
@@ -102,7 +108,8 @@ class Manager
         \Webbhuset\CollectorCheckout\Logger\Logger $logger,
         \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory,
         \Webbhuset\CollectorCheckout\Config\Config $config,
-        \Webbhuset\CollectorCheckout\Carrier\Manager $carrierManager
+        \Webbhuset\CollectorCheckout\Carrier\Manager $carrierManager,
+        CheckoutSession $checkoutSession
     ) {
         $this->cartManagement        = $cartManagement;
         $this->collectorAdapter      = $collectorAdapter;
@@ -122,13 +129,14 @@ class Manager
         $this->carrierManager        = $carrierManager;
         $this->setOrderStatus        = $setOrderStatus;
         $this->newsletterSubscriber  = $newsletterSubscriber;
+        $this->checkoutSession  = $checkoutSession;
     }
 
     /**
      * Create order from quote and return increment order id
      *
-     * @param $quoteId
-     * @return int incrementOrderId
+     * @param \Magento\Quote\Model\Quote $quote
+     * @return string incrementOrderId
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
@@ -140,6 +148,15 @@ class Manager
 
         $order = $this->orderRepository->get($orderId);
         $incrementOrderId = $order->getIncrementId();
+
+        if (!$this->checkoutSession->getLastOrderId()) {
+            $this->checkoutSession
+                ->setLastQuoteId($quoteId)
+                ->setLastSuccessQuoteId($quoteId)
+                ->setLastOrderId($orderId)
+                ->setLastRealOrderId($incrementOrderId)
+                ->setLastOrderStatus($order->getStatus());
+        }
 
         $this->logger->addInfo(
             "Submitted order order id: {$incrementOrderId}. qouteId: {$quoteId} "
