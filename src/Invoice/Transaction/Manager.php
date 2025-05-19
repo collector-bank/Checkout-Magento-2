@@ -36,8 +36,8 @@ class Manager
      */
     public function addTransaction(
         \Magento\Sales\Api\Data\OrderInterface $order,
-	$type,
-	$status = false,
+	    $type,
+	    $status = false,
         $response = []
     ) {
         $payment = $order->getPayment();
@@ -73,7 +73,6 @@ class Manager
         if ($parentTransId) {
             $transaction->setParentTxnId($parentTransId);
         }
-        $transaction->save();
         $payment->save();
     }
 
