@@ -27,6 +27,8 @@ class Manager
         $this->transactionFactory    = $transactionFactory;
     }
 
+    protected $counter = 0;
+
     /**
      * Adds a transaction to the order
      *
@@ -36,43 +38,40 @@ class Manager
      */
     public function addTransaction(
         \Magento\Sales\Api\Data\OrderInterface $order,
-	    $type,
-	    $status = false,
+        $type,
+        $status = false,
         $response = []
     ) {
         $payment = $order->getPayment();
-
-        $id             = $order->getIncrementId();
-        $txnId          = "{$id}-{$type}";
-        $parentTransId  = $payment->getLastTransId();
-        $paymentData    = $payment->getAdditionalInformation();
+        $txnId = $order->getIncrementId() . "-{$type}";
+        $parentTransId = $payment->getLastTransId();
+        $paymentData = $payment->getAdditionalInformation();
 
         if (!empty($response)) {
-            if(isset($response['InvoiceUrl'])) {
+            if (isset($response['InvoiceUrl'])) {
                 $paymentData['invoice_url'] = $response['InvoiceUrl'];
             }
-            if(isset($response['CorrelationId'])) {
-                $purchaseIdentifier = $response['CorrelationId'];
-                $paymentData['purchase_identifier'] = $purchaseIdentifier;
-                $txnId = $purchaseIdentifier;
+            if (isset($response['CorrelationId'])) {
+                $txnId = $response['CorrelationId'];
+                $paymentData['purchase_identifier'] = $txnId;
             }
-            if(isset($response['TotalAmount'])) {
+            if (isset($response['TotalAmount'])) {
                 $paymentData['amount_to_pay'] = $response['TotalAmount'];
             }
         }
-
         $payment->setTransactionId($txnId)
             ->setIsTransactionClosed($status)
             ->setTransactionAdditionalInfo(
                 \Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS,
                 $paymentData
             );
-
         $transaction = $payment->addTransaction($type, null, true);
-
         if ($parentTransId) {
             $transaction->setParentTxnId($parentTransId);
         }
+        $transaction->save();
+        $transaction->setDataChanges(false);
+        $payment->unsTransactions();
         $payment->save();
     }
 
