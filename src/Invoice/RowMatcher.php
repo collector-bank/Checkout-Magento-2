@@ -31,6 +31,7 @@ class RowMatcher
      * @var RowMatcher\InvoiceHandler
      */
     protected $invoiceHandler;
+    private \Webbhuset\CollectorCheckout\Test\GetOrderInformation $getOrderInformation;
 
     /**
      * rowMatcher constructor.
@@ -38,6 +39,7 @@ class RowMatcher
     public function __construct(
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Webbhuset\CollectorCheckout\Adapter $adapter,
+        \Webbhuset\CollectorCheckout\Test\GetOrderInformation $getOrderInformation,
         \Webbhuset\CollectorCheckout\Invoice\RowMatcher\CreditMemoHandler $creditMemoHandler,
         \Webbhuset\CollectorCheckout\Invoice\RowMatcher\InvoiceHandler $invoiceHandler
     ) {
@@ -45,6 +47,7 @@ class RowMatcher
         $this->adapter              = $adapter;
         $this->creditMemoHandler    = $creditMemoHandler;
         $this->invoiceHandler       = $invoiceHandler;
+        $this->getOrderInformation  = $getOrderInformation;
     }
 
     /**
@@ -155,18 +158,18 @@ class RowMatcher
     public function checkoutDataToArticleList(
         \Magento\Sales\Api\Data\OrderInterface $order
     ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList {
-        $checkoutData = $this->adapter->acquireCheckoutInformationFromOrder($order);
+        $orderInformation = $this->getOrderInformation->execute((int)$order->getEntityId());
         $articles = new ArticleList();
 
-        $items = $checkoutData->getOrder()->getItems();
+        $items = $orderInformation['data']['items'];
         foreach ($items as $item) {
             /** @var $item \Webbhuset\CollectorCheckoutSDK\Checkout\Order\Item */
-            $articleId      = $item->getId();
-            $description    = $item->getDescription();
-            $qty            = $item->getQuantity();
-            $sku            = $item->getSku();
-            $vat            = (float) $item->getVat();
-            $unitPrice      = (float) $item->getUnitPrice();
+            $articleId      = $item['articleNumber'];
+            $description    = $item['description'];
+            $qty            = $item['quantity'];
+            $sku            = $item['articleNumber'];
+            $vat            = (float) $item['vatRate'];
+            $unitPrice      = (float) $item['price'];
 
             $article = new Article($articleId, $description, $qty, $sku, $unitPrice, $vat);
 
