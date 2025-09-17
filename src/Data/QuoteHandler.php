@@ -130,6 +130,18 @@ class QuoteHandler
     }
 
     /**
+     * Set payment method
+     *
+     * @param Quote $quote
+     * @param       $paymentMethod
+     * @return QuoteHandler
+     */
+    public function setPaymentMethod(Quote $quote, $paymentMethod)
+    {
+        return $this->setAdditionalData($quote, 'payment_method', $paymentMethod);
+    }
+
+    /**
      * @param \Magento\Quote\Api\Data\CartInterface $quote
      * @param                                       $ssn
      *
@@ -148,6 +160,14 @@ class QuoteHandler
         return $this->getAdditionalData($quote, 'national_identification_number');
     }
 
+
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     */
+    public function getPaymentMethod(Quote $quote, $order)
+    {
+        return $this->getAdditionalData($quote, 'payment_method');
+    }
 
     /**
      * Get org number from quote

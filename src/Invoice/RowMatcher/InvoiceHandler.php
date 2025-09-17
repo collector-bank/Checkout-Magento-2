@@ -53,12 +53,12 @@ class InvoiceHandler
             if ($invoiceItem->getQty() > 0) {
                 $quoteId = $this->getItemQuoteIdBy($invoiceItem->getOrderItemId());
 
-                $article = $articleList->getArticleBySku($quoteId);
+                $article = $articleList->getArticleBySku($invoiceItem->getSku());
                 if ($article) {
                     $article->setQuantity($invoiceItem->getQty());
                     $matchingArticles->addArticle($article);
 
-                    $discountArticle = $articleList->getArticleBySku($quoteId . ":discount");
+                    $discountArticle = $articleList->getArticleBySku($invoiceItem->getSku() . ":discount");
                     if ($discountArticle) {
                         $discountArticle->setQuantity($invoiceItem->getQty());
                         $matchingArticles->addArticle($discountArticle);

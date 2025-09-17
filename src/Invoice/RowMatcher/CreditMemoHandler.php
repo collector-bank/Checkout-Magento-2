@@ -52,12 +52,12 @@ class CreditMemoHandler
             if ($creditItem->getQty() > 0) {
                 $quoteId = $this->getItemQuoteIdBy($creditItem->getOrderItemId());
 
-                $article = $articleList->getArticleBySku($quoteId);
+                $article = $articleList->getArticleBySku($creditItem->getSku());
                 if($article) {
                     $article->setQuantity($creditItem->getQty());
                     $matchingArticles->addArticle($article);
 
-                    $discountArticle = $articleList->getArticleBySku($quoteId . ":discount");
+                    $discountArticle = $articleList->getArticleBySku($creditItem->getSku() . ":discount");
                     if ($discountArticle) {
                         $discountArticle->setQuantity($creditItem->getQty());
                         $matchingArticles->addArticle($discountArticle);
