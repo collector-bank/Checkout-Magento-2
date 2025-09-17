@@ -58,7 +58,7 @@ class InvoiceHandler
                     $article->setQuantity($invoiceItem->getQty());
                     $matchingArticles->addArticle($article);
 
-                    $discountArticle = $articleList->getArticleBySku($quoteId . ":discount");
+                    $discountArticle = $articleList->getArticleBySku($invoiceItem->getSku() . ":discount");
                     if ($discountArticle) {
                         $discountArticle->setQuantity($invoiceItem->getQty());
                         $matchingArticles->addArticle($discountArticle);
