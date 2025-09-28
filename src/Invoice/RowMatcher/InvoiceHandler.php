@@ -51,14 +51,12 @@ class InvoiceHandler
     ): ArticleList {
         foreach ($invoice->getAllItems() as $invoiceItem) {
             if ($invoiceItem->getQty() > 0) {
-                $quoteId = $this->getItemQuoteIdBy($invoiceItem->getOrderItemId());
-
                 $article = $articleList->getArticleBySku($invoiceItem->getSku());
                 if ($article) {
                     $article->setQuantity($invoiceItem->getQty());
                     $matchingArticles->addArticle($article);
 
-                    $discountArticle = $articleList->getArticleBySku($invoiceItem->getSku() . ":discount");
+                    $discountArticle = $articleList->getDiscountArticleBySku($invoiceItem->getSku() . "-1");
                     if ($discountArticle) {
                         $discountArticle->setQuantity($invoiceItem->getQty());
                         $matchingArticles->addArticle($discountArticle);
