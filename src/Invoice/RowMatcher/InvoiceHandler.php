@@ -50,15 +50,13 @@ class InvoiceHandler
         \Magento\Sales\Api\Data\OrderInterface $order
     ): ArticleList {
         foreach ($invoice->getAllItems() as $invoiceItem) {
-            if ($invoiceItem->getQty() > 0) {
-                $quoteId = $this->getItemQuoteIdBy($invoiceItem->getOrderItemId());
-
+            if ($invoiceItem->getQty() > 0 && $invoiceItem->getPrice() > 0) {
                 $article = $articleList->getArticleBySku($invoiceItem->getSku());
                 if ($article) {
                     $article->setQuantity($invoiceItem->getQty());
                     $matchingArticles->addArticle($article);
 
-                    $discountArticle = $articleList->getArticleBySku($invoiceItem->getSku() . ":discount");
+                    $discountArticle = $articleList->getDiscountArticleBySku($invoiceItem->getSku() . "-1");
                     if ($discountArticle) {
                         $discountArticle->setQuantity($invoiceItem->getQty());
                         $matchingArticles->addArticle($discountArticle);

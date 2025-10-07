@@ -49,15 +49,13 @@ class CreditMemoHandler
         \Magento\Sales\Api\Data\OrderInterface $order
     ): ArticleList {
         foreach ($creditMemo->getAllItems() as $creditItem) {
-            if ($creditItem->getQty() > 0) {
-                $quoteId = $this->getItemQuoteIdBy($creditItem->getOrderItemId());
-
+            if ($creditItem->getQty() > 0 && $creditItem->getPrice() > 0) {
                 $article = $articleList->getArticleBySku($creditItem->getSku());
                 if($article) {
                     $article->setQuantity($creditItem->getQty());
                     $matchingArticles->addArticle($article);
 
-                    $discountArticle = $articleList->getArticleBySku($creditItem->getSku() . ":discount");
+                    $discountArticle = $articleList->getDiscountArticleBySku($creditItem->getSku() . "-1");
                     if ($discountArticle) {
                         $discountArticle->setQuantity($creditItem->getQty());
                         $matchingArticles->addArticle($discountArticle);
