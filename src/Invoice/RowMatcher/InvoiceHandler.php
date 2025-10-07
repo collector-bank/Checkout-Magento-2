@@ -50,7 +50,7 @@ class InvoiceHandler
         \Magento\Sales\Api\Data\OrderInterface $order
     ): ArticleList {
         foreach ($invoice->getAllItems() as $invoiceItem) {
-            if ($invoiceItem->getQty() > 0) {
+            if ($invoiceItem->getQty() > 0 && $invoiceItem->getPrice() > 0) {
                 $article = $articleList->getArticleBySku($invoiceItem->getSku());
                 if ($article) {
                     $article->setQuantity($invoiceItem->getQty());
