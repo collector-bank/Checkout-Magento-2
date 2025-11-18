@@ -5,7 +5,9 @@ namespace Webbhuset\CollectorCheckout\Gateway\Command;
 use Magento\Payment\Gateway\CommandInterface as CommandInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Magento\Sales\Api\Data\TransactionInterface;
+use Webbhuset\CollectorCheckout\Gateway\Config;
 use Webbhuset\CollectorPaymentSDK\Errors\ResponseError as ResponseError;
+use Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList;
 use Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRow;
 
 /**
@@ -243,6 +245,10 @@ class CollectorBankCommand implements CommandInterface
 
         $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $order);
         $adjustmentsInvoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
+        if (count($adjustmentsInvoiceRows) > 0 && $this->articleListHasOnlyRoundingMultiple($articleList)) {
+            $articleList = new ArticleList();
+        }
+
         /** @var InvoiceRow $adjustmentInvoiceRow */
         foreach ($adjustmentsInvoiceRows as $adjustmentInvoiceRow) {
             $article = $adjustmentInvoiceRow->toArticle();
@@ -283,6 +289,19 @@ class CollectorBankCommand implements CommandInterface
         return true;
     }
 
+    /**
+     * @param ArticleList $articles
+     * @return bool
+     */
+    private function articleListHasOnlyRoundingMultiple(ArticleList $articleList): bool
+    {
+        $hasRoundingSku = $articleList->getArticleBySku(Config::CURRENCY_ROUNDING_SKU);
+        if (count($articleList->getArticleList()) == 1 && $hasRoundingSku) {
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Get adjustments as collector invoice rows
