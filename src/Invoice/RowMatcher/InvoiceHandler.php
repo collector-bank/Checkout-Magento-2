@@ -2,6 +2,7 @@
 
 namespace Webbhuset\CollectorCheckout\Invoice\RowMatcher;
 
+use Webbhuset\CollectorCheckout\Helper\ProductType;
 use Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList as ArticleList;
 
 class InvoiceHandler
@@ -19,6 +20,21 @@ class InvoiceHandler
      * @var \Magento\Sales\Model\OrderRepository
      */
     protected $orderRepository;
+
+    /**
+     * @var \Webbhuset\CollectorCheckout\Helper\Translation
+     */
+    protected $translation;
+    /**
+     * @var \Webbhuset\CollectorCheckout\Helper\GetSkuSuffix
+     */
+    protected $getSkuSuffix;
+
+    /**
+     * @var ProductType
+     */
+    protected $productType;
+
     /**
      * rowMatcher constructor.
      */
@@ -26,10 +42,16 @@ class InvoiceHandler
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Webbhuset\CollectorCheckout\Adapter $adapter,
         \Magento\Sales\Api\OrderItemRepositoryInterface $orderItemRepository,
+        \Webbhuset\CollectorCheckout\Helper\Translation $translation,
+        ProductType $productType,
+        \Webbhuset\CollectorCheckout\Helper\GetSkuSuffix $getSkuSuffix,
         \Magento\Sales\Model\OrderRepository $orderRepository
     ) {
         $this->orderHandler         = $orderHandler;
         $this->orderItemRepository  = $orderItemRepository;
+        $this->translation          = $translation;
+        $this->getSkuSuffix         = $getSkuSuffix;
+        $this->productType          = $productType;
         $this->orderRepository      = $orderRepository;
     }
 
@@ -50,13 +72,33 @@ class InvoiceHandler
         \Magento\Sales\Api\Data\OrderInterface $order
     ): ArticleList {
         foreach ($invoice->getAllItems() as $invoiceItem) {
-            if ($invoiceItem->getQty() > 0 && $invoiceItem->getPrice() > 0) {
-                $article = $articleList->getArticleBySku($invoiceItem->getSku());
+            $productType = $this->productType->getProductTypeById((int)$invoiceItem->getProductId());
+            $sku = $invoiceItem->getSku();
+
+            if ($invoiceItem->getQty() > 0) {
+                if ($productType === \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+                    $skuSuffix = $this->getSkuSuffix->execute($invoiceItem->getSku());
+                    if ($skuSuffix) {
+                        $sku = $sku . $skuSuffix;
+                    }
+                }
+                if ($invoiceItem->getPrice() > 0) {
+                    $article = $articleList->getArticleBySku($sku);
+                } else {
+                    $article = $articleList->getArticleBySku("- " . $invoiceItem->getSku());
+                }
+
                 if ($article) {
                     $article->setQuantity($invoiceItem->getQty());
                     $matchingArticles->addArticle($article);
 
-                    $discountArticle = $articleList->getDiscountArticleBySku($invoiceItem->getSku() . "-1");
+                    if ($productType !== \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+                        $discountArticle = $articleList->getDiscountArticleBySku($invoiceItem->getSku() . "-1");
+                    } else {
+                        $discountLabel = $this->translation->getLabelByStoreId("Discount", $order->getStoreId());
+                        $discountArticle = $articleList->getDiscountArticleBySku($discountLabel . ": " . $sku);
+                    }
+
                     if ($discountArticle) {
                         $discountArticle->setQuantity($invoiceItem->getQty());
                         $matchingArticles->addArticle($discountArticle);

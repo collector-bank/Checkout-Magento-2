@@ -2,6 +2,7 @@
 
 namespace Webbhuset\CollectorCheckout\Invoice\RowMatcher;
 
+use Webbhuset\CollectorCheckout\Helper\ProductType;
 use Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList as ArticleList;
 
 class CreditMemoHandler
@@ -19,17 +20,38 @@ class CreditMemoHandler
      * @var \Magento\Sales\Model\OrderRepository
      */
     protected $orderRepository;
+
+    /**
+     * @var \Webbhuset\CollectorCheckout\Helper\Translation
+     */
+    protected $translation;
+    /**
+     * @var \Webbhuset\CollectorCheckout\Helper\GetSkuSuffix
+     */
+    protected $getSkuSuffix;
+
+    /**
+     * @var ProductType
+     */
+    protected $productType;
+
     /**
      * rowMatcher constructor.
      */
     public function __construct(
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Magento\Sales\Api\OrderItemRepositoryInterface $orderItemRepository,
-        \Magento\Sales\Model\OrderRepository $orderRepository
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+        \Webbhuset\CollectorCheckout\Helper\Translation $translation,
+        ProductType $productType,
+        \Webbhuset\CollectorCheckout\Helper\GetSkuSuffix $getSkuSuffix
     ) {
         $this->orderHandler         = $orderHandler;
         $this->orderItemRepository  = $orderItemRepository;
         $this->orderRepository      = $orderRepository;
+        $this->translation          = $translation;
+        $this->getSkuSuffix         = $getSkuSuffix;
+        $this->productType          = $productType;
     }
 
     /**
@@ -49,13 +71,31 @@ class CreditMemoHandler
         \Magento\Sales\Api\Data\OrderInterface $order
     ): ArticleList {
         foreach ($creditMemo->getAllItems() as $creditItem) {
-            if ($creditItem->getQty() > 0 && $creditItem->getPrice() > 0) {
-                $article = $articleList->getArticleBySku($creditItem->getSku());
-                if($article) {
+            $productType = $this->productType->getProductTypeById((int)$creditItem->getProductId());
+            $sku = $creditItem->getSku();
+            if ($creditItem->getQty() > 0) {
+                if ($productType === \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+                    $skuSuffix = $this->getSkuSuffix->execute($creditItem->getSku());
+                    if ($skuSuffix) {
+                        $sku = $sku . $skuSuffix;
+                    }
+                }
+                if ($creditItem->getPrice() > 0) {
+                    $article = $articleList->getArticleBySku($sku);
+                } else {
+                    $article = $articleList->getArticleBySku("- " . $creditItem->getSku());
+                }
+                if ($article) {
                     $article->setQuantity($creditItem->getQty());
                     $matchingArticles->addArticle($article);
 
-                    $discountArticle = $articleList->getDiscountArticleBySku($creditItem->getSku() . "-1");
+                    if ($productType !== \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+                        $discountArticle = $articleList->getDiscountArticleBySku($creditItem->getSku() . "-1");
+                    } else {
+                        $discountLabel = $this->translation->getLabelByStoreId("Discount", $order->getStoreId());
+                        $discountArticle = $articleList->getDiscountArticleBySku($discountLabel . ": " . $sku);
+                    }
+
                     if ($discountArticle) {
                         $discountArticle->setQuantity($creditItem->getQty());
                         $matchingArticles->addArticle($discountArticle);
@@ -63,7 +103,6 @@ class CreditMemoHandler
                 }
             }
         }
-
         return $matchingArticles;
     }
 
