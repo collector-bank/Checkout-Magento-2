@@ -32,6 +32,7 @@ class RowMatcher
      */
     protected $invoiceHandler;
     private \Webbhuset\CollectorCheckout\Test\GetOrderInformation $getOrderInformation;
+    private \Webbhuset\CollectorCheckout\Helper\GetMatchingArticles $getMatchingArticles;
 
     /**
      * rowMatcher constructor.
@@ -39,6 +40,7 @@ class RowMatcher
     public function __construct(
         \Webbhuset\CollectorCheckout\Data\OrderHandler $orderHandler,
         \Webbhuset\CollectorCheckout\Adapter $adapter,
+        \Webbhuset\CollectorCheckout\Helper\GetMatchingArticles $getMatchingArticles,
         \Webbhuset\CollectorCheckout\Test\GetOrderInformation $getOrderInformation,
         \Webbhuset\CollectorCheckout\Invoice\RowMatcher\CreditMemoHandler $creditMemoHandler,
         \Webbhuset\CollectorCheckout\Invoice\RowMatcher\InvoiceHandler $invoiceHandler
@@ -48,6 +50,7 @@ class RowMatcher
         $this->creditMemoHandler    = $creditMemoHandler;
         $this->invoiceHandler       = $invoiceHandler;
         $this->getOrderInformation  = $getOrderInformation;
+        $this->getMatchingArticles  = $getMatchingArticles;
     }
 
     /**
@@ -65,7 +68,7 @@ class RowMatcher
 
         $matchingArticles = new ArticleList();
 
-        $matchingArticles = $this->invoiceHandler->addItemsAndDiscounts(
+        $matchingArticles = $this->getMatchingArticles->execute(
             $matchingArticles,
             $checkoutDataArticleList,
             $invoice,
@@ -102,7 +105,7 @@ class RowMatcher
 
         $matchingArticles = new ArticleList();
 
-        $matchingArticles = $this->creditMemoHandler->addItemsAndDiscounts(
+        $matchingArticles = $this->getMatchingArticles->execute(
             $matchingArticles,
             $checkoutDataArticleList,
             $creditMemo,

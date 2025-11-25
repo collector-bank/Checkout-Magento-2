@@ -2,6 +2,7 @@
 
 namespace Webbhuset\CollectorCheckout\Invoice\RowMatcher;
 
+use Webbhuset\CollectorCheckout\Helper\ProductType;
 use Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList as ArticleList;
 
 class InvoiceHandler
@@ -19,6 +20,7 @@ class InvoiceHandler
      * @var \Magento\Sales\Model\OrderRepository
      */
     protected $orderRepository;
+
     /**
      * rowMatcher constructor.
      */
@@ -31,40 +33,6 @@ class InvoiceHandler
         $this->orderHandler         = $orderHandler;
         $this->orderItemRepository  = $orderItemRepository;
         $this->orderRepository      = $orderRepository;
-    }
-
-    /**
-     *
-     * Add items and discount as matchingArticles
-     *
-     * @param ArticleList                            $matchingArticles
-     * @param ArticleList                            $articleList
-     * @param \Magento\Sales\Model\Order\Creditmemo  $creditMemo
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
-     * @return ArticleList
-     */
-    public function addItemsAndDiscounts(
-        ArticleList $matchingArticles,
-        ArticleList $articleList,
-        \Magento\Sales\Model\Order\Invoice $invoice,
-        \Magento\Sales\Api\Data\OrderInterface $order
-    ): ArticleList {
-        foreach ($invoice->getAllItems() as $invoiceItem) {
-            if ($invoiceItem->getQty() > 0 && $invoiceItem->getPrice() > 0) {
-                $article = $articleList->getArticleBySku($invoiceItem->getSku());
-                if ($article) {
-                    $article->setQuantity($invoiceItem->getQty());
-                    $matchingArticles->addArticle($article);
-
-                    $discountArticle = $articleList->getDiscountArticleBySku($invoiceItem->getSku() . "-1");
-                    if ($discountArticle) {
-                        $discountArticle->setQuantity($invoiceItem->getQty());
-                        $matchingArticles->addArticle($discountArticle);
-                    }
-                }
-            }
-        }
-        return $matchingArticles;
     }
 
     /**
@@ -143,18 +111,5 @@ class InvoiceHandler
     ):void {
         $this->orderHandler->setDecimalRoundingInvoiced($order);
         $this->orderRepository->save($order);
-    }
-
-    /**
-     * Get item from order from quote item id
-     *
-     * @param int $orderItemId
-     * @return int|null
-     */
-    public function getItemQuoteIdBy(int $orderItemId)
-    {
-        $orderItem = $this->orderItemRepository->get($orderItemId);
-
-        return $orderItem->getQuoteItemId();
     }
 }

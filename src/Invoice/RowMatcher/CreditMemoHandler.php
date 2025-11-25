@@ -2,6 +2,7 @@
 
 namespace Webbhuset\CollectorCheckout\Invoice\RowMatcher;
 
+use Webbhuset\CollectorCheckout\Helper\ProductType;
 use Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList as ArticleList;
 
 class CreditMemoHandler
@@ -19,6 +20,8 @@ class CreditMemoHandler
      * @var \Magento\Sales\Model\OrderRepository
      */
     protected $orderRepository;
+
+
     /**
      * rowMatcher constructor.
      */
@@ -31,42 +34,6 @@ class CreditMemoHandler
         $this->orderItemRepository  = $orderItemRepository;
         $this->orderRepository      = $orderRepository;
     }
-
-    /**
-     *
-     * Add items and discount as matchingArticles
-     *
-     * @param ArticleList                            $matchingArticles
-     * @param ArticleList                            $articleList
-     * @param \Magento\Sales\Model\Order\Creditmemo  $creditMemo
-     * @param \Magento\Sales\Api\Data\OrderInterface $order
-     * @return ArticleList
-     */
-    public function addItemsAndDiscounts (
-        ArticleList $matchingArticles,
-        ArticleList $articleList,
-        \Magento\Sales\Model\Order\Creditmemo $creditMemo,
-        \Magento\Sales\Api\Data\OrderInterface $order
-    ): ArticleList {
-        foreach ($creditMemo->getAllItems() as $creditItem) {
-            if ($creditItem->getQty() > 0 && $creditItem->getPrice() > 0) {
-                $article = $articleList->getArticleBySku($creditItem->getSku());
-                if($article) {
-                    $article->setQuantity($creditItem->getQty());
-                    $matchingArticles->addArticle($article);
-
-                    $discountArticle = $articleList->getDiscountArticleBySku($creditItem->getSku() . "-1");
-                    if ($discountArticle) {
-                        $discountArticle->setQuantity($creditItem->getQty());
-                        $matchingArticles->addArticle($discountArticle);
-                    }
-                }
-            }
-        }
-
-        return $matchingArticles;
-    }
-
 
     /**
      *
@@ -136,19 +103,5 @@ class CreditMemoHandler
         }
 
         return $matchingArticles;
-    }
-
-
-    /**
-     * Get item from order from quote item id
-     *
-     * @param int $orderItemId
-     * @return int|null
-     */
-    public function getItemQuoteIdBy (int $orderItemId)
-    {
-        $orderItem = $this->orderItemRepository->get($orderItemId);
-
-        return $orderItem->getQuoteItemId();
     }
 }
