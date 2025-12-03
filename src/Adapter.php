@@ -380,10 +380,7 @@ class Adapter
         if ($config->getIsMockMode()) {
             return new \Webbhuset\CollectorCheckoutSDK\Adapter\MockAdapter($config);
         }
-        if ($config->getIsOath()) {
-            return new \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey($config);
-        }
 
-        return new \Webbhuset\CollectorCheckoutSDK\Adapter\CurlAdapter($config);
+        return new \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey($config);
     }
 }

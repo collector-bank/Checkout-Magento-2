@@ -84,22 +84,6 @@
                     </field>
 
                     <field
-                        id="activeoath"
-                        translate="label"
-                        type="select"
-                        sortOrder="35"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                    >
-                        <label>Enabled Oath</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <depends>
-                            <field id='active'>1</field>
-                        </depends>
-                    </field>
-
-                    <field
                         id='client_id'
                         translate='label'
                         type='text'
@@ -108,28 +92,27 @@
                         showInWebsite='1'
                         showInStore='1'
                     >
-                        <label>Client id</label>
-                        <comment><![CDATA[]]></comment>
+                        <validate>required-entry</validate>
+                        <label>Client ID (OAuth)</label>
                         <depends>
                             <field id='active'>1</field>
-                            <field id='activeoath'>1</field>
                         </depends>
                     </field>
 
                     <field
                         id='client_secret'
                         translate='label'
-                        type='text'
+                        type='obscure'
                         sortOrder='38'
                         showInDefault='1'
                         showInWebsite='1'
                         showInStore='1'
                     >
-                        <label>Client secret</label>
-                        <comment><![CDATA[]]></comment>
+                        <validate>required-entry</validate>
+                        <label>Client Secret (OAuth)</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <depends>
                             <field id='active'>1</field>
-                            <field id='activeoath'>1</field>
                         </depends>
                     </field>
 
@@ -238,23 +221,6 @@
 
 
                     <field
-                        id="test_mode_activeoath"
-                        translate="label"
-                        type="select"
-                        sortOrder="91"
-                        showInDefault="1"
-                        showInWebsite="1"
-                        showInStore="1"
-                    >
-                        <label>Test mode - Enabled Oath</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <depends>
-                            <field id='active'>1</field>
-                            <field id='test_mode'>1</field>
-                        </depends>
-                    </field>
-
-                    <field
                         id='test_mode_client_id'
                         translate='label'
                         type='text'
@@ -263,30 +229,29 @@
                         showInWebsite='1'
                         showInStore='1'
                     >
-                        <label>Test mode - Client id</label>
-                        <comment><![CDATA[]]></comment>
+                        <validate>required-entry</validate>
+                        <label>Test mode - Client ID (OAuth)</label>
                         <depends>
                             <field id='active'>1</field>
                             <field id='test_mode'>1</field>
-                            <field id='test_mode_activeoath'>1</field>
                         </depends>
                     </field>
 
                     <field
                         id='test_mode_client_secret'
                         translate='label'
-                        type='text'
+                        type='obscure'
                         sortOrder='93'
                         showInDefault='1'
                         showInWebsite='1'
                         showInStore='1'
                     >
-                        <label>Test mode - Client secret</label>
-                        <comment><![CDATA[]]></comment>
+                        <validate>required-entry</validate>
+                        <label>Test mode - Client Secret (OAuth)</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                         <depends>
                             <field id='active'>1</field>
                             <field id='test_mode'>1</field>
-                            <field id='test_mode_activeoath'>1</field>
                         </depends>
                     </field>
 

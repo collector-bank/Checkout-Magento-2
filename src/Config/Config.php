@@ -230,18 +230,19 @@ class Config implements
         return $this->getConfigValue('test_mode') ? $this->getConfigValue('test_mode') : false;
     }
 
+    /**
+     * OAuth is now always enabled when using the Walley Checkout API
+     *
+     * @return bool
+     */
     public function getIsOath(): bool
     {
-        if ($this->getIsTestModeOath()) {
-            return true;
-        }
-
-        return (bool) $this->getConfigValue('activeoath');
+        return true;
     }
 
     public function getClientId(): string
     {
-        if ($this->getIsTestModeOath()) {
+        if ($this->getIsTestMode()) {
             return $this->getTestModeClientId();
         }
 
@@ -250,21 +251,21 @@ class Config implements
 
     public function getClientSecret(): string
     {
-        if ($this->getIsTestModeOath()) {
+        if ($this->getIsTestMode()) {
             return $this->getTestModeClientSecret();
         }
 
         return (string) $this->getConfigValue('client_secret');
     }
 
+    /**
+     * In test mode, OAuth is always enabled
+     *
+     * @return bool
+     */
     public function getIsTestModeOath(): bool
     {
-        $isTestMode = $this->getIsTestMode();
-        if (!$isTestMode) {
-            return false;
-        }
-
-        return (bool) $this->getConfigValue('test_mode_activeoath');
+        return $this->getIsTestMode();
     }
 
     public function getTestModeClientSecret(): string
