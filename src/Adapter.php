@@ -97,7 +97,21 @@ class Adapter
                     $publicToken = $collectorSession->getPublicToken();
                 } else {
                     $errorMsg = $responseError->getErrorLogMessageFromResponse();
-                    $this->logger->addCritical("Response error when updating fees. " . $errorMsg);
+                    $responseBody = $responseError->getResponseBody();
+                    $response = $responseError->getResponse();
+                    $request = $responseError->getRequest();
+
+                    $logContext = [
+                        'error_message' => $errorMsg,
+                        'http_status' => $response['status'] ?? 'unknown',
+                        'response_body' => $responseBody,
+                        'response_header' => $response['header'] ?? '',
+                        'request_data' => is_array($request) ? $request : json_decode($request, true),
+                        'exception_code' => $responseError->getCode(),
+                        'exception_message' => $responseError->getMessage(),
+                    ];
+
+                    $this->logger->addCritical("Response error when updating fees. " . $errorMsg, $logContext);
 
                     throw new ResponseErrorOnCartUpdate(
                         new Phrase(
@@ -214,7 +228,26 @@ class Adapter
             $this->quoteRepository->save($quote);
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
             $errorMsg = $e->getErrorLogMessageFromResponse();
-            $this->logger->addCritical("Response error when initiating iframe " . $errorMsg);
+            $responseBody = $e->getResponseBody();
+            $response = $e->getResponse();
+            $request = $e->getRequest();
+
+            // Build comprehensive error message
+            $logContext = [
+                'error_message' => $errorMsg,
+                'http_status' => $response['status'] ?? 'unknown',
+                'response_body' => $responseBody,
+                'response_header' => $response['header'] ?? '',
+                'request_data' => is_array($request) ? $request : json_decode($request, true),
+                'exception_code' => $e->getCode(),
+                'exception_message' => $e->getMessage(),
+            ];
+
+            // Log with full context
+            $this->logger->addCritical(
+                "Response error when initiating iframe: " . $errorMsg,
+                $logContext
+            );
 
             throw new CanNotInitiateIframeException(
                 new Phrase(
@@ -322,7 +355,21 @@ class Adapter
             }
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
             $errorMsg = $e->getErrorLogMessageFromResponse();
-            $this->logger->addCritical("Response error when updating fees. " . $errorMsg);
+            $responseBody = $e->getResponseBody();
+            $response = $e->getResponse();
+            $request = $e->getRequest();
+
+            $logContext = [
+                'error_message' => $errorMsg,
+                'http_status' => $response['status'] ?? 'unknown',
+                'response_body' => $responseBody,
+                'response_header' => $response['header'] ?? '',
+                'request_data' => is_array($request) ? $request : json_decode($request, true),
+                'exception_code' => $e->getCode(),
+                'exception_message' => $e->getMessage(),
+            ];
+
+            $this->logger->addCritical("Response error when updating fees. " . $errorMsg, $logContext);
 
             throw new ResponseErrorOnCartUpdate(
                 new Phrase(
@@ -357,7 +404,21 @@ class Adapter
             }
         } catch (\Webbhuset\CollectorCheckoutSDK\Errors\ResponseError $e) {
             $errorMsg = $e->getErrorLogMessageFromResponse();
-            $this->logger->addCritical("Response error when updating cart. " . $errorMsg);
+            $responseBody = $e->getResponseBody();
+            $response = $e->getResponse();
+            $request = $e->getRequest();
+
+            $logContext = [
+                'error_message' => $errorMsg,
+                'http_status' => $response['status'] ?? 'unknown',
+                'response_body' => $responseBody,
+                'response_header' => $response['header'] ?? '',
+                'request_data' => is_array($request) ? $request : json_decode($request, true),
+                'exception_code' => $e->getCode(),
+                'exception_message' => $e->getMessage(),
+            ];
+
+            $this->logger->addCritical("Response error when updating cart. " . $errorMsg, $logContext);
 
             throw new ResponseErrorOnCartUpdate(
                 new Phrase(
