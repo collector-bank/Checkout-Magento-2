@@ -48,40 +48,6 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     </field>
 
-                    <field
-                            id='username'
-                            translate='label'
-                            type='text'
-                            sortOrder='20'
-                            showInDefault='1'
-                            showInWebsite='1'
-                            showInStore='1'
-                    >
-                        <validate>required-entry</validate>
-                        <label>Username</label>
-                        <comment><![CDATA[]]></comment>
-                        <depends>
-                            <field id='active'>1</field>
-                        </depends>
-                    </field>
-
-                    <field
-                            id='password'
-                            translate='label'
-                            type="obscure"
-                            sortOrder='30'
-                            showInDefault='1'
-                            showInWebsite='1'
-                            showInStore='1'
-                    >
-                        <validate>required-entry</validate>
-                        <label>Password</label>
-                        <comment><![CDATA[]]></comment>
-                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                        <depends>
-                            <field id='active'>1</field>
-                        </depends>
-                    </field>
 
                     <field
                         id='client_id'
@@ -179,43 +145,6 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <depends>
                             <field id='active'>1</field>
-                        </depends>
-                    </field>
-
-                    <field
-                            id='test_mode_username'
-                            translate='label'
-                            type='text'
-                            sortOrder='80'
-                            showInDefault='1'
-                            showInWebsite='1'
-                            showInStore='1'
-                    >
-                        <label>Test mode - Username</label>
-                        <validate>required-entry</validate>
-                        <comment><![CDATA[]]></comment>
-                        <depends>
-                            <field id='active'>1</field>
-                            <field id='test_mode'>1</field>
-                        </depends>
-                    </field>
-
-                    <field
-                            id='test_mode_password'
-                            translate='label'
-                            type="obscure"
-                            sortOrder='90'
-                            showInDefault='1'
-                            showInWebsite='1'
-                            showInStore='1'
-                    >
-                        <label>Test mode - Password</label>
-                        <validate>required-entry</validate>
-                        <comment><![CDATA[]]></comment>
-                        <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                        <depends>
-                            <field id='active'>1</field>
-                            <field id='test_mode'>1</field>
                         </depends>
                     </field>
 

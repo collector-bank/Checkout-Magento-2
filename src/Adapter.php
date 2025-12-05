@@ -434,9 +434,6 @@ class Adapter
      */
     public function getAdapter($config) : \Webbhuset\CollectorCheckoutSDK\Adapter\AdapterInterface
     {
-        if ($config->getIsMockMode()) {
-            return new \Webbhuset\CollectorCheckoutSDK\Adapter\MockAdapter($config);
-        }
 
         return new \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey($config);
     }

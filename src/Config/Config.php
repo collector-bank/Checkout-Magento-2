@@ -22,17 +22,9 @@ class Config implements
      */
     protected $storeManager;
     /**
-     * @var \Magento\Framework\Encryption\EncryptorInterface
-     */
-    protected $encryptor;
-    /**
      * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
-    /**
-     * @var \Webbhuset\CollectorCheckout\Data\QuoteHandler
-     */
-    protected $quoteDataHandler;
     /**
      * @var \Webbhuset\CollectorCheckout\Data\OrderHandler
      */
@@ -53,13 +45,11 @@ class Config implements
 
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Webbhuset\CollectorCheckout\Config\Source\Country\Country $countryData,
         \Webbhuset\CollectorCheckout\Oath\AccessKeyManager $accessKeyManager
     ) {
         $this->scopeConfig      = $scopeConfig;
-        $this->encryptor        = $encryptor;
         $this->storeManager     = $storeManager;
         $this->countryData      = $countryData;
         $this->accessKeyManager = $accessKeyManager;
@@ -107,35 +97,6 @@ class Config implements
         return 1 == $this->getConfigValue('create_customer_account');
     }
 
-    /**
-     * Get the username
-     *
-     * @return string
-     */
-    public function getUsername() : string
-    {
-        return $this->getIsTestMode() ? $this->getTestModeUsername() : $this->getProductionModeUsername();
-    }
-
-    /**
-     * Get shared access key
-     *
-     * @return string
-     */
-    public function getSharedAccessKey() : string
-    {
-        return $this->getPassword();
-    }
-
-    /**
-     * Get shared access key / password
-     *
-     * @return string
-     */
-    public function getPassword() : string
-    {
-        return $this->getIsTestMode() ? $this->getTestModePassword() : $this->getProductionModePassword();
-    }
 
     /**
      * Get country code
@@ -210,15 +171,6 @@ class Config implements
         return $this->getConfigValue('default_customer_type') ? $this->getConfigValue('default_customer_type') : 0;
     }
 
-    /**
-     * Returns true if in mock mode
-     *
-     * @return bool
-     */
-    public function getIsMockMode(): bool
-    {
-        return false;
-    }
 
     /**
      * Returns true if in test mode
@@ -482,32 +434,6 @@ class Config implements
         return $this->getB2BProfileName();
     }
 
-    /**
-     * Get production mode username
-     *
-     * @return string
-     */
-    public function getProductionModeUsername(): string
-    {
-        return $this->getConfigValue('username') ? $this->getConfigValue('username') : "";
-    }
-
-    /**
-     * Get production mode password / shared secret
-     *
-     * @return string
-     */
-    public function getProductionModePassword(): string
-    {
-        $value = $this->getConfigValue('password');
-        if (!$value) {
-            return "";
-        }
-
-        $value = $this->encryptor->decrypt($value);
-
-        return $value;
-    }
 
     /**
      * Get production mode store id for B2C
@@ -529,31 +455,6 @@ class Config implements
         return $this->getConfigValue('b2b') ? $this->getConfigValue('b2b') : "";
     }
 
-    /**
-     * Get username for testmode
-     *
-     * @return string
-     */
-    public function getTestModeUsername(): string
-    {
-        return $this->getConfigValue('test_mode_username') ? $this->getConfigValue('test_mode_username') : "";
-    }
-
-    /**
-     * Get password for testmode
-     *
-     * @return string
-     */
-    public function getTestModePassword(): string
-    {
-        $value = $this->getConfigValue('test_mode_password');
-        if (!$value) {
-            return "";
-        }
-        $value = $this->encryptor->decrypt($value);
-
-        return $value;
-    }
 
     /**
      * Get storeid for b2b for testmode
@@ -671,9 +572,7 @@ class Config implements
      */
     public function getMode()
     {
-        $mode = $this->getIsTestMode() ? "test mode" : "production mode";
-
-        return $this->getIsMockMode() ? "mock mode" : $mode;
+        return $this->getIsTestMode() ? "test mode" : "production mode";
     }
 
     /**
