@@ -91,6 +91,19 @@ class RowMatcher
     }
 
     /**
+     * Returns the full article list from checkout data without doing any matching.
+     * Used as a failsafe for full invoice activation to avoid complex matching edge cases.
+     *
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @return ArticleList
+     */
+    public function fullInvoiceToArticleList(
+        \Magento\Sales\Api\Data\OrderInterface $order
+    ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList {
+        return $this->checkoutDataToArticleList($order);
+    }
+
+    /**
      * Converts a credit memo to a collector article list that can be used to credit items using collectors payment api
      *
      * @param \Magento\Sales\Model\Order\Creditmemo  $creditMemo
@@ -129,27 +142,16 @@ class RowMatcher
     }
 
     /**
-     * Convert adjustment fee to invoice rows
+     * Returns the full article list from checkout data without doing any matching.
+     * Used as a failsafe for full credit memo refund to avoid complex matching edge cases.
      *
-     * @param $adjustmentFee
-     * @return InvoiceRow
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @return ArticleList
      */
-    public function adjustmentToInvoiceRows(
-        $adjustmentFee,
-        $taxPercent = 0
-    ): \Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRow {
-        if ($adjustmentFee > 0) {
-            $articleId = __('Discount');
-            $description = __('Discount');
-            $type = 'discount';
-        } else {
-            $articleId  = __('Fee');
-            $description = __('Fee');
-            $type = 'fee';
-        }
-        $qty = 1;
-
-        return new InvoiceRow($articleId, $description, $qty, $adjustmentFee, (float) $taxPercent, $type);
+    public function fullCreditMemoToArticleList(
+        \Magento\Sales\Api\Data\OrderInterface $order
+    ): \Webbhuset\CollectorPaymentSDK\Invoice\Article\ArticleList {
+        return $this->checkoutDataToArticleList($order);
     }
 
     /**
