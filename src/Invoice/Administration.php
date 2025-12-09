@@ -3,8 +3,6 @@
 namespace Webbhuset\CollectorCheckout\Invoice;
 
 use Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey;
-use Webbhuset\CollectorPaymentSDK\Adapter\SoapAdapter;
-use Webbhuset\CollectorPaymentSDK\Invoice\Administration as InvoiceAdministration;
 
 /**
  * Class Administration
@@ -77,32 +75,7 @@ class Administration
     }
 
     /**
-     * Activate the invoice in collector bank portal
-     *
-     * @param string $invoiceNo
-     * @param string $orderId
-     * @return array
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function activateInvoice(string $invoiceNo, string $orderId):array
-    {
-        $config = $this->getConfig($orderId);
-
-        $adapter = new SoapAdapter($config);
-        $invoiceAdmin = new InvoiceAdministration($adapter);
-
-        $result = $invoiceAdmin->activateInvoice($invoiceNo, $orderId);
-
-        $this->logger->addInfo(
-            "Invoice activated online orderId: {$orderId} invoiceNo: {$invoiceNo} "
-        );
-
-        return $result;
-    }
-
-    /**
-     * Activate the invoice in collector bank portal
+     * Cancel the invoice in collector bank portal
      *
      * @param string $invoiceNo
      * @param string $orderId
@@ -113,30 +86,20 @@ class Administration
     public function cancelInvoice(string $invoiceNo, string $orderId):array
     {
         $config = $this->getConfig($orderId);
-        if ($config->getIsOath()) {
-            /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
-            $adapter = $this->adapter->getAdapter($config);
-            $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
-            $order = $this->orderRepository->get($orderId);
-            $articleList = $this->rowMatcher->checkoutDataToArticleList($order);
-            $uniqid = uniqid();
-            $adapter->cancelInvoice($walleyOrderId, $articleList, $uniqid);
 
-            $this->logger->addInfo(
-                "Invoice cancelled online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
-            );
+        /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
+        $adapter = $this->adapter->getAdapter($config);
+        $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
+        $order = $this->orderRepository->get($orderId);
+        $articleList = $this->rowMatcher->checkoutDataToArticleList($order);
+        $uniqid = uniqid();
+        $adapter->cancelInvoice($walleyOrderId, $articleList, $uniqid);
 
-            return ['NewInvoiceNo' => $uniqid];
-        } else {
-            $adapter = new SoapAdapter($config);
-            $invoiceAdmin = new InvoiceAdministration($adapter);
+        $this->logger->addInfo(
+            "Invoice cancelled online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
+        );
 
-            $this->logger->addInfo(
-                "Invoice cancelled online orderId: {$orderId} invoiceNo: {$invoiceNo} "
-            );
-
-            return $invoiceAdmin->cancelInvoice($invoiceNo, $orderId);
-        }
+        return ['NewInvoiceNo' => $uniqid];
     }
 
     /**
@@ -154,26 +117,17 @@ class Administration
         string $orderId
     ):array {
         $config = $this->getConfig($orderId);
-        if ($config->getIsOath()) {
-            /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
-            $adapter = $this->adapter->getAdapter($config);
-            $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
-            $uniqid = uniqid();
-            $adapter->partCreditInvoice($walleyOrderId, $articleList, $uniqid);
-            $this->logger->addInfo(
-                "Invoice credited online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
-            );
 
-            return ['NewInvoiceNo' => $uniqid];
-        } else {
-            $adapter = new SoapAdapter($config);
-            $invoiceAdmin = new InvoiceAdministration($adapter);
-            $this->logger->addInfo(
-                "Invoice credited online orderId: {$orderId} invoiceNo: {$invoiceNo} "
-            );
+        /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
+        $adapter = $this->adapter->getAdapter($config);
+        $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
+        $uniqid = uniqid();
+        $adapter->partCreditInvoice($walleyOrderId, $articleList, $uniqid);
+        $this->logger->addInfo(
+            "Invoice credited online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
+        );
 
-            return $invoiceAdmin->partCreditInvoice($invoiceNo, $articleList, $orderId);
-        }
+        return ['NewInvoiceNo' => $uniqid];
     }
 
 
@@ -193,104 +147,20 @@ class Administration
         string $correlationId
     ):array {
         $config = $this->getConfig($orderId);
-        if ($config->getIsOath()) {
-            /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
-            $adapter = $this->adapter->getAdapter($config);
-            $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
-            $uniq = uniqid();
-            $adapter->partActivateInvoice($walleyOrderId, $articleList, $uniq);
 
-            $this->logger->addInfo(
-                "Invoice activated online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
-            );
-
-            return ['NewInvoiceNo' => $uniq];
-        } else {
-            $adapter = new SoapAdapter($config);
-            $invoiceAdmin = new InvoiceAdministration($adapter);
-
-            $this->logger->addInfo(
-                "Invoice activated online orderId: {$orderId} invoiceNo: {$invoiceNo} "
-            );
-
-            return $invoiceAdmin->partActivateInvoice($invoiceNo, $articleList, $correlationId);
-        }
-
-
-    }
-
-
-    /**
-     * Credit an invoice in collector bank portal
-     *
-     * @param string $invoiceNo
-     * @param string $orderId
-     * @return array
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function creditInvoice(string $invoiceNo, string $orderId):array
-    {
-        $config = $this->getConfig($orderId);
-
-        $adapter = new SoapAdapter($config);
-        $invoiceAdmin = new InvoiceAdministration($adapter);
+        /** @var \Webbhuset\CollectorCheckoutSDK\Adapter\CurlWithAccessKey $adapter */
+        $adapter = $this->adapter->getAdapter($config);
+        $walleyOrderId = $this->extractWalleyOrderId->execute((int)$orderId);
+        $uniq = uniqid();
+        $adapter->partActivateInvoice($walleyOrderId, $articleList, $uniq);
 
         $this->logger->addInfo(
-            "Invoice credited online orderId: {$orderId} invoiceNo: {$invoiceNo} "
+            "Invoice activated online orderId: {$orderId} invoiceNo: {$walleyOrderId} "
         );
 
-        return $invoiceAdmin->creditInvoice($invoiceNo, $orderId);
+        return ['NewInvoiceNo' => $uniq];
     }
 
-
-    /**
-     * Adjust invoice in collector bank portal
-     *
-     * @param string $invoiceNo
-     * @param \Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRows[] $invoiceRows
-     * @param string $orderId
-     * @return array
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function adjustInvoice(
-        string $invoiceNo,
-        $invoiceRows,
-        string $orderId
-    ):array {
-        $config = $this->getConfig($orderId);
-
-        $adapter = new SoapAdapter($config);
-        $invoiceAdmin = new InvoiceAdministration($adapter);
-
-        $this->logger->addInfo(
-            "Invoice adjusted online orderId: {$orderId} invoiceNo: {$invoiceNo} "
-        );
-
-        return $invoiceAdmin->adjustInvoice($invoiceNo, $invoiceRows, $orderId);
-    }
-
-
-    /**
-     * Get invoice information from collector bank portal
-     *
-     * @param int    $invoiceNo
-     * @param int    $orderId
-     * @param string $clientIp
-     * @return array
-     * @throws \Magento\Framework\Exception\InputException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
-    public function getInvoiceInformation(int $invoiceNo, int $orderId, string $clientIp):array
-    {
-        $config = $this->getConfig($orderId);
-
-        $adapter = new SoapAdapter($config);
-        $invoiceAdmin = new InvoiceAdministration($adapter);
-
-        return $invoiceAdmin->getInvoiceInformation($invoiceNo, $clientIp, $orderId);
-    }
 
     /**
      * Invoice an order offline

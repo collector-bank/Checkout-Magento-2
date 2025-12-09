@@ -112,7 +112,11 @@ class CollectorBankCommand implements CommandInterface
         $order      = $payment->getOrder();
         $invoice    = $order->getInvoiceCollection()->getLastItem();
 
-        $articleList = $this->rowMatcher->invoiceToArticleList($invoice, $order);
+        if ($this->isFullActivation($invoice, $order)) {
+            $articleList = $this->rowMatcher->fullInvoiceToArticleList($order);
+        } else {
+            $articleList = $this->rowMatcher->invoiceToArticleList($invoice, $order);
+        }
 
         try {
             $invoiceNo  = $this->getPurchaseIdentifier($order);
@@ -152,6 +156,45 @@ class CollectorBankCommand implements CommandInterface
         }
 
         return true;
+    }
+
+    /**
+     *
+     * @param \Magento\Sales\Model\Order\Invoice $invoice
+     * @param \Magento\Sales\Model\Order $order
+     * @return bool
+     */
+    protected function isFullActivation($invoice, $order): bool
+    {
+        $invoiceCollection = $order->getInvoiceCollection();
+        if ($invoiceCollection->getSize() > 1) {
+            return false;
+        }
+
+        $invoiceTotal = (float) $invoice->getGrandTotal();
+        $orderTotal = (float) $order->getGrandTotal();
+
+        return abs($invoiceTotal - $orderTotal) < 0.01;
+    }
+
+    /**
+     * Check if this is a full credit (refund of the entire order)
+     *
+     * @param \Magento\Sales\Model\Order\Creditmemo $creditMemo
+     * @param \Magento\Sales\Model\Order $order
+     * @return bool
+     */
+    protected function isFullCredit($creditMemo, $order): bool
+    {
+        $creditMemoCollection = $order->getCreditmemosCollection();
+        if ($creditMemoCollection->getSize() > 1) {
+            return false;
+        }
+
+        $creditMemoTotal = (float) $creditMemo->getGrandTotal();
+        $orderTotal = (float) $order->getGrandTotal();
+
+        return abs($creditMemoTotal - $orderTotal) < 0.01;
     }
 
     /**
@@ -243,11 +286,12 @@ class CollectorBankCommand implements CommandInterface
         $order      = $payment->getOrder();
         $creditMemo = $payment->getCreditmemo();
 
-        $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $order);
-        $adjustmentsInvoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
-        if (count($adjustmentsInvoiceRows) > 0 && $this->articleListHasOnlyRoundingMultiple($articleList)) {
-            $articleList = new ArticleList();
+        if ($this->isFullCredit($creditMemo, $order)) {
+            $articleList = $this->rowMatcher->fullCreditMemoToArticleList($order);
+        } else {
+            $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $order);
         }
+        $adjustmentsInvoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
 
         /** @var InvoiceRow $adjustmentInvoiceRow */
         foreach ($adjustmentsInvoiceRows as $adjustmentInvoiceRow) {

@@ -7,12 +7,11 @@ class StoreConfig extends \Webbhuset\CollectorCheckout\Config\Config
 {
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\Encryption\EncryptorInterface $encryptor,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Webbhuset\CollectorCheckout\Config\Source\Country\Country $countryData,
         \Webbhuset\CollectorCheckout\Oath\AccessKeyManager $accessKeyManager
     ) {
-        parent::__construct($scopeConfig, $encryptor, $storeManager, $countryData, $accessKeyManager);
+        parent::__construct($scopeConfig, $storeManager, $countryData, $accessKeyManager);
     }
 
     public function setScopeStoreId($storeId)
