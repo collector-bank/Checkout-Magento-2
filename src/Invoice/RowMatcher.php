@@ -189,4 +189,28 @@ class RowMatcher
     ): InvoiceRows {
         return new InvoiceRows();
     }
+
+    /**
+     * Convert adjustment fee to invoice rows
+     *
+     * @param $adjustmentFee
+     * @return InvoiceRow
+     */
+    public function adjustmentToInvoiceRows(
+        $adjustmentFee,
+        $taxPercent = 0
+    ): \Webbhuset\CollectorPaymentSDK\Invoice\Rows\InvoiceRow {
+        if ($adjustmentFee > 0) {
+            $articleId = __('Discount');
+            $description = __('Discount');
+            $type = 'discount';
+        } else {
+            $articleId  = __('Fee');
+            $description = __('Fee');
+            $type = 'fee';
+        }
+        $qty = 1;
+
+        return new InvoiceRow($articleId, $description, $qty, $adjustmentFee, (float) $taxPercent, $type);
+    }
 }
