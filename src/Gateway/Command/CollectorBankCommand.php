@@ -286,12 +286,12 @@ class CollectorBankCommand implements CommandInterface
         $order      = $payment->getOrder();
         $creditMemo = $payment->getCreditmemo();
 
-        if ($this->isFullCredit($creditMemo, $order)) {
+        $adjustmentsInvoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
+        if (empty($adjustmentsInvoiceRows) && $this->isFullCredit($creditMemo, $order)) {
             $articleList = $this->rowMatcher->fullCreditMemoToArticleList($order);
         } else {
             $articleList = $this->rowMatcher->creditMemoToArticleList($creditMemo, $order);
         }
-        $adjustmentsInvoiceRows = $this->getAdjustmentsInvoiceRows($creditMemo);
 
         /** @var InvoiceRow $adjustmentInvoiceRow */
         foreach ($adjustmentsInvoiceRows as $adjustmentInvoiceRow) {
