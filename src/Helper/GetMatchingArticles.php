@@ -38,7 +38,9 @@ class GetMatchingArticles
             $isBundleChild = $this->isBundleChild($item);
 
             if ($item->getQty() > 0) {
-                if ($productType === \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE) {
+                if ($productType === \Magento\Catalog\Model\Product\Type::TYPE_BUNDLE
+                    && $this->isShouldActivateBundleItem($item)
+                ) {
                     $skuSuffix = $this->skuSuffix->execute($baseSku);
                     $skuWithSuffix = $baseSku . $skuSuffix;
 
@@ -109,5 +111,17 @@ class GetMatchingArticles
             return false;
         }
         return $parentItem->getProductType() === \Magento\Bundle\Model\Product\Type::TYPE_CODE;
+    }
+
+    /**
+     * Prevents activating already activated bundle item
+     *
+     * @param \Magento\Sales\Model\Order\Invoice\Item $item
+     * @return bool
+     */
+    private function isShouldActivateBundleItem(\Magento\Sales\Model\Order\Invoice\Item $item): bool
+    {
+        $orderItem = $item->getOrderItem();
+        return $orderItem->getBaseRowInvoiced() < $orderItem->getBaseRowTotalInclTax();
     }
 }
