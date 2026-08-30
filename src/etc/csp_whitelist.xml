@@ -12,17 +12,29 @@
             <values>
                 <value id="uat_collector" type="host">checkout-uat.collector.se</value>
                 <value id="uat_walley" type="host">checkout.uat.walleydev.com</value>
+                <value id="prod_collector" type="host">checkout.collector.se</value>
+                <value id="prod_walley" type="host">checkout.walley.se</value>
             </values>
         </policy>
         <policy id="frame-src">
             <values>
                 <value id="uat_collector" type="host">checkout-uat.collector.se</value>
                 <value id="uat_walley" type="host">checkout.uat.walleydev.com</value>
+                <value id="prod_collector" type="host">checkout.collector.se</value>
+                <value id="prod_walley" type="host">checkout.walley.se</value>
             </values>
         </policy>
         <policy id="connect-src">
             <values>
                 <value id="uat_walley" type="host">api.checkout.uat.walleydev.com</value>
+                <value id="api_walleypay" type="host">api.walleypay.com</value>
+                <value id="api_checkout_walleypay" type="host">api.checkout.walleypay.com</value>
+                <value id="api_checkout_walley" type="host">api.checkout.walley.se</value>
+                <value id="api_checkout_collector" type="host">api.checkout.collector.se</value>
+                <value id="checkout_collector" type="host">checkout.collector.se</value>
+                <value id="checkout_walley" type="host">checkout.walley.se</value>
+                <value id="checkout_uat_collector" type="host">checkout-uat.collector.se</value>
+                <value id="checkout_uat_walley" type="host">checkout.uat.walleydev.com</value>
             </values>
         </policy>
     </policies>
