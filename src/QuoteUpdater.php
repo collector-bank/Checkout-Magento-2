@@ -67,10 +67,16 @@ class QuoteUpdater
         }
 
         if ($customer instanceof SDK\BusinessCustomer) {
-            $billingAddress = $this->setBusinessAddressData($billingAddress, $customer, $collectorInvoiceAddress)
-                ->setCountryId($checkoutData->getCountryCode());
-            $shippingAddress = $this->setBusinessAddressData($shippingAddress, $customer, $collectorDeliveryAddress)
-                ->setCountryId($checkoutData->getCountryCode());
+            // Contact person is not known until the buyer has completed it in the iframe,
+            // writing an address without name and phone makes the quote save fail validation
+            if ($this->hasBusinessContactData($customer, $collectorInvoiceAddress)) {
+                $billingAddress = $this->setBusinessAddressData($billingAddress, $customer, $collectorInvoiceAddress)
+                    ->setCountryId($checkoutData->getCountryCode());
+            }
+            if ($this->hasBusinessContactData($customer, $collectorDeliveryAddress)) {
+                $shippingAddress = $this->setBusinessAddressData($shippingAddress, $customer, $collectorDeliveryAddress)
+                    ->setCountryId($checkoutData->getCountryCode());
+            }
 
             $this->quoteHandler->setOrgNumber($quote, $customer->getOrganizationNumber())
                 ->setReference($quote, $customer->getInvoiceReference())
@@ -288,8 +294,8 @@ class QuoteUpdater
     ) {
         $address->setEmail($customer->getEmail())
             ->setTelephone($customer->getMobilePhoneNumber())
-            ->setFirstname($customer->getFirstName())
-            ->setLastname($customer->getLastName())
+            ->setFirstname($this->getBusinessFirstName($customer, $collectorAddress))
+            ->setLastname($this->getBusinessLastName($customer, $collectorAddress))
             ->setCompany($collectorAddress->getCompanyName())
             ->setStreet(trim(
                 implode("\n", [
@@ -300,5 +306,49 @@ class QuoteUpdater
             ->setCity($collectorAddress->getCity());
 
         return $address;
+    }
+
+    /**
+     * Returns true if name and phone of the business contact person are available
+     *
+     * @param SDK\BusinessCustomer $customer
+     * @param SDK\BusinessAddress $collectorAddress
+     * @return bool
+     */
+    public function hasBusinessContactData(
+        SDK\BusinessCustomer $customer,
+        SDK\BusinessAddress $collectorAddress
+    ): bool {
+        return '' !== $this->getBusinessFirstName($customer, $collectorAddress)
+            && '' !== $this->getBusinessLastName($customer, $collectorAddress)
+            && '' !== trim($customer->getMobilePhoneNumber());
+    }
+
+    /**
+     * Contact first name, falls back to the name on the address
+     *
+     * @param SDK\BusinessCustomer $customer
+     * @param SDK\BusinessAddress $collectorAddress
+     * @return string
+     */
+    private function getBusinessFirstName(
+        SDK\BusinessCustomer $customer,
+        SDK\BusinessAddress $collectorAddress
+    ): string {
+        return trim($customer->getFirstName()) ?: trim($collectorAddress->getFirstName());
+    }
+
+    /**
+     * Contact last name, falls back to the name on the address
+     *
+     * @param SDK\BusinessCustomer $customer
+     * @param SDK\BusinessAddress $collectorAddress
+     * @return string
+     */
+    private function getBusinessLastName(
+        SDK\BusinessCustomer $customer,
+        SDK\BusinessAddress $collectorAddress
+    ): string {
+        return trim($customer->getLastName()) ?: trim($collectorAddress->getLastName());
     }
 }
