@@ -241,6 +241,8 @@ class Adapter
     public function initialize(\Magento\Quote\Model\Quote $quote) : \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Session
     {
         $config = $this->configFactory->create(['storeId' => (int)$quote->getStoreId()]);
+        $customerType = (int)$this->quoteDataHandler->getCustomerType($quote) ?: $config->getDefaultCustomerType();
+        $config->setCustomerType($customerType);
         $quote = $this->quoteUpdater->setDefaultShippingIfEmpty($quote);
 
         $cart = $this->quoteConverter->getCart($quote);
@@ -268,7 +270,6 @@ class Adapter
                 $initCustomer
             );
 
-            $customerType = $this->quoteDataHandler->getCustomerType($quote) ?? $config->getDefaultCustomerType();
             $storeId = $config->getStoreId();
 
             $this->quoteDataHandler->setPrivateId($quote, $collectorSession->getPrivateId())

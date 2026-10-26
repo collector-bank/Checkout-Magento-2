@@ -94,6 +94,13 @@ class Config extends GatewayConfig implements
     private $storeId = null;
 
     /**
+     * Customer type of the current checkout, falls back to configured default when not set
+     *
+     * @var ?int $customerType
+     */
+    private $customerType = null;
+
+    /**
      * @var \Webbhuset\CollectorCheckout\Oath\AccessKeyManager
      */
     private \Webbhuset\CollectorCheckout\Oath\AccessKeyManager $accessKeyManager;
@@ -167,7 +174,7 @@ class Config extends GatewayConfig implements
      */
     public function getStoreId() : string
     {
-        $customerType = $this->getDefaultCustomerType();
+        $customerType = $this->getCustomerType();
 
         if (\Webbhuset\CollectorCheckout\Config\Source\Customer\DefaultType::PRIVATE_CUSTOMERS == $customerType) {
             return $this->getB2CStoreId();
@@ -219,6 +226,27 @@ class Config extends GatewayConfig implements
     public function getDefaultCustomerType(): int
     {
         return (int)$this->getConfigurationSectionValue(self::CONFIG_FIELD_DEFAULT_CUSTOMER_TYPE);
+    }
+
+    /**
+     * Get customer type of the current checkout, or the default customer type if not set
+     *
+     * @return int
+     */
+    public function getCustomerType(): int
+    {
+        return $this->customerType ?: $this->getDefaultCustomerType();
+    }
+
+    /**
+     * Set customer type of the current checkout, used to pick B2C or B2B store id and profile name
+     *
+     * @param int|null $customerType
+     * @return void
+     */
+    public function setCustomerType(?int $customerType): void
+    {
+        $this->customerType = $customerType;
     }
 
     /**
@@ -471,7 +499,7 @@ class Config extends GatewayConfig implements
      */
     public function getProfileName(): string
     {
-        $customerType = $this->getDefaultCustomerType();
+        $customerType = $this->getCustomerType();
 
         if (\Webbhuset\CollectorCheckout\Config\Source\Customer\DefaultType::PRIVATE_CUSTOMERS == $customerType) {
             return $this->getB2CProfileName();
