@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Webbhuset\CollectorCheckout\Service\Sdk\Checkout;
 
 use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Errors\RequestError;
-use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Errors\ResponseError;
+use Magento\Framework\HTTP\Client\CurlFactory;
+use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Adapter\CurlWithAccessKey;
+use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Adapter\MockAdapter;
 use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Customer\PrivateCustomer;
 use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Customer\PrivateAddress;
 use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Customer\BusinessCustomer;
@@ -18,19 +20,25 @@ use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Config\ConfigInterface;
 class Test
 {
     private $useRealRequests;
+    private ?ConfigInterface $config;
+    private CurlFactory $curlFactory;
+    private SessionFactory $sessionFactory;
 
     public function __construct(
+        CurlFactory $curlFactory,
+        SessionFactory $sessionFactory,
         bool $useRealRequests = false,
         ?ConfigInterface $config = null
     ) {
+        $this->curlFactory = $curlFactory;
+        $this->sessionFactory = $sessionFactory;
         $this->useRealRequests = $useRealRequests;
         $this->config = $config;
     }
     public function getMockConfig() : Config
     {
         $config = new Config;
-        $config->setUsername('my-username')
-            ->setSharedAccessKey('my-shared-access-key')
+        $config->setAccessKey('my-access-key')
             ->setCountryCode('SE')
             ->setStoreId('1')
             ->setRedirectPageUri('https://example.com')
@@ -45,10 +53,10 @@ class Test
     {
         $config = $this->getConfig();
         if ($this->useRealRequests) {
-            return new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Adapter\CurlAdapter($config);
+            return new CurlWithAccessKey($config, $this->curlFactory);
         }
 
-        return new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Adapter\MockAdapter($config);
+        return new MockAdapter($config, $this->curlFactory);
     }
 
     public function getConfig()
@@ -66,7 +74,7 @@ class Test
             'items' => []
         ];
 
-        $request = json_encode($requestData, true);
+        $request = json_encode($requestData);
 
         $responseData = [
             'id' => 'f5f4e86d-95b1-4c1a-8ad0-1d5907236bd7',
@@ -81,14 +89,12 @@ class Test
             ]
         ];
 
-        $response = json_encode($responseData, true);
-
-        throw new RequestError($request, $response);
+        throw new RequestError($request, $responseData['error']['code'], $responseData['error']['message']);
     }
 
     public function initialize() : Session
     {
-        $shippingFee = new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Fees\Fee(1, "Shipping fee", 10, 25);
+        $shippingFee = new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Fees\Fee('1', "Shipping fee", 10, 25);
         $fees = new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Fees($shippingFee, null);
         $item = new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Cart\Item(
             'my-sku',
@@ -113,7 +119,7 @@ class Test
         $reference = 'ref-000001';
 
         $adapter = $this->getAdapter();
-        $session = new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Session($adapter);
+        $session = $this->sessionFactory->create(['adapter' => $adapter]);
         $session->initialize(
             $this->getConfig(),
             $fees,
@@ -150,14 +156,14 @@ class Test
     public function updateFees(Session $session) : Session
     {
         $shippingFee = new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Fees\Fee(
-            1,
+            '1',
             "Shipping fee",
             20,
             25
         );
 
         $directInvoiceFee = new \Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Checkout\Fees\Fee(
-            2,
+            '2',
             "Direct invoice fee",
             100,
             25
@@ -210,7 +216,7 @@ class Test
 
         $session->load($privateId);
 
-        return $session->getCheckoutData;
+        return $session->getCheckoutData();
     }
 
     public function initUpdateLoad()
