@@ -52,7 +52,7 @@ class Index extends \Magento\Framework\App\Action\Action
         $this->quoteInitializer = $quoteInitializer;
         $this->storage = $storage;
 
-        return parent::__construct($context);
+        parent::__construct($context);
     }
 
     /**

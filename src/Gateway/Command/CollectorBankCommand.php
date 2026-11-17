@@ -118,6 +118,7 @@ class CollectorBankCommand implements CommandInterface
             $articleList = $this->rowMatcher->invoiceToArticleList($invoice, $order);
         }
 
+        $invoiceNo = null;
         try {
             $invoiceNo  = $this->getPurchaseIdentifier($order);
             $orderId = $order->getId();
@@ -304,6 +305,7 @@ class CollectorBankCommand implements CommandInterface
             return true;
         }
 
+        $invoiceNo = null;
         try {
             $invoiceNo = $creditMemo->getInvoice()->getTransactionId();
             $orderId = (int)$payment->getOrder()->getId();
@@ -390,6 +392,7 @@ class CollectorBankCommand implements CommandInterface
         $payment = $this->extractPayment($payment);
 
         $response = [];
+        $invoiceNo = null;
         try {
             $invoiceNo = $this->getPurchaseIdentifier($payment->getOrder());
             $orderId = (int)$payment->getOrder()->getId();

@@ -3,6 +3,8 @@
 namespace Webbhuset\CollectorCheckout\Gateway;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
+use Magento\Framework\Exception\LocalizedException;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Config
@@ -52,6 +54,9 @@ class Config implements ConfigProviderInterface
      */
     protected $request;
 
+    /** @var LoggerInterface */
+    private $logger;
+
     /**
      * Config constructor.
      *
@@ -64,12 +69,14 @@ class Config implements ConfigProviderInterface
         \Webbhuset\CollectorCheckout\Config\Config $config,
         \Magento\Framework\View\Asset\Repository $assetRepo,
         \Magento\Framework\UrlInterface $urlBuilder,
-        \Magento\Framework\App\RequestInterface $request
+        \Magento\Framework\App\RequestInterface $request,
+        LoggerInterface $logger
     ) {
         $this->config = $config;
         $this->assetRepo = $assetRepo;
         $this->urlBuilder = $urlBuilder;
         $this->request = $request;
+        $this->logger = $logger;
     }
 
     /**

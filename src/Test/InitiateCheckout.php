@@ -8,7 +8,7 @@ use Webbhuset\CollectorCheckout\Adapter;
 use Webbhuset\CollectorCheckout\Config\Config;
 use Webbhuset\CollectorCheckout\Test\Data\GetCart;
 use Webbhuset\CollectorCheckout\Test\Data\GetFees;
-use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\Session;
+use Webbhuset\CollectorCheckout\Service\Sdk\Checkout\SessionFactory;
 
 class InitiateCheckout
 {
@@ -33,18 +33,23 @@ class InitiateCheckout
      */
     private $getFees;
 
+    /** @var SessionFactory */
+    private $sessionFactory;
+
     public function __construct(
         Emulation $emulation,
         Adapter $adapter,
         Config $config,
         GetCart $getCart,
-        GetFees $getFees
+        GetFees $getFees,
+        SessionFactory $sessionFactory
     ) {
         $this->emulation = $emulation;
         $this->config = $config;
         $this->adapter = $adapter;
         $this->getCart = $getCart;
         $this->getFees = $getFees;
+        $this->sessionFactory = $sessionFactory;
     }
 
     public function execute(int $storeId):string
@@ -53,7 +58,7 @@ class InitiateCheckout
 
         $config = $this->config;
         $adapter = $this->adapter->getAdapter($config);
-        $session = new Session($adapter);
+        $session = $this->sessionFactory->create(['adapter' => $adapter]);
         $result = $session->initialize(
             $config,
             $this->getFees->execute(),

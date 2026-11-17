@@ -6,7 +6,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote;
 use Webbhuset\CollectorCheckout\Adapter;
 use Webbhuset\CollectorCheckout\Checkout\Quote\Manager;
-use Webbhuset\CollectorCheckout\Logger\Logger;
 
 /**
  * Access synchronize SDK call with public token only
@@ -25,8 +24,7 @@ class SynchronizeByPublicToken
 
     public function __construct(
         Manager $quoteManager,
-        Adapter $collectorAdapter,
-        Logger $logger
+        Adapter $collectorAdapter
     ) {
         $this->quoteManager = $quoteManager;
         $this->collectorAdapter = $collectorAdapter;

@@ -12,8 +12,7 @@ class Cart
     private $totalAmount;
 
     public function __construct(
-        array $items,
-        ?int $totalAmount = null
+        array $items
     ) {
         // Type check items
         foreach ($items as $item) {

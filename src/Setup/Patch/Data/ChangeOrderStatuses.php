@@ -37,6 +37,8 @@ class ChangeOrderStatuses implements \Magento\Framework\Setup\Patch\DataPatchInt
         $models->save();
 
         $this->setup->endSetup();
+
+        return $this;
     }
 
     public static function getDependencies()
